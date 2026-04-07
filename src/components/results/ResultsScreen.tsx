@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Share2, Link, Check } from "lucide-react";
+import { Share2, Link, Check, Download } from "lucide-react";
 import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
+import { generateResultsPDF } from "@/lib/generatePDF";
 
 interface ResultsScreenProps {
   result: ScoringResult;
