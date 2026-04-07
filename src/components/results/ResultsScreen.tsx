@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Share2, Link, Check, Download } from "lucide-react";
 import { useState } from "react";
@@ -115,6 +116,10 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
 
 const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
