@@ -48,6 +48,13 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
     );
   };
 
+  const handleWhatsapp = () => {
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`,
+      "_blank"
+    );
+  };
+
   const handleNativeShare = async () => {
     if (navigator.share) {
       await navigator.share({ title: "Headroom Results", text: shareText, url: shareUrl });
