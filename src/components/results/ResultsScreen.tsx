@@ -23,6 +23,81 @@ const burnoutBgColors: Record<string, string> = {
   critical: "from-warm-red/20 to-warm-red/5",
 };
 
+const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
+  const [copied, setCopied] = useState(false);
+  const shareText = `I'm "${archetype.name}" — ${archetype.headline}. Take the Headroom assessment to discover your cognitive load pattern.`;
+  const shareUrl = window.location.origin;
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTwitter = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      "_blank"
+    );
+  };
+
+  const handleLinkedin = () => {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      "_blank"
+    );
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      await navigator.share({ title: "Headroom Results", text: shareText, url: shareUrl });
+    } else {
+      handleCopyLink();
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-3">
+      <motion.button
+        onClick={handleNativeShare}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
+        className="h-11 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+      >
+        <Share2 className="w-4 h-4" />
+        Share my results
+      </motion.button>
+      <motion.button
+        onClick={handleTwitter}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+        aria-label="Share on X"
+      >
+        <Twitter className="w-4 h-4" />
+      </motion.button>
+      <motion.button
+        onClick={handleLinkedin}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+        aria-label="Share on LinkedIn"
+      >
+        <Linkedin className="w-4 h-4" />
+      </motion.button>
+      <motion.button
+        onClick={handleCopyLink}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+        aria-label="Copy link"
+      >
+        {copied ? <Check className="w-4 h-4 text-primary" /> : <Link className="w-4 h-4" />}
+      </motion.button>
+    </div>
+  );
+};
+
 const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
 
