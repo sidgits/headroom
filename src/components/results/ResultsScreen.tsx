@@ -48,9 +48,9 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   };
 
   const socials = [
-    { icon: Twitter, label: "X", onClick: handleTwitter },
-    { icon: Linkedin, label: "LinkedIn", onClick: handleLinkedin },
-    { icon: MessageCircle, label: "WhatsApp", onClick: handleWhatsapp },
+    { icon: Twitter, label: "X", href: twitterUrl },
+    { icon: Linkedin, label: "LinkedIn", href: linkedinUrl },
+    { icon: MessageCircle, label: "WhatsApp", href: whatsappUrl },
   ];
 
   return (
