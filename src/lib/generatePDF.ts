@@ -35,6 +35,7 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   };
 
   // Subtle watermark — large faded text in center
+  // Subtle diagonal watermark
   doc.saveGraphicsState();
   const gState = new (doc as any).GState({ opacity: 0.04 });
   doc.setGState(gState);
@@ -42,15 +43,16 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   doc.setFontSize(72);
   doc.setTextColor(...golden);
   const wmText = "HEADROOM";
-  const wmWidth = doc.getTextWidth(wmText);
-  doc.text(wmText, (pageWidth - wmWidth) / 2, pageHeight / 2 + 10);
+  const centerX = pageWidth / 2;
+  const centerY = pageHeight / 2;
+  doc.text(wmText, centerX, centerY, { align: "center", angle: 45 });
   doc.restoreGraphicsState();
 
-  // Logo
+  // Logo (800x380 original, aspect 2.1:1)
   try {
     const logoDataUrl = await loadImageAsDataURL("/headroom-logo.png");
-    const logoWidth = 50;
-    const logoHeight = 14;
+    const logoWidth = 48;
+    const logoHeight = logoWidth / 2.1;
     doc.addImage(logoDataUrl, "PNG", margin, y, logoWidth, logoHeight);
     y += logoHeight + 6;
   } catch {
