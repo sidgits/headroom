@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Share2, Link, Check, Download } from "lucide-react";
+import { Link, Check, Download } from "lucide-react";
 import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
@@ -16,19 +16,17 @@ const burnoutColors: Record<string, string> = {
   low: "text-golden",
   moderate: "text-primary",
   high: "text-deep-orange",
-  critical: "text-warm-red",
 };
 
 const burnoutBgColors: Record<string, string> = {
   low: "from-golden/20 to-golden/5",
   moderate: "from-primary/20 to-primary/5",
   high: "from-deep-orange/20 to-deep-orange/5",
-  critical: "from-warm-red/20 to-warm-red/5",
 };
 
 const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
   const [copied, setCopied] = useState(false);
-  const shareText = `I'm "${archetype.name}". Take the Headroom assessment to discover your cognitive load pattern.`;
+  const shareText = "Know someone whose calendar is working against them? Send them this.";
   const shareUrl = window.location.origin;
 
   const handleCopyLink = async () => {
@@ -76,7 +74,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   return (
     <div className="space-y-5">
       <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider">
-        Share your results
+        Know someone whose calendar is working against them? Send them this.
       </p>
 
       <div className="flex items-center justify-center gap-4">
@@ -90,7 +88,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
             whileTap={{ scale: 0.95 }}
             className="flex flex-col items-center gap-1.5 group"
           >
-            <div className="w-12 h-12 rounded-2xl bg-secondary/80 border border-border/50 backdrop-blur-sm flex items-center justify-center text-muted-foreground group-hover:text-foreground group-hover:border-primary/40 group-hover:bg-primary/10 transition-all duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-secondary/80 border border-border/50 flex items-center justify-center text-muted-foreground group-hover:text-foreground group-hover:border-primary/40 group-hover:bg-primary/10 transition-all duration-200">
               <Icon />
             </div>
             <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">{label}</span>
@@ -103,7 +101,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
           whileTap={{ scale: 0.95 }}
           className="flex flex-col items-center gap-1.5 group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-secondary/80 border border-border/50 backdrop-blur-sm flex items-center justify-center text-muted-foreground group-hover:text-foreground group-hover:border-primary/40 group-hover:bg-primary/10 transition-all duration-200">
+          <div className="w-12 h-12 rounded-2xl bg-secondary/80 border border-border/50 flex items-center justify-center text-muted-foreground group-hover:text-foreground group-hover:border-primary/40 group-hover:bg-primary/10 transition-all duration-200">
             {copied ? <Check className="w-5 h-5 text-primary" /> : <Link className="w-5 h-5" />}
           </div>
           <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">
@@ -116,7 +114,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
 };
 
 const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
-  const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
+  const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
 
   const logged = useRef(false);
 
@@ -144,7 +142,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
       </div>
 
       <div className="relative max-w-lg mx-auto px-6 py-12 space-y-8">
-        {/* Archetype Header */}
+        {/* LAYER 1 — THE REVEAL */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 24 }}
@@ -160,64 +158,61 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
             {archetype.emoji}
           </motion.div>
           <p className="text-sm uppercase tracking-widest text-muted-foreground mb-2">
-            Your pattern
+            Your Headroom Profile
           </p>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
             {archetype.name}
           </h1>
-          <p className="text-xl text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red font-semibold">
+          <p className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red font-semibold italic leading-relaxed max-w-sm mx-auto">
             {archetype.headline}
-          </p>
-          <p className="text-xs text-muted-foreground mt-3 leading-relaxed max-w-sm mx-auto">
-            Rooted in Sweller's Cognitive Load Theory — the gold standard in understanding how the brain processes work.
           </p>
         </motion.div>
 
-        {/* Archetype Description */}
+        {/* LAYER 2 — THE MIRROR */}
         <motion.div
-          className="backdrop-blur-sm bg-card/50 border border-border/50 rounded-2xl p-6"
+          className="space-y-6"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <p className="text-muted-foreground leading-relaxed">{archetype.description}</p>
-        </motion.div>
-
-        {/* Burnout Risk */}
-        <motion.div
-          className={`rounded-2xl p-6 bg-gradient-to-br ${burnoutBgColors[burnoutRisk.level]} border border-border/30`}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className={`text-sm font-bold uppercase tracking-wider ${burnoutColors[burnoutRisk.level]}`}>
-              {burnoutRisk.label}
-            </div>
-            <div className="flex-1 h-px bg-border/50" />
-            <span className="text-sm text-muted-foreground">Burnout Risk</span>
+          <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
+              At your best
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">{mirror.atYourBest}</p>
           </div>
-          <p className="text-foreground/80 text-sm leading-relaxed">
-            {burnoutRisk.description}
-          </p>
+
+          <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-accent">
+              What's working against you
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">{mirror.workingAgainstYou}</p>
+          </div>
+
+          <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-warm-red">
+              The pattern you probably haven't noticed
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">{mirror.patternNotNoticed}</p>
+          </div>
         </motion.div>
 
-        {/* Dimension Breakdown */}
+        {/* LAYER 3 — DIMENSION BARS */}
         <motion.div
-          className="backdrop-blur-sm bg-card/50 border border-border/50 rounded-2xl p-6 space-y-5"
+          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-5"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
           <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-            Your Dimensions
+            Your Headroom Dimensions
           </h3>
           {dimensionScores.map((dim, i) => {
             const pct = (dim.score / dim.maxScore) * 100;
             return (
-              <div key={dim.name}>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-foreground">{dim.name}</span>
+              <div key={dim.name} className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium text-foreground">{dim.name} ({dim.code})</span>
                   <span className="text-muted-foreground">
                     {dim.score}/{dim.maxScore}
                   </span>
@@ -230,17 +225,30 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
                     transition={{ delay: 0.7 + i * 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">{dim.plainLanguage}</p>
+                <p className="text-sm text-foreground/80">{dim.interpretation}</p>
               </div>
             );
           })}
-          <p className="text-xs text-muted-foreground pt-1">
-            Higher scores indicate greater cognitive load in that area.
-          </p>
         </motion.div>
 
-        {/* Recommendations */}
+        {/* LAYER 4 — SHADOW ARCHETYPE */}
         <motion.div
-          className="backdrop-blur-sm bg-card/50 border border-border/50 rounded-2xl p-6 space-y-4"
+          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, duration: 0.5 }}
+        >
+          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+            Under pressure you shift toward
+          </h3>
+          <p className="text-lg font-semibold text-foreground">{shadowArchetype.name}</p>
+          <p className="text-muted-foreground leading-relaxed text-[15px]">{shadowArchetype.description}</p>
+        </motion.div>
+
+        {/* LAYER 5 — THE ONE UNLOCK */}
+        <motion.div
+          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.5 }}
@@ -248,28 +256,42 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
           <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
             What to do next
           </h3>
-          {recommendations.map((rec, i) => (
-            <motion.div
-              key={i}
-              className="flex gap-3 items-start"
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 + i * 0.1, duration: 0.4 }}
-            >
-              <span className="mt-0.5 w-6 h-6 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0 text-xs font-bold text-primary">
-                {i + 1}
-              </span>
-              <p className="text-foreground/80 text-sm leading-relaxed">{rec}</p>
-            </motion.div>
-          ))}
+          <p className="text-foreground/90 leading-relaxed text-[15px]">{recommendations[0]}</p>
         </motion.div>
 
-        {/* Download & Share & Retake */}
+        {/* LAYER 6 — BURNOUT RISK SIGNAL */}
+        <motion.div
+          className={`rounded-2xl p-6 bg-gradient-to-br ${burnoutBgColors[burnoutRisk.level]} border border-border/30 space-y-3`}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65, duration: 0.5 }}
+        >
+          <div className="flex items-center gap-3 mb-1">
+            <div className={`text-sm font-bold uppercase tracking-wider ${burnoutColors[burnoutRisk.level]}`}>
+              Burnout Risk: {burnoutRisk.label}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            Signal: {burnoutRisk.signal}
+          </p>
+          <p className="text-foreground/80 text-sm leading-relaxed">
+            {burnoutRisk.description}
+          </p>
+          <div className="pt-2 border-t border-border/30">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Early intervention</p>
+            <p className="text-foreground/80 text-sm leading-relaxed">{burnoutRisk.earlyIntervention}</p>
+          </div>
+          <p className="text-xs text-muted-foreground pt-1">
+            Derived from your E / I / G score signature. Not a diagnosis — an early pattern signal.
+          </p>
+        </motion.div>
+
+        {/* LAYER 7 — SHARE + RETURN */}
         <motion.div
           className="space-y-6 pt-4 pb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
+          transition={{ delay: 1.0, duration: 0.5 }}
         >
           <motion.button
             onClick={() => generateResultsPDF(result, role)}
@@ -278,7 +300,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
             className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 transition-all"
           >
             <Download className="w-5 h-5" />
-            Download Results
+            Download my profile
           </motion.button>
 
           <ShareButtons archetype={archetype} />
