@@ -166,6 +166,9 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
           <p className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red font-semibold italic leading-relaxed max-w-sm mx-auto">
             {archetype.headline}
           </p>
+          <p className="text-xs text-muted-foreground mt-3 max-w-xs mx-auto leading-relaxed">
+            Rooted in Sweller's Cognitive Load Theory — the gold standard in understanding how the brain processes work.
+          </p>
         </motion.div>
 
         {/* LAYER 2 — THE MIRROR */}
