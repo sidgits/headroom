@@ -84,13 +84,23 @@ const Admin = () => {
     if (!authed) return;
 
     const fetchCompletions = async () => {
-      const { data, error } = await supabase
-        .from("assessment_completions")
-        .select("*")
-        .order("created_at", { ascending: false });
+      try {
+        const { data, error } = await supabase.functions.invoke("admin-completions", {
+          body: { password: "__session__" },
+        });
 
-      if (!error && data) {
-        setCompletions(data as AssessmentCompletion[]);
+        // Use stored password from session for re-auth
+        const storedPw = sessionStorage.getItem("headroom_admin_pw");
+        if (storedPw) {
+          const { data: d2, error: e2 } = await supabase.functions.invoke("admin-completions", {
+            body: { password: storedPw },
+          });
+          if (!e2 && d2?.completions) {
+            setCompletions(d2.completions as AssessmentCompletion[]);
+          }
+        }
+      } catch {
+        // Failed to fetch
       }
       setLoading(false);
     };
