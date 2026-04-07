@@ -140,9 +140,15 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
     const pct = (dim.score / dim.maxScore) * 100;
 
     doc.setFont("helvetica", "bold");
+    const cogLoadLabel = dim.code === "E" ? "Extraneous Cognitive Load" : dim.code === "I" ? "Intrinsic Cognitive Load" : "Germane Cognitive Load";
     doc.setFontSize(10);
     doc.setTextColor(...dark);
+    doc.setFont("helvetica", "bold");
     doc.text(`${dim.name} (${dim.code})`, margin, y);
+    const labelWidth = doc.getTextWidth(`${dim.name} (${dim.code}) `);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(...muted);
+    doc.text(`— ${cogLoadLabel}`, margin + labelWidth, y);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...muted);
     doc.text(`${dim.score}/${dim.maxScore}`, pageWidth - margin, y, { align: "right" });

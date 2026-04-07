@@ -215,7 +215,9 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
             return (
               <div key={dim.name} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="font-medium text-foreground">{dim.name} ({dim.code})</span>
+                  <span className="font-medium text-foreground">
+                    {dim.name} ({dim.code}) — <span className="italic font-normal text-muted-foreground">{dim.code === "E" ? "Extraneous Cognitive Load" : dim.code === "I" ? "Intrinsic Cognitive Load" : "Germane Cognitive Load"}</span>
+                  </span>
                   <span className="text-muted-foreground">
                     {dim.score}/{dim.maxScore}
                   </span>
