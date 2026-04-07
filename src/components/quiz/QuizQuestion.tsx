@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import QuizProgressBar from "./QuizProgressBar";
 import type { QuizQuestionData } from "@/data/quizQuestions";
 
@@ -9,6 +10,15 @@ interface QuizQuestionProps {
   onAnswer: (answerId: string) => void;
 }
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.15 + i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
 const QuizQuestion = ({ question, current, total, onAnswer }: QuizQuestionProps) => {
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -18,37 +28,60 @@ const QuizQuestion = ({ question, current, total, onAnswer }: QuizQuestionProps)
     setTimeout(() => {
       onAnswer(answerId);
       setSelected(null);
-    }, 300);
+    }, 350);
   };
 
   return (
-    <div className="min-h-screen flex flex-col px-6 pt-12 pb-8 bg-background">
-      <QuizProgressBar current={current} total={total} />
+    <div className="min-h-screen flex flex-col px-6 pt-12 pb-8 bg-background relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[50%] translate-x-[-50%] w-[100%] h-[40%] rounded-full bg-gradient-to-b from-primary/8 via-accent/5 to-transparent blur-3xl" />
+      </div>
 
-      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
-        <p className="text-sm text-muted-foreground mb-2">
+      <div className="relative">
+        <QuizProgressBar current={current} total={total} />
+      </div>
+
+      <div className="relative flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <motion.p
+          className="text-sm text-muted-foreground mb-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
           Question {current} of {total}
-        </p>
-        <h2 className="text-[22px] md:text-2xl font-bold text-foreground leading-snug mb-8">
+        </motion.p>
+        <motion.h2
+          className="text-[22px] md:text-2xl font-bold text-foreground leading-snug mb-8"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
           {question.question}
-        </h2>
+        </motion.h2>
 
         <div className="space-y-3">
-          {question.answers.map((answer) => {
+          {question.answers.map((answer, i) => {
             const isSelected = selected === answer.id;
             return (
-              <button
+              <motion.button
                 key={answer.id}
                 onClick={() => handleSelect(answer.id)}
                 disabled={!!selected}
-                className={`w-full min-h-[56px] px-5 py-4 rounded-lg border text-left transition-all duration-300 active:scale-[0.98] ${
+                custom={i}
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                whileHover={!selected ? { scale: 1.02, y: -1 } : {}}
+                whileTap={!selected ? { scale: 0.98 } : {}}
+                className={`w-full min-h-[56px] px-5 py-4 rounded-xl border text-left transition-all duration-300 shadow-sm ${
                   isSelected
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-foreground hover:border-primary hover:bg-secondary"
-                } ${selected && !isSelected ? "opacity-50" : ""}`}
+                    ? "border-primary bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg shadow-primary/25"
+                    : "border-border/60 bg-card/60 backdrop-blur-sm text-foreground hover:border-primary/60 hover:bg-secondary/80 hover:shadow-md hover:shadow-primary/10"
+                } ${selected && !isSelected ? "opacity-40 scale-[0.98]" : ""}`}
               >
                 <span className="font-medium">{answer.text}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
