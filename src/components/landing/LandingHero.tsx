@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 interface LandingHeroProps {
   onStart: () => void;
 }
@@ -17,54 +19,111 @@ const vignettes = [
   },
 ];
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
 const LandingHero = ({ onStart }: LandingHeroProps) => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
+      {/* Warm radial gradient background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[50%] translate-x-[-50%] w-[140%] h-[70%] rounded-full bg-gradient-to-b from-primary/15 via-accent/10 to-transparent blur-3xl" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] rounded-full bg-gradient-to-tl from-warm-red/10 via-deep-orange/8 to-transparent blur-3xl" />
+        <div className="absolute top-[30%] left-[-5%] w-[30%] h-[40%] rounded-full bg-golden/8 blur-3xl" />
+      </div>
+
+      {/* Subtle grain texture overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E")' }} />
+
       {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-12 text-center">
-        <img
+      <section className="relative flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-12 text-center">
+        <motion.img
           src="/headroom-logo.png"
           alt="Headroom"
           className="w-48 md:w-64 mb-10"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         />
-        <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-tight max-w-2xl">
+        <motion.h1
+          className="text-3xl md:text-5xl font-bold text-foreground leading-tight max-w-2xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
           Your brain has a capacity.{" "}
-          <span className="text-primary">Nobody told you what's filling it.</span>
-        </h1>
-        <p className="mt-5 text-lg md:text-xl text-muted-foreground max-w-lg">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red">
+            Nobody told you what's filling it.
+          </span>
+        </motion.h1>
+        <motion.p
+          className="mt-5 text-xl md:text-2xl text-muted-foreground max-w-lg font-medium"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
           A 2-minute assessment that reveals your cognitive load pattern — and what to do about it.
-        </p>
-        <button
+        </motion.p>
+        <motion.button
           onClick={onStart}
-          className="mt-8 w-full max-w-xs h-14 rounded-lg bg-primary text-primary-foreground font-semibold text-lg transition-all hover:opacity-90 active:scale-[0.98]"
+          className="mt-8 w-full max-w-xs h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.97 }}
         >
           Discover your pattern
-        </button>
+        </motion.button>
       </section>
 
       {/* Vignettes */}
-      <section className="px-6 pb-12 max-w-lg mx-auto space-y-6">
-        {vignettes.map((v) => (
-          <p key={v.name} className="text-base text-muted-foreground italic leading-relaxed">
+      <section className="relative px-6 pb-12 max-w-lg mx-auto space-y-6">
+        {vignettes.map((v, i) => (
+          <motion.p
+            key={v.name}
+            className="text-base text-muted-foreground italic leading-relaxed backdrop-blur-sm bg-card/40 rounded-xl px-5 py-4 border border-border/50"
+            custom={i}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            variants={fadeUp}
+          >
             <span className="font-semibold text-foreground not-italic">{v.name}</span>{" "}
             {v.text}
-          </p>
+          </motion.p>
         ))}
       </section>
 
       {/* Second CTA */}
-      <section className="px-6 pb-16 text-center max-w-lg mx-auto">
+      <motion.section
+        className="relative px-6 pb-16 text-center max-w-lg mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
         <p className="text-xl font-semibold text-foreground mb-6">
           Different jobs. Different titles.{" "}
-          <span className="text-primary">Same problem.</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-warm-red">
+            Same problem.
+          </span>
         </p>
-        <button
+        <motion.button
           onClick={onStart}
-          className="w-full max-w-xs h-14 rounded-lg bg-primary text-primary-foreground font-semibold text-lg transition-all hover:opacity-90 active:scale-[0.98]"
+          className="w-full max-w-xs h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.97 }}
         >
           Take the assessment
-        </button>
-      </section>
+        </motion.button>
+      </motion.section>
     </div>
   );
 };
