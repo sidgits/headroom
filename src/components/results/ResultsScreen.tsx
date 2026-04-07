@@ -93,6 +93,14 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
         <Linkedin className="w-4 h-4" />
       </motion.button>
       <motion.button
+        onClick={handleWhatsapp}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+        aria-label="Share on WhatsApp"
+      >
+        <MessageCircle className="w-4 h-4" />
+      <motion.button
         onClick={handleCopyLink}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
