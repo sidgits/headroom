@@ -22,7 +22,7 @@ interface AssessmentCompletion {
   created_at: string;
 }
 
-const AdminLogin = ({ onAuth }: { onAuth: () => void }) => {
+const AdminLogin = ({ onAuth }: { onAuth: (pw: string) => void }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,8 @@ const AdminLogin = ({ onAuth }: { onAuth: () => void }) => {
         setError("Incorrect password");
       } else {
         sessionStorage.setItem("headroom_admin", "1");
-        onAuth();
+        sessionStorage.setItem("headroom_admin_pw", password);
+        onAuth(password);
       }
     } catch {
       setError("Something went wrong");
@@ -77,27 +78,20 @@ const AdminLogin = ({ onAuth }: { onAuth: () => void }) => {
 
 const Admin = () => {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("headroom_admin") === "1");
+  const [adminPw, setAdminPw] = useState(() => sessionStorage.getItem("headroom_admin_pw") || "");
   const [completions, setCompletions] = useState<AssessmentCompletion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authed) return;
+    if (!authed || !adminPw) return;
 
     const fetchCompletions = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("admin-completions", {
-          body: { password: "__session__" },
+          body: { password: adminPw },
         });
-
-        // Use stored password from session for re-auth
-        const storedPw = sessionStorage.getItem("headroom_admin_pw");
-        if (storedPw) {
-          const { data: d2, error: e2 } = await supabase.functions.invoke("admin-completions", {
-            body: { password: storedPw },
-          });
-          if (!e2 && d2?.completions) {
-            setCompletions(d2.completions as AssessmentCompletion[]);
-          }
+        if (!error && data?.completions) {
+          setCompletions(data.completions as AssessmentCompletion[]);
         }
       } catch {
         // Failed to fetch
@@ -106,7 +100,7 @@ const Admin = () => {
     };
 
     fetchCompletions();
-  }, [authed]);
+  }, [authed, adminPw]);
 
   if (!authed) {
     return <AdminLogin onAuth={() => setAuthed(true)} />;
