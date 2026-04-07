@@ -1,5 +1,16 @@
 import type { ScoringResult } from "./scoring";
 
+async function loadImageAsDataURL(url: string): Promise<string> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 export async function generateResultsPDF(result: ScoringResult, role: string): Promise<void> {
   const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
 
@@ -7,9 +18,10 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   const contentWidth = pageWidth - margin * 2;
-  let y = 25;
+  let y = 20;
 
   // Colors
   const golden: [number, number, number] = [196, 150, 28];
@@ -22,15 +34,43 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
     critical: [200, 60, 50],
   };
 
-  // Header
+  // Subtle watermark — large faded text in center
+  doc.saveGraphicsState();
+  const gState = new (doc as any).GState({ opacity: 0.04 });
+  doc.setGState(gState);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
+  doc.setFontSize(72);
+  doc.setTextColor(...golden);
+  const wmText = "HEADROOM";
+  const wmWidth = doc.getTextWidth(wmText);
+  doc.text(wmText, (pageWidth - wmWidth) / 2, pageHeight / 2 + 10);
+  doc.restoreGraphicsState();
+
+  // Logo
+  try {
+    const logoDataUrl = await loadImageAsDataURL("/headroom-logo.png");
+    const logoWidth = 50;
+    const logoHeight = 14;
+    doc.addImage(logoDataUrl, "PNG", margin, y, logoWidth, logoHeight);
+    y += logoHeight + 6;
+  } catch {
+    // Fallback text if logo fails
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...golden);
+    doc.text("headroom", margin, y + 5);
+    y += 12;
+  }
+
+  // Subtitle
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
   doc.setTextColor(...muted);
-  doc.text("HEADROOM ASSESSMENT RESULTS", margin, y);
+  doc.text("ASSESSMENT RESULTS", margin, y);
   y += 4;
   doc.setDrawColor(220, 210, 195);
   doc.line(margin, y, pageWidth - margin, y);
-  y += 16;
+  y += 14;
 
   // Archetype emoji + name
   doc.setFontSize(28);
