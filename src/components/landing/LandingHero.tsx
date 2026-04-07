@@ -63,7 +63,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           </span>
         </motion.h1>
         <motion.p
-          className="mt-5 text-2xl md:text-3xl text-muted-foreground max-w-lg font-medium"
+          className="mt-5 text-3xl md:text-4xl text-muted-foreground max-w-xl font-semibold"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
