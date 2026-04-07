@@ -63,53 +63,49 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
     }
   };
 
+  const socials = [
+    { icon: Twitter, label: "X", onClick: handleTwitter },
+    { icon: Linkedin, label: "LinkedIn", onClick: handleLinkedin },
+    { icon: MessageCircle, label: "WhatsApp", onClick: handleWhatsapp },
+  ];
+
   return (
-    <div className="flex items-center justify-center gap-3">
+    <div className="space-y-4">
       <motion.button
         onClick={handleNativeShare}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
-        className="h-11 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className="w-full h-12 rounded-2xl bg-gradient-to-r from-primary via-accent to-destructive text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2.5 shadow-lg shadow-primary/25 relative overflow-hidden group"
       >
-        <Share2 className="w-4 h-4" />
-        Share my results
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-white/10 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+        <Share2 className="w-4 h-4 relative z-10" />
+        <span className="relative z-10">Share my results</span>
       </motion.button>
-      <motion.button
-        onClick={handleTwitter}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-        aria-label="Share on X"
-      >
-        <Twitter className="w-4 h-4" />
-      </motion.button>
-      <motion.button
-        onClick={handleLinkedin}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-        aria-label="Share on LinkedIn"
-      >
-        <Linkedin className="w-4 h-4" />
-      </motion.button>
-      <motion.button
-        onClick={handleWhatsapp}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-        aria-label="Share on WhatsApp"
-      >
-        <MessageCircle className="w-4 h-4" />
-      </motion.button>
-      <motion.button
-        onClick={handleCopyLink}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-        aria-label="Copy link"
-      >
-        {copied ? <Check className="w-4 h-4 text-primary" /> : <Link className="w-4 h-4" />}
-      </motion.button>
+
+      <div className="flex items-center justify-center gap-2">
+        {socials.map(({ icon: Icon, label, onClick }) => (
+          <motion.button
+            key={label}
+            onClick={onClick}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-10 h-10 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary/15 transition-all duration-200"
+            aria-label={`Share on ${label}`}
+          >
+            <Icon className="w-4 h-4" />
+          </motion.button>
+        ))}
+        <div className="w-px h-5 bg-border/60 mx-1" />
+        <motion.button
+          onClick={handleCopyLink}
+          whileHover={{ scale: 1.1, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-10 h-10 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary/15 transition-all duration-200"
+          aria-label="Copy link"
+        >
+          {copied ? <Check className="w-4 h-4 text-primary" /> : <Link className="w-4 h-4" />}
+        </motion.button>
+      </div>
     </div>
   );
 };
