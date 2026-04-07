@@ -26,7 +26,7 @@ const burnoutBgColors: Record<string, string> = {
 
 const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
   const [copied, setCopied] = useState(false);
-  const shareText = "Know someone whose calendar is working against them? Send them this.";
+  const shareText = "Share Your Result";
   const shareUrl = window.location.origin;
 
   const handleCopyLink = async () => {
