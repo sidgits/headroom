@@ -67,17 +67,19 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
       </motion.button>
 
       <div className="flex items-center justify-center gap-2">
-        {socials.map(({ icon: Icon, label, onClick }) => (
-          <motion.button
+        {socials.map(({ icon: Icon, label, href }) => (
+          <motion.a
             key={label}
-            onClick={onClick}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
             className="w-10 h-10 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary/15 transition-all duration-200"
             aria-label={`Share on ${label}`}
           >
             <Icon className="w-4 h-4" />
-          </motion.button>
+          </motion.a>
         ))}
         <div className="w-px h-5 bg-border/60 mx-1" />
         <motion.button
