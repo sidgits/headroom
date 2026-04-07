@@ -77,7 +77,7 @@ const QuizQuestion = ({ question, current, total, onAnswer }: QuizQuestionProps)
                 className={`w-full min-h-[56px] px-5 py-4 rounded-xl border text-left transition-all duration-300 shadow-sm ${
                   isSelected
                     ? "border-primary bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg shadow-primary/25"
-                    : "border-border/60 bg-card/60 backdrop-blur-sm text-foreground hover:border-primary/60 hover:bg-secondary/80 hover:shadow-md hover:shadow-primary/10"
+                    : "border-border/60 bg-card/80 text-foreground hover:border-primary/60 hover:bg-secondary/80 hover:shadow-md hover:shadow-primary/10"
                 } ${selected && !isSelected ? "opacity-40 scale-[0.98]" : ""}`}
               >
                 <span className="font-medium">{answer.text}</span>
