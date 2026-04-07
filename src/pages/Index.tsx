@@ -103,47 +103,50 @@ const Index = () => {
   };
 
   return (
-    <AnimatePresence mode="wait">
-      {screen === "landing" && (
-        <motion.div key="landing" {...pageTransition}>
-          <LandingHero onStart={handleStart} />
-        </motion.div>
-      )}
-      {screen === "role" && (
-        <motion.div key="role" {...pageTransition}>
-          <RoleSelector onSelect={handleRoleSelect} />
-        </motion.div>
-      )}
-      {screen === "disclaimer" && (
-        <motion.div key="disclaimer" {...pageTransition}>
-          <Disclaimer onStart={handleDisclaimerStart} />
-        </motion.div>
-      )}
-      {screen === "quiz" && (
-        <motion.div key={`quiz-${currentQuestion}`} {...pageTransition}>
-          <QuizQuestion
-            question={quizQuestions[currentQuestion]}
-            current={currentQuestion + 1}
-            total={quizQuestions.length}
-            onAnswer={handleAnswer}
-          />
-        </motion.div>
-      )}
-      {screen === "sprinterCheck" && (
-        <motion.div key="sprinterCheck" {...pageTransition}>
-          <SprintCheck onAnswer={handleSprinterAnswer} />
-        </motion.div>
-      )}
-      {screen === "results" && scoringResult && (
-        <motion.div key="results" {...pageTransition}>
-          <ResultsScreen
-            result={scoringResult}
-            role={quizState.role}
-            onRetake={handleRetake}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait">
+        {screen === "landing" && (
+          <motion.div key="landing" {...pageTransition}>
+            <LandingHero onStart={handleStart} />
+          </motion.div>
+        )}
+        {screen === "role" && (
+          <motion.div key="role" {...pageTransition}>
+            <RoleSelector onSelect={handleRoleSelect} />
+          </motion.div>
+        )}
+        {screen === "disclaimer" && (
+          <motion.div key="disclaimer" {...pageTransition}>
+            <Disclaimer onStart={handleDisclaimerStart} />
+          </motion.div>
+        )}
+        {screen === "quiz" && (
+          <motion.div key={`quiz-${currentQuestion}`} {...pageTransition}>
+            <QuizQuestion
+              question={quizQuestions[currentQuestion]}
+              current={currentQuestion + 1}
+              total={quizQuestions.length}
+              onAnswer={handleAnswer}
+            />
+          </motion.div>
+        )}
+        {screen === "sprinterCheck" && (
+          <motion.div key="sprinterCheck" {...pageTransition}>
+            <SprintCheck onAnswer={handleSprinterAnswer} />
+          </motion.div>
+        )}
+        {screen === "results" && scoringResult && (
+          <motion.div key="results" {...pageTransition}>
+            <ResultsScreen
+              result={scoringResult}
+              role={quizState.role}
+              onRetake={handleRetake}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <Footer />
+    </>
   );
 };
 
