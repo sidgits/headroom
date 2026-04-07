@@ -117,7 +117,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
 const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
