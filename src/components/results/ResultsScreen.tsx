@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { Share2, Twitter, Linkedin, Link, Check } from "lucide-react";
+import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
 
 interface ResultsScreenProps {
