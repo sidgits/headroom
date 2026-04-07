@@ -43,29 +43,14 @@ const Index = () => {
   const handleAnswer = useCallback(
     (answerId: string) => {
       const questionId = quizQuestions[currentQuestion].id;
+      const updatedAnswers = { ...quizState.answers, [questionId]: answerId };
 
-      setQuizState((prev) => {
-        const updatedAnswers = { ...prev.answers, [questionId]: answerId };
-
-        if (currentQuestion < quizQuestions.length - 1) {
-          return { ...prev, answers: updatedAnswers };
-        }
-
-        // Last question — check for sprinter pattern
-        if (updatedAnswers[4] === "B" && updatedAnswers[6] === "A") {
-          return { ...prev, answers: updatedAnswers };
-        }
-
-        // Calculate results
-        const result = calculateResults(updatedAnswers, null);
-        setScoringResult(result);
-        return { ...prev, answers: updatedAnswers };
-      });
+      setQuizState((prev) => ({ ...prev, answers: updatedAnswers }));
 
       if (currentQuestion < quizQuestions.length - 1) {
         setCurrentQuestion((prev) => prev + 1);
       } else {
-        const updatedAnswers = { ...quizState.answers, [questionId]: answerId };
+        // Last question — check for sprinter pattern: Q4=B AND Q6=A
         if (updatedAnswers[4] === "B" && updatedAnswers[6] === "A") {
           setScreen("sprinterCheck");
         } else {

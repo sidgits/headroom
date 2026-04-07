@@ -12,9 +12,8 @@ async function loadImageAsDataURL(url: string): Promise<string> {
 }
 
 export async function generateResultsPDF(result: ScoringResult, role: string): Promise<void> {
-  const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
+  const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
 
-  // Dynamic import jspdf
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -23,7 +22,6 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   const contentWidth = pageWidth - margin * 2;
   let y = 20;
 
-  // Colors
   const golden: [number, number, number] = [196, 150, 28];
   const dark: [number, number, number] = [46, 38, 28];
   const muted: [number, number, number] = [120, 105, 90];
@@ -31,24 +29,19 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
     low: [196, 150, 28],
     moderate: [196, 150, 28],
     high: [210, 105, 30],
-    critical: [200, 60, 50],
   };
 
-  // Subtle watermark — large faded text in center
-  // Subtle diagonal watermark
+  // Watermark
   doc.saveGraphicsState();
   const gState = new (doc as any).GState({ opacity: 0.04 });
   doc.setGState(gState);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(72);
   doc.setTextColor(...golden);
-  const wmText = "HEADROOM";
-  const centerX = pageWidth / 2;
-  const centerY = pageHeight / 2;
-  doc.text(wmText, centerX, centerY, { align: "center", angle: 45 });
+  doc.text("HEADROOM", pageWidth / 2, pageHeight / 2, { align: "center", angle: 45 });
   doc.restoreGraphicsState();
 
-  // Logo (800x380 original, aspect 2.1:1)
+  // Logo
   try {
     const logoDataUrl = await loadImageAsDataURL("/headroom-logo.png");
     const logoWidth = 48;
@@ -56,7 +49,6 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
     doc.addImage(logoDataUrl, "PNG", margin, y, logoWidth, logoHeight);
     y += logoHeight + 6;
   } catch {
-    // Fallback text if logo fails
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(...golden);
@@ -68,136 +60,217 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(...muted);
-  doc.text("ASSESSMENT RESULTS", margin, y);
+  doc.text("YOUR HEADROOM PROFILE", margin, y);
   y += 4;
   doc.setDrawColor(220, 210, 195);
   doc.line(margin, y, pageWidth - margin, y);
   y += 14;
 
-  // Archetype emoji + name
+  // LAYER 1 — Archetype name + headline
   doc.setFontSize(28);
   doc.setTextColor(...dark);
   doc.setFont("helvetica", "bold");
   doc.text(archetype.name, margin, y);
   y += 10;
 
-  // Headline
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setTextColor(...golden);
-  doc.setFont("helvetica", "normal");
-  doc.text(archetype.headline, margin, y);
-  y += 10;
+  doc.setFont("helvetica", "italic");
+  const headlineLines = doc.splitTextToSize(archetype.headline, contentWidth);
+  doc.text(headlineLines, margin, y);
+  y += headlineLines.length * 5 + 8;
 
-  // Role
   doc.setFontSize(9);
   doc.setTextColor(...muted);
-  doc.text(`Role: ${role}`, margin, y);
-  y += 12;
-
-  // Description
-  doc.setFontSize(10);
-  doc.setTextColor(...dark);
   doc.setFont("helvetica", "normal");
-  const descLines = doc.splitTextToSize(archetype.description, contentWidth);
-  doc.text(descLines, margin, y);
-  y += descLines.length * 5 + 10;
+  doc.text(`Role: ${role}`, margin, y);
+  y += 10;
 
-  // Burnout Risk section
+  // LAYER 2 — Mirror paragraphs
+  const mirrorSections = [
+    { label: "AT YOUR BEST", text: mirror.atYourBest },
+    { label: "WHAT'S WORKING AGAINST YOU", text: mirror.workingAgainstYou },
+    { label: "THE PATTERN YOU PROBABLY HAVEN'T NOTICED", text: mirror.patternNotNoticed },
+  ];
+
+  for (const section of mirrorSections) {
+    // Check if we need a new page
+    if (y > pageHeight - 50) {
+      doc.addPage();
+      y = 20;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...golden);
+    doc.text(section.label, margin, y);
+    y += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(...dark);
+    const lines = doc.splitTextToSize(section.text, contentWidth);
+    doc.text(lines, margin, y);
+    y += lines.length * 5 + 8;
+  }
+
+  // LAYER 3 — Dimensions
+  if (y > pageHeight - 70) {
+    doc.addPage();
+    y = 20;
+  }
+
   doc.setDrawColor(220, 210, 195);
   doc.line(margin, y, pageWidth - margin, y);
-  y += 10;
+  y += 8;
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.setTextColor(...muted);
-  doc.text("BURNOUT RISK", margin, y);
+  doc.text("YOUR HEADROOM DIMENSIONS", margin, y);
+  y += 10;
+
+  dimensionScores.forEach((dim) => {
+    const pct = (dim.score / dim.maxScore) * 100;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...dark);
+    doc.text(`${dim.name} (${dim.code})`, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...muted);
+    doc.text(`${dim.score}/${dim.maxScore}`, pageWidth - margin, y, { align: "right" });
+    y += 5;
+
+    // Bar
+    const barHeight = 4;
+    doc.setFillColor(235, 228, 218);
+    doc.roundedRect(margin, y, contentWidth, barHeight, 2, 2, "F");
+    doc.setFillColor(...golden);
+    const fillWidth = (pct / 100) * contentWidth;
+    if (fillWidth > 0) doc.roundedRect(margin, y, fillWidth, barHeight, 2, 2, "F");
+    y += 6;
+
+    // Interpretation
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...muted);
+    const interpLines = doc.splitTextToSize(dim.interpretation, contentWidth);
+    doc.text(interpLines, margin, y);
+    y += interpLines.length * 4 + 6;
+  });
+
+  // LAYER 4 — Shadow Archetype
+  if (y > pageHeight - 40) {
+    doc.addPage();
+    y = 20;
+  }
+
+  doc.setDrawColor(220, 210, 195);
+  doc.line(margin, y, pageWidth - margin, y);
   y += 8;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...muted);
+  doc.text("UNDER PRESSURE YOU SHIFT TOWARD", margin, y);
+  y += 7;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(...dark);
+  doc.text(shadowArchetype.name, margin, y);
+  y += 7;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(...dark);
+  const shadowLines = doc.splitTextToSize(shadowArchetype.description, contentWidth);
+  doc.text(shadowLines, margin, y);
+  y += shadowLines.length * 5 + 8;
+
+  // LAYER 5 — One Unlock
+  if (y > pageHeight - 40) {
+    doc.addPage();
+    y = 20;
+  }
+
+  doc.setDrawColor(220, 210, 195);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...muted);
+  doc.text("WHAT TO DO NEXT", margin, y);
+  y += 7;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(...dark);
+  const unlockLines = doc.splitTextToSize(recommendations[0], contentWidth);
+  doc.text(unlockLines, margin, y);
+  y += unlockLines.length * 5 + 8;
+
+  // LAYER 6 — Burnout Risk
+  if (y > pageHeight - 50) {
+    doc.addPage();
+    y = 20;
+  }
+
+  doc.setDrawColor(220, 210, 195);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...muted);
+  doc.text("BURNOUT RISK SIGNAL", margin, y);
+  y += 7;
 
   const riskColor = burnoutColorMap[burnoutRisk.level] || golden;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setTextColor(...riskColor);
   doc.text(burnoutRisk.label, margin, y);
-  y += 7;
+  y += 6;
+
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(9);
+  doc.setTextColor(...muted);
+  const signalLines = doc.splitTextToSize(`Signal: ${burnoutRisk.signal}`, contentWidth);
+  doc.text(signalLines, margin, y);
+  y += signalLines.length * 4 + 4;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(...dark);
   const riskLines = doc.splitTextToSize(burnoutRisk.description, contentWidth);
   doc.text(riskLines, margin, y);
-  y += riskLines.length * 5 + 10;
-
-  // Dimensions
-  doc.setDrawColor(220, 210, 195);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 10;
+  y += riskLines.length * 5 + 6;
 
   doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(...golden);
+  doc.text("EARLY INTERVENTION", margin, y);
+  y += 5;
+
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.setTextColor(...muted);
-  doc.text("YOUR DIMENSIONS", margin, y);
-  y += 10;
-
-  dimensionScores.forEach((dim) => {
-    const pct = (dim.score / dim.maxScore) * 100;
-    
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(...dark);
-    doc.text(dim.name, margin, y);
-    doc.setTextColor(...muted);
-    doc.text(`${dim.score}/${dim.maxScore}`, pageWidth - margin, y, { align: "right" });
-    y += 5;
-
-    // Progress bar background
-    const barHeight = 4;
-    const barWidth = contentWidth;
-    doc.setFillColor(235, 228, 218);
-    doc.roundedRect(margin, y, barWidth, barHeight, 2, 2, "F");
-
-    // Progress bar fill
-    doc.setFillColor(...golden);
-    const fillWidth = (pct / 100) * barWidth;
-    if (fillWidth > 0) {
-      doc.roundedRect(margin, y, fillWidth, barHeight, 2, 2, "F");
-    }
-    y += 12;
-  });
-
-  // Recommendations
-  y += 2;
-  doc.setDrawColor(220, 210, 195);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 10;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(...muted);
-  doc.text("WHAT TO DO NEXT", margin, y);
-  y += 10;
-
-  recommendations.forEach((rec, i) => {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(...golden);
-    doc.text(`${i + 1}.`, margin, y);
-
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...dark);
-    const recLines = doc.splitTextToSize(rec, contentWidth - 10);
-    doc.text(recLines, margin + 10, y);
-    y += recLines.length * 5 + 6;
-  });
+  doc.setTextColor(...dark);
+  const interventionLines = doc.splitTextToSize(burnoutRisk.earlyIntervention, contentWidth);
+  doc.text(interventionLines, margin, y);
+  y += interventionLines.length * 4 + 4;
 
   // Footer
-  y = doc.internal.pageSize.getHeight() - 15;
+  y = pageHeight - 15;
   doc.setDrawColor(220, 210, 195);
   doc.line(margin, y, pageWidth - margin, y);
   y += 6;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...muted);
-  doc.text("headroom — cognitive load assessment", margin, y);
+  doc.text("headroom — cognitive load assessment • theheadroom.co", margin, y);
   doc.text(new Date().toLocaleDateString(), pageWidth - margin, y, { align: "right" });
 
   doc.save("headroom-results.pdf");
