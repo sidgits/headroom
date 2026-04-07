@@ -74,7 +74,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   return (
     <div className="space-y-5">
       <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider">
-        Know someone whose calendar is working against them? Send them this.
+        Share Your Result
       </p>
 
       <div className="flex items-center justify-center gap-4">

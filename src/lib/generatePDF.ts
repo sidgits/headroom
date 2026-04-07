@@ -80,9 +80,15 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   doc.text(headlineLines, margin, y);
   y += headlineLines.length * 5 + 8;
 
-  doc.setFontSize(9);
+  doc.setFontSize(8);
   doc.setTextColor(...muted);
   doc.setFont("helvetica", "normal");
+  const cltLine = "Rooted in Sweller\u2019s Cognitive Load Theory \u2014 the gold standard in understanding how the brain processes work.";
+  const cltLines = doc.splitTextToSize(cltLine, contentWidth);
+  doc.text(cltLines, margin, y);
+  y += cltLines.length * 4 + 4;
+
+  doc.setFontSize(9);
   doc.text(`Role: ${role}`, margin, y);
   y += 10;
 
