@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingHero from "@/components/landing/LandingHero";
 import RoleSelector from "@/components/quiz/RoleSelector";
