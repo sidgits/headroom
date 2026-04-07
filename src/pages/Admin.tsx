@@ -145,6 +145,8 @@ const Admin = () => {
             <button
               onClick={() => {
                 sessionStorage.removeItem("headroom_admin");
+                sessionStorage.removeItem("headroom_admin_pw");
+                setAdminPw("");
                 setAuthed(false);
               }}
               className="text-xs text-muted-foreground underline hover:text-foreground"
