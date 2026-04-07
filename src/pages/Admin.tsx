@@ -22,7 +22,7 @@ interface AssessmentCompletion {
   created_at: string;
 }
 
-const AdminLogin = ({ onAuth }: { onAuth: () => void }) => {
+const AdminLogin = ({ onAuth }: { onAuth: (pw: string) => void }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,8 @@ const AdminLogin = ({ onAuth }: { onAuth: () => void }) => {
         setError("Incorrect password");
       } else {
         sessionStorage.setItem("headroom_admin", "1");
-        onAuth();
+        sessionStorage.setItem("headroom_admin_pw", password);
+        onAuth(password);
       }
     } catch {
       setError("Something went wrong");
@@ -77,29 +78,32 @@ const AdminLogin = ({ onAuth }: { onAuth: () => void }) => {
 
 const Admin = () => {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("headroom_admin") === "1");
+  const [adminPw, setAdminPw] = useState(() => sessionStorage.getItem("headroom_admin_pw") || "");
   const [completions, setCompletions] = useState<AssessmentCompletion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authed) return;
+    if (!authed || !adminPw) return;
 
     const fetchCompletions = async () => {
-      const { data, error } = await supabase
-        .from("assessment_completions")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error && data) {
-        setCompletions(data as AssessmentCompletion[]);
+      try {
+        const { data, error } = await supabase.functions.invoke("admin-completions", {
+          body: { password: adminPw },
+        });
+        if (!error && data?.completions) {
+          setCompletions(data.completions as AssessmentCompletion[]);
+        }
+      } catch {
+        // Failed to fetch
       }
       setLoading(false);
     };
 
     fetchCompletions();
-  }, [authed]);
+  }, [authed, adminPw]);
 
   if (!authed) {
-    return <AdminLogin onAuth={() => setAuthed(true)} />;
+    return <AdminLogin onAuth={(pw) => { setAdminPw(pw); setAuthed(true); }} />;
   }
 
   const roleLabels: Record<string, string> = {
@@ -141,6 +145,8 @@ const Admin = () => {
             <button
               onClick={() => {
                 sessionStorage.removeItem("headroom_admin");
+                sessionStorage.removeItem("headroom_admin_pw");
+                setAdminPw("");
                 setAuthed(false);
               }}
               className="text-xs text-muted-foreground underline hover:text-foreground"
