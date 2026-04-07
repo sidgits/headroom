@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Share2, Twitter, Linkedin, Link, Check } from "lucide-react";
+import { Share2, Twitter, Linkedin, Link, Check, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
 
@@ -48,6 +48,13 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
     );
   };
 
+  const handleWhatsapp = () => {
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`,
+      "_blank"
+    );
+  };
+
   const handleNativeShare = async () => {
     if (navigator.share) {
       await navigator.share({ title: "Headroom Results", text: shareText, url: shareUrl });
@@ -84,6 +91,15 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
         aria-label="Share on LinkedIn"
       >
         <Linkedin className="w-4 h-4" />
+      </motion.button>
+      <motion.button
+        onClick={handleWhatsapp}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-11 h-11 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+        aria-label="Share on WhatsApp"
+      >
+        <MessageCircle className="w-4 h-4" />
       </motion.button>
       <motion.button
         onClick={handleCopyLink}
