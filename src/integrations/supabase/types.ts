@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessment_completions: {
+        Row: {
+          archetype_id: string
+          archetype_name: string
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          region: string | null
+          role: string
+        }
+        Insert: {
+          archetype_id: string
+          archetype_name: string
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          region?: string | null
+          role: string
+        }
+        Update: {
+          archetype_id?: string
+          archetype_name?: string
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          region?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
