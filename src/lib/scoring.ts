@@ -49,7 +49,7 @@ const ARCHETYPES: Archetype[] = [
     id: "architect",
     name: "The Architect",
     emoji: "🏗️",
-    headline: "You're building with intention",
+    headline: "I'm building with intention",
     description:
       "You have a clear sense of your priorities and protect your mental space. Your cognitive load is well-managed, giving you room to think strategically and grow. The challenge ahead is maintaining this — and helping others find the same clarity.",
   },
@@ -57,7 +57,7 @@ const ARCHETYPES: Archetype[] = [
     id: "juggler",
     name: "The Juggler",
     emoji: "🤹",
-    headline: "You're keeping it all in the air — barely",
+    headline: "I'm keeping it all in the air — barely",
     description:
       "You're competent and capable, but you're managing more than you should be. Things are working, but there's no margin. One unexpected demand could tip you from coping to overwhelmed. You need to create boundaries before the load creates them for you.",
   },
@@ -65,7 +65,7 @@ const ARCHETYPES: Archetype[] = [
     id: "absorber",
     name: "The Absorber",
     emoji: "🧽",
-    headline: "You take on everything — and it's taking a toll",
+    headline: "I take on everything — and it's taking a toll",
     description:
       "You say yes when you should say no. You carry other people's problems alongside your own. Your cognitive load isn't just about your work — it's about everyone else's too. The first step is recognising that absorption isn't the same as leadership.",
   },
@@ -73,7 +73,7 @@ const ARCHETYPES: Archetype[] = [
     id: "survivor",
     name: "The Survivor",
     emoji: "🔥",
-    headline: "You're running on fumes",
+    headline: "I'm running on fumes",
     description:
       "Your brain is full. Growth has stopped. Deep thinking is a memory. You're in survival mode — getting through each day but not building anything meaningful. This isn't sustainable, and the longer it continues the harder recovery becomes. Something has to change.",
   },
@@ -81,7 +81,7 @@ const ARCHETYPES: Archetype[] = [
     id: "sprinter",
     name: "The Sprinter",
     emoji: "⚡",
-    headline: "You're fast — but you can't maintain this pace",
+    headline: "I'm fast — but I can't maintain this pace",
     description:
       "You thrive under pressure and move quickly. But your pattern shows signs of chronic sprinting — high energy with no recovery. Sprint mode works for weeks, not months. Without deliberate rest, you'll cross from high-performance into burnout territory.",
   },
