@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Share2, Link, Check, Download } from "lucide-react";
 import { useState } from "react";
