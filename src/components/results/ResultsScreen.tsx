@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Share2, Link, Check, Download } from "lucide-react";
 import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ResultsScreenProps {
   result: ScoringResult;
@@ -117,8 +118,21 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
 const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
 
+  const logged = useRef(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    if (!logged.current) {
+      logged.current = true;
+      supabase.functions.invoke("log-assessment", {
+        body: {
+          role,
+          archetype_id: archetype.id,
+          archetype_name: archetype.name,
+        },
+      }).catch(() => {});
+    }
   }, []);
 
   return (
