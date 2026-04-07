@@ -100,6 +100,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
         aria-label="Share on WhatsApp"
       >
         <MessageCircle className="w-4 h-4" />
+      </motion.button>
       <motion.button
         onClick={handleCopyLink}
         whileHover={{ scale: 1.1 }}
