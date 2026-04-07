@@ -103,7 +103,7 @@ const Admin = () => {
   }, [authed, adminPw]);
 
   if (!authed) {
-    return <AdminLogin onAuth={() => setAuthed(true)} />;
+    return <AdminLogin onAuth={(pw) => { setAdminPw(pw); setAuthed(true); }} />;
   }
 
   const roleLabels: Record<string, string> = {
