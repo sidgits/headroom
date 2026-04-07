@@ -79,7 +79,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
-          Discover your pattern
+          Click to Discover your Pattern
         </motion.button>
       </section>
 
