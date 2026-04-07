@@ -20,11 +20,11 @@ const SprintCheck = ({ onAnswer }: SprintCheckProps) => {
   const options = [
     {
       id: "A",
-      text: "Yes — I've been running at this pace for weeks and I can't slow down",
+      text: "I go through intense productive phases followed by periods where I need to completely switch off and recover",
     },
     {
       id: "B",
-      text: "No — this is temporary and I know it will ease up soon",
+      text: "I'm consistently overloaded — it doesn't come in waves, it's just always a lot",
     },
   ];
 
@@ -55,7 +55,7 @@ const SprintCheck = ({ onAnswer }: SprintCheckProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          One more thing…
+          One last thing — which pattern sounds more like you?
         </motion.h2>
         <motion.p
           className="text-muted-foreground text-center mb-8"
@@ -63,7 +63,7 @@ const SprintCheck = ({ onAnswer }: SprintCheckProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          Your answers suggest you might be in a sprint pattern. Does this feel accurate?
+          This helps us distinguish between two different cognitive load patterns.
         </motion.p>
 
         <div className="space-y-3">
