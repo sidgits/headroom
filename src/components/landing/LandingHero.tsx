@@ -46,7 +46,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
         <motion.img
           src="/headroom-logo.png"
           alt="Headroom"
-          className="w-48 md:w-64 mb-10"
+          className="w-64 md:w-80 mb-10"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
