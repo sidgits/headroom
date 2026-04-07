@@ -34,26 +34,10 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleTwitter = () => {
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-      "_blank"
-    );
-  };
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
 
-  const handleLinkedin = () => {
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-      "_blank"
-    );
-  };
-
-  const handleWhatsapp = () => {
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`,
-      "_blank"
-    );
-  };
 
   const handleNativeShare = async () => {
     if (navigator.share) {
