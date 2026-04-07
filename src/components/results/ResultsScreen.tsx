@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Share2, Link, Check } from "lucide-react";
+import { Share2, Link, Check, Download } from "lucide-react";
 import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
+import { generateResultsPDF } from "@/lib/generatePDF";
 
 interface ResultsScreenProps {
   result: ScoringResult;
@@ -241,13 +242,23 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
           ))}
         </motion.div>
 
-        {/* Share & Retake */}
+        {/* Download & Share & Retake */}
         <motion.div
-          className="space-y-4 pt-4 pb-8"
+          className="space-y-6 pt-4 pb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.5 }}
         >
+          <motion.button
+            onClick={() => generateResultsPDF(result, role)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 transition-all"
+          >
+            <Download className="w-5 h-5" />
+            Download Results
+          </motion.button>
+
           <ShareButtons archetype={archetype} />
           <div className="text-center">
             <button
