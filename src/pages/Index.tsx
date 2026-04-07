@@ -4,7 +4,9 @@ import RoleSelector from "@/components/quiz/RoleSelector";
 import Disclaimer from "@/components/quiz/Disclaimer";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
+import ResultsScreen from "@/components/results/ResultsScreen";
 import { quizQuestions } from "@/data/quizQuestions";
+import { calculateResults, type ScoringResult } from "@/lib/scoring";
 
 type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "results";
 
@@ -22,6 +24,7 @@ const Index = () => {
     answers: {},
     sprinterAnswer: null,
   });
+  const [scoringResult, setScoringResult] = useState<ScoringResult | null>(null);
 
   const handleStart = useCallback(() => setScreen("role"), []);
 
@@ -39,21 +42,33 @@ const Index = () => {
     (answerId: string) => {
       const questionId = quizQuestions[currentQuestion].id;
 
-      setQuizState((prev) => ({
-        ...prev,
-        answers: { ...prev.answers, [questionId]: answerId },
-      }));
+      setQuizState((prev) => {
+        const updatedAnswers = { ...prev.answers, [questionId]: answerId };
+
+        if (currentQuestion < quizQuestions.length - 1) {
+          return { ...prev, answers: updatedAnswers };
+        }
+
+        // Last question — check for sprinter pattern
+        if (updatedAnswers[4] === "B" && updatedAnswers[6] === "A") {
+          return { ...prev, answers: updatedAnswers };
+        }
+
+        // Calculate results
+        const result = calculateResults(updatedAnswers, null);
+        setScoringResult(result);
+        return { ...prev, answers: updatedAnswers };
+      });
 
       if (currentQuestion < quizQuestions.length - 1) {
         setCurrentQuestion((prev) => prev + 1);
       } else {
-        const updatedAnswers = {
-          ...quizState.answers,
-          [questionId]: answerId,
-        };
+        const updatedAnswers = { ...quizState.answers, [questionId]: answerId };
         if (updatedAnswers[4] === "B" && updatedAnswers[6] === "A") {
           setScreen("sprinterCheck");
         } else {
+          const result = calculateResults(updatedAnswers, null);
+          setScoringResult(result);
           setScreen("results");
         }
       }
@@ -61,9 +76,21 @@ const Index = () => {
     [currentQuestion, quizState.answers]
   );
 
-  const handleSprinterAnswer = useCallback((answerId: string) => {
-    setQuizState((prev) => ({ ...prev, sprinterAnswer: answerId }));
-    setScreen("results");
+  const handleSprinterAnswer = useCallback(
+    (answerId: string) => {
+      setQuizState((prev) => ({ ...prev, sprinterAnswer: answerId }));
+      const result = calculateResults(quizState.answers, answerId);
+      setScoringResult(result);
+      setScreen("results");
+    },
+    [quizState.answers]
+  );
+
+  const handleRetake = useCallback(() => {
+    setQuizState({ role: "", answers: {}, sprinterAnswer: null });
+    setCurrentQuestion(0);
+    setScoringResult(null);
+    setScreen("landing");
   }, []);
 
   return (
@@ -83,21 +110,12 @@ const Index = () => {
       {screen === "sprinterCheck" && (
         <SprintCheck onAnswer={handleSprinterAnswer} />
       )}
-      {screen === "results" && (
-        <div className="min-h-screen flex items-center justify-center px-6 bg-background">
-          <div className="text-center max-w-md">
-            <p className="text-4xl mb-4">✨</p>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Assessment complete
-            </h2>
-            <p className="text-muted-foreground">
-              Your results are being prepared. Scoring engine coming in Phase 2.
-            </p>
-            <pre className="mt-6 p-4 bg-secondary rounded-lg text-left text-sm text-muted-foreground overflow-auto">
-              {JSON.stringify(quizState, null, 2)}
-            </pre>
-          </div>
-        </div>
+      {screen === "results" && scoringResult && (
+        <ResultsScreen
+          result={scoringResult}
+          role={quizState.role}
+          onRetake={handleRetake}
+        />
       )}
     </>
   );
