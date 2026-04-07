@@ -116,6 +116,10 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
 const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations } = result;
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Background */}
