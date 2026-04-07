@@ -1,0 +1,1 @@
+DROP POLICY "Allow anonymous inserts" ON assessment_completions;
