@@ -25,7 +25,7 @@ const burnoutBgColors: Record<string, string> = {
 
 const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
   const [copied, setCopied] = useState(false);
-  const shareText = `I'm "${archetype.name}" — ${archetype.headline}. Take the Headroom assessment to discover your cognitive load pattern.`;
+  const shareText = `I'm "${archetype.name}". Take the Headroom assessment to discover your cognitive load pattern.`;
   const shareUrl = window.location.origin;
 
   const handleCopyLink = async () => {
