@@ -82,17 +82,6 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
         Share Your Result
       </p>
 
-      {/* Download share image button */}
-      <motion.button
-        onClick={handleDownloadImage}
-        disabled={downloading}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border border-border/50 bg-secondary/60 text-foreground font-medium text-sm transition-all hover:bg-secondary/80 disabled:opacity-50"
-      >
-        <ImageIcon className="w-4 h-4" />
-        {downloading ? "Saving image…" : downloaded ? "✓ Image saved — attach it to your post" : "Save share image"}
-      </motion.button>
 
       <div className="flex items-center justify-center gap-4">
         {socials.map(({ icon: Icon, label }) => (
