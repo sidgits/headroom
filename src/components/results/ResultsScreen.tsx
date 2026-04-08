@@ -1,6 +1,6 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { Download } from "lucide-react";
+import { Download, Image as ImageIcon } from "lucide-react";
 import html2canvas from "html2canvas";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
@@ -25,60 +25,50 @@ const burnoutBgColors: Record<string, string> = {
 };
 
 const ShareButtons = ({ archetype, captureRef }: { archetype: ScoringResult["archetype"]; captureRef: React.RefObject<HTMLDivElement> }) => {
+  const [downloading, setDownloading] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
   const shareText = `I'm the ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
 
-  const captureAndShare = useCallback(async (platform: string) => {
-    let imageBlob: Blob | null = null;
+  const shareUrls: Record<string, string> = {
+    X: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
+    Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://headroomapp.co")}&quote=${encodeURIComponent(shareText)}`,
+    LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://headroomapp.co")}`,
+    WhatsApp: `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+    Instagram: `https://www.instagram.com/`,
+  };
 
-    if (captureRef.current) {
-      try {
-        const canvas = await html2canvas(captureRef.current, {
-          backgroundColor: "#0c0a09",
-          scale: 2,
-          useCORS: true,
-        });
-        imageBlob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob((blob) => resolve(blob), "image/png")
-        );
-      } catch (e) {
-        console.error("Screenshot capture failed", e);
-      }
-    }
-
-    // Try Web Share API with image if supported
-    if (imageBlob && navigator.share && navigator.canShare) {
-      const file = new File([imageBlob], "headroom-result.png", { type: "image/png" });
-      const shareData: ShareData = { text: shareText, files: [file] };
-      if (navigator.canShare(shareData)) {
-        try {
-          await navigator.share(shareData);
-          return;
-        } catch (e) {
-          // User cancelled or error — fall through to URL sharing
-        }
-      }
-    }
-
-    // Fallback: download image then open share URL
-    if (imageBlob) {
-      const url = URL.createObjectURL(imageBlob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "headroom-result.png";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    const shareUrls: Record<string, string> = {
-      X: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
-      Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://headroomapp.co")}&quote=${encodeURIComponent(shareText)}`,
-      LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://headroomapp.co")}`,
-      WhatsApp: `https://wa.me/?text=${encodeURIComponent(shareText)}`,
-      Instagram: `https://www.instagram.com/`,
-    };
-
+  const handleShare = (platform: string) => {
+    // Synchronous window.open — no popup blocker issues
     window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
-  }, [archetype, shareText, captureRef]);
+  };
+
+  const handleDownloadImage = useCallback(async () => {
+    if (!captureRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const canvas = await html2canvas(captureRef.current, {
+        backgroundColor: "#0c0a09",
+        scale: 2,
+        useCORS: true,
+      });
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob((b) => resolve(b), "image/png")
+      );
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "headroom-result.png";
+        a.click();
+        URL.revokeObjectURL(url);
+        setDownloaded(true);
+      }
+    } catch (e) {
+      console.error("Screenshot capture failed", e);
+    } finally {
+      setDownloading(false);
+    }
+  }, [captureRef, downloading]);
 
   const XIcon = () => (
     <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -124,11 +114,23 @@ const ShareButtons = ({ archetype, captureRef }: { archetype: ScoringResult["arc
         Share Your Result
       </p>
 
+      {/* Download share image button */}
+      <motion.button
+        onClick={handleDownloadImage}
+        disabled={downloading}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border border-border/50 bg-secondary/60 text-foreground font-medium text-sm transition-all hover:bg-secondary/80 disabled:opacity-50"
+      >
+        <ImageIcon className="w-4 h-4" />
+        {downloading ? "Saving image…" : downloaded ? "✓ Image saved — attach it to your post" : "Save share image"}
+      </motion.button>
+
       <div className="flex items-center justify-center gap-4">
         {socials.map(({ icon: Icon, label }) => (
           <motion.button
             key={label}
-            onClick={() => captureAndShare(label)}
+            onClick={() => handleShare(label)}
             whileHover={{ scale: 1.1, y: -3 }}
             whileTap={{ scale: 0.95 }}
             className="flex flex-col items-center gap-1.5 group"
