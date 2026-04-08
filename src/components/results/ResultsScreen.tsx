@@ -176,6 +176,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
       <div className="relative max-w-lg mx-auto px-6 py-12 space-y-8">
         {/* LAYER 1 — THE REVEAL */}
         <motion.div
+          ref={archetypeRef}
           className="text-center"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -341,7 +342,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
             Download my profile
           </motion.button>
 
-          <ShareButtons archetype={archetype} />
+          <ShareButtons archetype={archetype} captureRef={archetypeRef} />
           <div className="text-center">
             <button
               onClick={onRetake}
