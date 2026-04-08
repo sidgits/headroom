@@ -24,17 +24,71 @@ const burnoutBgColors: Record<string, string> = {
   high: "from-deep-orange/20 to-deep-orange/5",
 };
 
-const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
+const ShareButtons = ({ archetype, captureRef }: { archetype: ScoringResult["archetype"]; captureRef: React.RefObject<HTMLDivElement> }) => {
   const shareText = `I'm the ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
 
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://headroomapp.co")}`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://headroomapp.co")}&quote=${encodeURIComponent(shareText)}`;
+  const captureAndShare = useCallback(async (platform: string) => {
+    let imageBlob: Blob | null = null;
+
+    if (captureRef.current) {
+      try {
+        const canvas = await html2canvas(captureRef.current, {
+          backgroundColor: "#0c0a09",
+          scale: 2,
+          useCORS: true,
+        });
+        imageBlob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((blob) => resolve(blob), "image/png")
+        );
+      } catch (e) {
+        console.error("Screenshot capture failed", e);
+      }
+    }
+
+    // Try Web Share API with image if supported
+    if (imageBlob && navigator.share && navigator.canShare) {
+      const file = new File([imageBlob], "headroom-result.png", { type: "image/png" });
+      const shareData: ShareData = { text: shareText, files: [file] };
+      if (navigator.canShare(shareData)) {
+        try {
+          await navigator.share(shareData);
+          return;
+        } catch (e) {
+          // User cancelled or error — fall through to URL sharing
+        }
+      }
+    }
+
+    // Fallback: download image then open share URL
+    if (imageBlob) {
+      const url = URL.createObjectURL(imageBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "headroom-result.png";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    const shareUrls: Record<string, string> = {
+      X: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
+      Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://headroomapp.co")}&quote=${encodeURIComponent(shareText)}`,
+      LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://headroomapp.co")}`,
+      WhatsApp: `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+      Instagram: `https://www.instagram.com/`,
+    };
+
+    window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
+  }, [archetype, shareText, captureRef]);
 
   const XIcon = () => (
     <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+
+  const InstagramIcon = () => (
+    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
     </svg>
   );
 
@@ -57,10 +111,11 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   );
 
   const socials = [
-    { icon: XIcon, label: "X", href: twitterUrl },
-    { icon: FacebookIcon, label: "Facebook", href: facebookUrl },
-    { icon: LinkedInIcon, label: "LinkedIn", href: linkedinUrl },
-    { icon: WhatsAppIcon, label: "WhatsApp", href: whatsappUrl },
+    { icon: XIcon, label: "X" },
+    { icon: InstagramIcon, label: "Instagram" },
+    { icon: FacebookIcon, label: "Facebook" },
+    { icon: LinkedInIcon, label: "LinkedIn" },
+    { icon: WhatsAppIcon, label: "WhatsApp" },
   ];
 
   return (
@@ -70,12 +125,10 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
       </p>
 
       <div className="flex items-center justify-center gap-4">
-        {socials.map(({ icon: Icon, label, href }) => (
-          <motion.a
+        {socials.map(({ icon: Icon, label }) => (
+          <motion.button
             key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={() => captureAndShare(label)}
             whileHover={{ scale: 1.1, y: -3 }}
             whileTap={{ scale: 0.95 }}
             className="flex flex-col items-center gap-1.5 group"
@@ -84,7 +137,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
               <Icon />
             </div>
             <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">{label}</span>
-          </motion.a>
+          </motion.button>
         ))}
       </div>
     </div>
