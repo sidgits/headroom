@@ -148,6 +148,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
 
   const logged = useRef(false);
+  const archetypeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
