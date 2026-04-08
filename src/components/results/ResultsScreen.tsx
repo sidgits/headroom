@@ -1,7 +1,6 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Download, Image as ImageIcon } from "lucide-react";
-import html2canvas from "html2canvas";
+import { Download } from "lucide-react";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,9 +23,7 @@ const burnoutBgColors: Record<string, string> = {
   high: "from-deep-orange/20 to-deep-orange/5",
 };
 
-const ShareButtons = ({ archetype, captureRef }: { archetype: ScoringResult["archetype"]; captureRef: React.RefObject<HTMLDivElement> }) => {
-  const [downloading, setDownloading] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
+const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
   const shareText = `I'm the ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
 
   const shareUrls: Record<string, string> = {
@@ -38,37 +35,8 @@ const ShareButtons = ({ archetype, captureRef }: { archetype: ScoringResult["arc
   };
 
   const handleShare = (platform: string) => {
-    // Synchronous window.open — no popup blocker issues
     window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
   };
-
-  const handleDownloadImage = useCallback(async () => {
-    if (!captureRef.current || downloading) return;
-    setDownloading(true);
-    try {
-      const canvas = await html2canvas(captureRef.current, {
-        backgroundColor: "#0c0a09",
-        scale: 2,
-        useCORS: true,
-      });
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob((b) => resolve(b), "image/png")
-      );
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "headroom-result.png";
-        a.click();
-        URL.revokeObjectURL(url);
-        setDownloaded(true);
-      }
-    } catch (e) {
-      console.error("Screenshot capture failed", e);
-    } finally {
-      setDownloading(false);
-    }
-  }, [captureRef, downloading]);
 
   const XIcon = () => (
     <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -114,17 +82,6 @@ const ShareButtons = ({ archetype, captureRef }: { archetype: ScoringResult["arc
         Share Your Result
       </p>
 
-      {/* Download share image button */}
-      <motion.button
-        onClick={handleDownloadImage}
-        disabled={downloading}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border border-border/50 bg-secondary/60 text-foreground font-medium text-sm transition-all hover:bg-secondary/80 disabled:opacity-50"
-      >
-        <ImageIcon className="w-4 h-4" />
-        {downloading ? "Saving image…" : downloaded ? "✓ Image saved — attach it to your post" : "Save share image"}
-      </motion.button>
 
       <div className="flex items-center justify-center gap-4">
         {socials.map(({ icon: Icon, label }) => (
@@ -344,7 +301,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
             Download my profile
           </motion.button>
 
-          <ShareButtons archetype={archetype} captureRef={archetypeRef} />
+          <ShareButtons archetype={archetype} />
           <div className="text-center">
             <button
               onClick={onRetake}
