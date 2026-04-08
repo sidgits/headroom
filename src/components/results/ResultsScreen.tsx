@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Link, Check, Download } from "lucide-react";
-import { useState } from "react";
+import { Download } from "lucide-react";
+import html2canvas from "html2canvas";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
 import { supabase } from "@/integrations/supabase/client";
