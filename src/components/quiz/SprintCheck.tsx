@@ -20,11 +20,11 @@ const SprintCheck = ({ onAnswer }: SprintCheckProps) => {
   const options = [
     {
       id: "A",
-      text: "I go through intense productive phases followed by periods where I need to completely switch off and recover",
+      text: "I work in intense bursts, then I need real recovery time before the next one",
     },
     {
       id: "B",
-      text: "I'm consistently overloaded — it doesn't come in waves, it's just always a lot",
+      text: "I'm consistently overloaded — it's not cyclical, it's just always a lot",
     },
   ];
 
