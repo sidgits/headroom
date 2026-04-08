@@ -24,7 +24,7 @@ const burnoutBgColors: Record<string, string> = {
 };
 
 const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
-  const shareText = `I'm the ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
+  const shareText = `I'm ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
 
   const shareUrls: Record<string, string> = {
     X: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
