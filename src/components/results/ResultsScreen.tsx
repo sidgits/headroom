@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,9 +27,9 @@ const burnoutBgColors: Record<string, string> = {
 const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
   const shareText = `I'm ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
 
-  const logShareClick = (platform: string) => {
+  const logShareClick = (platform: string, completed: boolean = false) => {
     supabase.functions.invoke("log-share-click", {
-      body: { platform, archetype_name: archetype.name },
+      body: { platform, archetype_name: archetype.name, completed },
     }).catch(() => {});
   };
 
@@ -41,8 +42,16 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   };
 
   const handleShare = (platform: string) => {
-    logShareClick(platform);
+    logShareClick(platform, false);
     window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
+    
+    // Show thank you toast and log as completed
+    setTimeout(() => {
+      toast.success("Thank you for sharing! 🙌", {
+        duration: 3000,
+      });
+      logShareClick(platform, true);
+    }, 1500);
   };
 
   const XIcon = () => (

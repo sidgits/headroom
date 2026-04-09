@@ -53,18 +53,21 @@ export type Database = {
       share_clicks: {
         Row: {
           archetype_name: string
+          completed: boolean
           created_at: string
           id: string
           platform: string
         }
         Insert: {
           archetype_name: string
+          completed?: boolean
           created_at?: string
           id?: string
           platform: string
         }
         Update: {
           archetype_name?: string
+          completed?: boolean
           created_at?: string
           id?: string
           platform?: string
