@@ -1,0 +1,1 @@
+ALTER TABLE public.share_clicks ADD COLUMN completed BOOLEAN NOT NULL DEFAULT false;
