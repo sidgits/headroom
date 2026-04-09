@@ -21,12 +21,34 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get IP from request headers — no geo lookup, just store IP
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("cf-connecting-ip") ||
       req.headers.get("x-real-ip") ||
       "unknown";
+
+    let city = null;
+    let region = null;
+    let country = null;
+
+    const ipstackKey = Deno.env.get("IPSTACK_API_KEY");
+    if (ip && ip !== "unknown" && ip !== "127.0.0.1" && ipstackKey) {
+      try {
+        const geoRes = await fetch(
+          `http://api.ipstack.com/${ip}?access_key=${ipstackKey}&fields=city,region_name,country_name`
+        );
+        if (geoRes.ok) {
+          const geo = await geoRes.json();
+          if (!geo.error) {
+            city = geo.city || null;
+            region = geo.region_name || null;
+            country = geo.country_name || null;
+          }
+        }
+      } catch {
+        // Geolocation failed silently
+      }
+    }
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -38,6 +60,9 @@ Deno.serve(async (req) => {
       archetype_id,
       archetype_name,
       ip_address: ip,
+      city,
+      region,
+      country,
     });
 
     if (error) {
