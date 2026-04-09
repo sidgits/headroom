@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
 import { supabase } from "@/integrations/supabase/client";
