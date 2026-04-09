@@ -26,6 +26,12 @@ const burnoutBgColors: Record<string, string> = {
 const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) => {
   const shareText = `I'm ${archetype.name}, visit headroomapp.co to know your headroom profile!`;
 
+  const logShareClick = (platform: string) => {
+    supabase.functions.invoke("log-share-click", {
+      body: { platform, archetype_name: archetype.name },
+    }).catch(() => {});
+  };
+
   const shareUrls: Record<string, string> = {
     X: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
     Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://headroomapp.co")}&quote=${encodeURIComponent(shareText)}`,
