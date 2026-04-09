@@ -41,6 +41,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   };
 
   const handleShare = (platform: string) => {
+    logShareClick(platform);
     window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
   };
 
