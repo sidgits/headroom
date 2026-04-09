@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { platform, archetype_name } = await req.json();
+    const { platform, archetype_name, completed } = await req.json();
 
     if (!platform || !archetype_name) {
       return new Response(
@@ -29,6 +29,7 @@ Deno.serve(async (req) => {
     const { error } = await supabase.from("share_clicks").insert({
       platform,
       archetype_name,
+      completed: completed === true,
     });
 
     if (error) {
