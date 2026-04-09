@@ -50,6 +50,27 @@ export type Database = {
         }
         Relationships: []
       }
+      share_clicks: {
+        Row: {
+          archetype_name: string
+          created_at: string
+          id: string
+          platform: string
+        }
+        Insert: {
+          archetype_name: string
+          created_at?: string
+          id?: string
+          platform: string
+        }
+        Update: {
+          archetype_name?: string
+          created_at?: string
+          id?: string
+          platform?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
