@@ -129,6 +129,11 @@ const Index = () => {
             <SprintCheck onAnswer={handleSprinterAnswer} />
           </motion.div>
         )}
+        {screen === "email" && (
+          <motion.div key="email" {...pageTransition}>
+            <EmailCapture onSubmit={handleEmailSubmit} />
+          </motion.div>
+        )}
         {screen === "results" && scoringResult && (
           <motion.div key="results" {...pageTransition}>
             <ResultsScreen
