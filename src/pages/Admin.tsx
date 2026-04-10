@@ -227,7 +227,7 @@ const Admin = () => {
                     ))}
                     {completions.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                           No assessments completed yet.
                         </TableCell>
                       </TableRow>
