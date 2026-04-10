@@ -7,10 +7,11 @@ import Disclaimer from "@/components/quiz/Disclaimer";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
+import EmailCapture from "@/components/quiz/EmailCapture";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 
-type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "results";
+type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
 
 interface QuizState {
   role: string;
@@ -56,7 +57,7 @@ const Index = () => {
         } else {
           const result = calculateResults(updatedAnswers, null);
           setScoringResult(result);
-          setScreen("results");
+          setScreen("email");
         }
       }
     },
@@ -68,9 +69,17 @@ const Index = () => {
       setQuizState((prev) => ({ ...prev, sprinterAnswer: answerId }));
       const result = calculateResults(quizState.answers, answerId);
       setScoringResult(result);
-      setScreen("results");
+      setScreen("email");
     },
     [quizState.answers]
+  );
+
+  const handleEmailSubmit = useCallback(
+    (_email: string) => {
+      // Email is stored — just proceed to results
+      setScreen("results");
+    },
+    []
   );
 
   const handleRetake = useCallback(() => {
@@ -118,6 +127,11 @@ const Index = () => {
         {screen === "sprinterCheck" && (
           <motion.div key="sprinterCheck" {...pageTransition}>
             <SprintCheck onAnswer={handleSprinterAnswer} />
+          </motion.div>
+        )}
+        {screen === "email" && (
+          <motion.div key="email" {...pageTransition}>
+            <EmailCapture onSubmit={handleEmailSubmit} />
           </motion.div>
         )}
         {screen === "results" && scoringResult && (
