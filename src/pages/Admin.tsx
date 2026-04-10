@@ -188,6 +188,7 @@ const Admin = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Date</TableHead>
+                      <TableHead>Email</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Archetype</TableHead>
                       <TableHead>Location</TableHead>
@@ -205,6 +206,9 @@ const Admin = () => {
                             hour: "2-digit",
                             minute: "2-digit",
                           })}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {c.email || "—"}
                         </TableCell>
                         <TableCell className="text-sm">
                           {roleLabels[c.role] || c.role}
