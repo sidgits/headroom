@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface ResultsScreenProps {
   result: ScoringResult;
   role: string;
+  email: string;
   onRetake: () => void;
 }
 
