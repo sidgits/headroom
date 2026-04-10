@@ -15,6 +15,7 @@ interface AssessmentCompletion {
   role: string;
   archetype_id: string;
   archetype_name: string;
+  email: string | null;
   ip_address: string | null;
   city: string | null;
   region: string | null;
@@ -188,6 +189,7 @@ const Admin = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Date</TableHead>
+                      <TableHead>Email</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Archetype</TableHead>
                       <TableHead>Location</TableHead>
@@ -207,6 +209,9 @@ const Admin = () => {
                           })}
                         </TableCell>
                         <TableCell className="text-sm">
+                          {c.email || "—"}
+                        </TableCell>
+                        <TableCell className="text-sm">
                           {roleLabels[c.role] || c.role}
                         </TableCell>
                         <TableCell className="text-sm">
@@ -222,7 +227,7 @@ const Admin = () => {
                     ))}
                     {completions.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                           No assessments completed yet.
                         </TableCell>
                       </TableRow>

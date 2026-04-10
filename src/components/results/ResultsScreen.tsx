@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface ResultsScreenProps {
   result: ScoringResult;
   role: string;
+  email: string;
   onRetake: () => void;
 }
 
@@ -119,7 +120,7 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   );
 };
 
-const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
+const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
 
   const logged = useRef(false);
@@ -135,6 +136,7 @@ const ResultsScreen = ({ result, role, onRetake }: ResultsScreenProps) => {
           role,
           archetype_id: archetype.id,
           archetype_name: archetype.name,
+          email,
         },
       }).catch(() => {});
     }

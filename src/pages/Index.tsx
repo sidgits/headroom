@@ -74,9 +74,11 @@ const Index = () => {
     [quizState.answers]
   );
 
+  const [userEmail, setUserEmail] = useState("");
+
   const handleEmailSubmit = useCallback(
-    (_email: string) => {
-      // Email is stored — just proceed to results
+    (email: string) => {
+      setUserEmail(email);
       setScreen("results");
     },
     []
@@ -139,6 +141,7 @@ const Index = () => {
             <ResultsScreen
               result={scoringResult}
               role={quizState.role}
+              email={userEmail}
               onRetake={handleRetake}
             />
           </motion.div>
