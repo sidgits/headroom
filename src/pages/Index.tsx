@@ -7,10 +7,11 @@ import Disclaimer from "@/components/quiz/Disclaimer";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
+import EmailCapture from "@/components/quiz/EmailCapture";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 
-type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "results";
+type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
 
 interface QuizState {
   role: string;
