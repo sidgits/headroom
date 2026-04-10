@@ -1,0 +1,1 @@
+ALTER TABLE public.assessment_completions ADD COLUMN email TEXT;
