@@ -30,7 +30,7 @@ const EmailCapture = ({ onSubmit }: EmailCaptureProps) => {
     <div className="min-h-screen flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-md text-center space-y-8">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
-          Enter Email to Discover Your Pattern
+          Enter email to Discover your Pattern
         </h1>
         <div className="space-y-3">
           <Input
