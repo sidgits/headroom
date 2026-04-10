@@ -15,6 +15,7 @@ interface AssessmentCompletion {
   role: string;
   archetype_id: string;
   archetype_name: string;
+  email: string | null;
   ip_address: string | null;
   city: string | null;
   region: string | null;
