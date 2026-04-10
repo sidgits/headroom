@@ -57,7 +57,7 @@ const Index = () => {
         } else {
           const result = calculateResults(updatedAnswers, null);
           setScoringResult(result);
-          setScreen("results");
+          setScreen("email");
         }
       }
     },
@@ -69,9 +69,17 @@ const Index = () => {
       setQuizState((prev) => ({ ...prev, sprinterAnswer: answerId }));
       const result = calculateResults(quizState.answers, answerId);
       setScoringResult(result);
-      setScreen("results");
+      setScreen("email");
     },
     [quizState.answers]
+  );
+
+  const handleEmailSubmit = useCallback(
+    (_email: string) => {
+      // Email is stored — just proceed to results
+      setScreen("results");
+    },
+    []
   );
 
   const handleRetake = useCallback(() => {
