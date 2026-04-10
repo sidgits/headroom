@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { role, archetype_id, archetype_name } = await req.json();
+    const { role, archetype_id, archetype_name, email } = await req.json();
 
     if (!role || !archetype_id || !archetype_name) {
       return new Response(
@@ -59,6 +59,7 @@ Deno.serve(async (req) => {
       role,
       archetype_id,
       archetype_name,
+      email: email || null,
       ip_address: ip,
       city,
       region,
