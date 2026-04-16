@@ -23,7 +23,7 @@ interface AssessmentCompletion {
   created_at: string;
 }
 
-const AdminLogin = ({ onAuth }: { onAuth: (pw: string) => void }) => {
+const AdminLogin = ({ onAuth }: { onAuth: (token: string) => void }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,11 +39,11 @@ const AdminLogin = ({ onAuth }: { onAuth: (pw: string) => void }) => {
       });
 
       if (fnError || !data?.valid) {
-        setError("Incorrect password");
+        setError(data?.error || "Incorrect password");
       } else {
         sessionStorage.setItem("headroom_admin", "1");
-        sessionStorage.setItem("headroom_admin_pw", password);
-        onAuth(password);
+        sessionStorage.setItem("headroom_admin_token", data.token);
+        onAuth(data.token);
       }
     } catch {
       setError("Something went wrong");
@@ -79,21 +79,27 @@ const AdminLogin = ({ onAuth }: { onAuth: (pw: string) => void }) => {
 
 const Admin = () => {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("headroom_admin") === "1");
-  const [adminPw, setAdminPw] = useState(() => sessionStorage.getItem("headroom_admin_pw") || "");
+  const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem("headroom_admin_token") || "");
   const [completions, setCompletions] = useState<AssessmentCompletion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authed || !adminPw) return;
+    if (!authed || !adminToken) return;
 
     const fetchCompletions = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("admin-completions", {
-          body: { password: adminPw },
+          body: { token: adminToken },
         });
-        if (!error && data?.completions) {
-          setCompletions(data.completions as AssessmentCompletion[]);
+        if (error || !data?.completions) {
+          // Token may have expired
+          sessionStorage.removeItem("headroom_admin");
+          sessionStorage.removeItem("headroom_admin_token");
+          setAdminToken("");
+          setAuthed(false);
+          return;
         }
+        setCompletions(data.completions as AssessmentCompletion[]);
       } catch {
         // Failed to fetch
       }
@@ -101,10 +107,10 @@ const Admin = () => {
     };
 
     fetchCompletions();
-  }, [authed, adminPw]);
+  }, [authed, adminToken]);
 
   if (!authed) {
-    return <AdminLogin onAuth={(pw) => { setAdminPw(pw); setAuthed(true); }} />;
+    return <AdminLogin onAuth={(token) => { setAdminToken(token); setAuthed(true); }} />;
   }
 
   const roleLabels: Record<string, string> = {
@@ -146,8 +152,8 @@ const Admin = () => {
             <button
               onClick={() => {
                 sessionStorage.removeItem("headroom_admin");
-                sessionStorage.removeItem("headroom_admin_pw");
-                setAdminPw("");
+                sessionStorage.removeItem("headroom_admin_token");
+                setAdminToken("");
                 setAuthed(false);
               }}
               className="text-xs text-muted-foreground underline hover:text-foreground"
