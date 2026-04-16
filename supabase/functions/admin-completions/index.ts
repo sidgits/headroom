@@ -5,17 +5,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const TOKEN_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
+
+async function verifyToken(token: string, secret: string): Promise<boolean> {
+  const parts = token.split(".");
+  if (parts.length !== 2) return false;
+
+  const [timestamp, sigHex] = parts;
+  const ts = parseInt(timestamp, 10);
+  if (isNaN(ts)) return false;
+
+  // Check token age
+  if (Date.now() - ts > TOKEN_MAX_AGE_MS) return false;
+
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"]
+  );
+
+  const sigBytes = new Uint8Array(sigHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)));
+  return crypto.subtle.verify("HMAC", key, sigBytes, encoder.encode(timestamp));
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { password } = await req.json();
+    const { token } = await req.json();
 
-    // Verify admin password
     const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-    if (!adminPassword || password !== adminPassword) {
+    if (!adminPassword || !token || !(await verifyToken(token, adminPassword))) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }

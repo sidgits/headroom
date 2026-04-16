@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     if (ip && ip !== "unknown" && ip !== "127.0.0.1" && ipstackKey) {
       try {
         const geoRes = await fetch(
-          `http://api.ipstack.com/${ip}?access_key=${ipstackKey}&fields=city,region_name,country_name`
+          `https://api.ipstack.com/${ip}?access_key=${ipstackKey}&fields=city,region_name,country_name`
         );
         if (geoRes.ok) {
           const geo = await geoRes.json();
