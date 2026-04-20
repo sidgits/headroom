@@ -3,6 +3,9 @@ const Footer = () => (
     <p className="text-center text-[11px] text-muted-foreground tracking-wide">
       Headroom is a Digital Lexicon Corp production · Delaware, DE
     </p>
+    <p className="text-center text-[11px] text-muted-foreground tracking-wide mt-1">
+      © 2026, Digital Lexicon Corp &amp; Digital Lexicon Sdn Bhd
+    </p>
   </footer>
 );
 
