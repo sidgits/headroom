@@ -108,7 +108,10 @@ const Index = () => {
         <AnimatePresence mode="wait">
           {screen === "landing" && (
             <motion.div key="landing" {...pageTransition}>
-              {returning.user && returning.completion ? (
+              {returning.loading ? (
+                // Avoid flashing LandingHero before we know whether the user has a past completion.
+                <div className="min-h-screen bg-background" aria-hidden />
+              ) : returning.user && returning.completion ? (
                 <ReturningUserHome
                   user={returning.user}
                   completion={returning.completion}

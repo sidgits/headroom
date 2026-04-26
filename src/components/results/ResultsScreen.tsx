@@ -330,10 +330,10 @@ const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) =>
             <div className="flex justify-center">
               <button
                 onClick={async () => {
-                  const result = await lovable.auth.signInWithOAuth("google", {
+                  const oauthResult = await lovable.auth.signInWithOAuth("google", {
                     redirect_uri: window.location.origin,
                   });
-                  if (result.error) {
+                  if (oauthResult.error) {
                     toast.error("Sign-in failed. Please try again.");
                   }
                 }}
