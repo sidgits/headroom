@@ -2,12 +2,14 @@ import { useState, useCallback } from "react";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingHero from "@/components/landing/LandingHero";
+import ReturningUserHome, { useReturningUserProfile } from "@/components/landing/ReturningUserHome";
 import RoleSelector from "@/components/quiz/RoleSelector";
 import Disclaimer from "@/components/quiz/Disclaimer";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
 import EmailCapture from "@/components/quiz/EmailCapture";
+import ProfileBadge from "@/components/auth/ProfileBadge";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 
@@ -21,6 +23,7 @@ interface QuizState {
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("landing");
+  const returning = useReturningUserProfile();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizState, setQuizState] = useState<QuizState>({
     role: "",
@@ -100,11 +103,20 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ProfileBadge />
       <div className="flex-1">
         <AnimatePresence mode="wait">
           {screen === "landing" && (
             <motion.div key="landing" {...pageTransition}>
-              <LandingHero onStart={handleStart} />
+              {returning.user && returning.completion ? (
+                <ReturningUserHome
+                  user={returning.user}
+                  completion={returning.completion}
+                  onRetake={handleStart}
+                />
+              ) : (
+                <LandingHero onStart={handleStart} />
+              )}
             </motion.div>
           )}
           {screen === "role" && (

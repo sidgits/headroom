@@ -21,6 +21,28 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Optional: try to identify the signed-in user from the Authorization header.
+    // The function deploys with verify_jwt=false so we validate the token in code.
+    let user_id: string | null = null;
+    let user_email: string | null = null;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      try {
+        const userClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: authHeader } } }
+        );
+        const { data: userData } = await userClient.auth.getUser();
+        if (userData?.user) {
+          user_id = userData.user.id;
+          user_email = userData.user.email ?? null;
+        }
+      } catch {
+        // Anonymous completion — user_id stays null
+      }
+    }
+
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("cf-connecting-ip") ||
@@ -59,7 +81,9 @@ Deno.serve(async (req) => {
       role,
       archetype_id,
       archetype_name,
-      email: email || null,
+      // Prefer the verified signed-in email; fall back to the value provided in the body.
+      email: user_email || email || null,
+      user_id,
       ip_address: ip,
       city,
       region,

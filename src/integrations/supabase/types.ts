@@ -26,6 +26,7 @@ export type Database = {
           ip_address: string | null
           region: string | null
           role: string
+          user_id: string | null
         }
         Insert: {
           archetype_id: string
@@ -38,6 +39,7 @@ export type Database = {
           ip_address?: string | null
           region?: string | null
           role: string
+          user_id?: string | null
         }
         Update: {
           archetype_id?: string
@@ -50,6 +52,7 @@ export type Database = {
           ip_address?: string | null
           region?: string | null
           role?: string
+          user_id?: string | null
         }
         Relationships: []
       }
