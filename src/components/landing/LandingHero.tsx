@@ -158,6 +158,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
       </motion.section>
     </div>
   );
-};
+});
+LandingHero.displayName = "LandingHero";
 
 export default LandingHero;
