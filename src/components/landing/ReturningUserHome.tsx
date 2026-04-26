@@ -138,57 +138,59 @@ export interface ReturningUserState {
   loading: boolean;
   user: User | null;
   completion: CompletionRow | null;
+  /** Force a refetch of the latest completion for the current user. */
+  refresh: () => void;
 }
 
 /** Hook that resolves the signed-in user and their most recent completion (by user_id or email). */
 export const useReturningUserProfile = (): ReturningUserState => {
-  const [state, setState] = useState<ReturningUserState>({
+  const [state, setState] = useState<Omit<ReturningUserState, "refresh">>({
     loading: true,
     user: null,
     completion: null,
   });
+  const [refreshTick, setRefreshTick] = useState(0);
   // Track the user id we've already loaded for so we don't refetch on token refresh.
   const loadedForUserId = useRef<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    const load = async (user: User | null) => {
-      if (!user) {
-        loadedForUserId.current = null;
-        if (active) setState({ loading: false, user: null, completion: null });
-        return;
-      }
-      if (loadedForUserId.current === user.id) {
-        // Already loaded for this user — just refresh the user object, keep completion.
-        if (active) setState((s) => ({ ...s, loading: false, user }));
-        return;
-      }
-      loadedForUserId.current = user.id;
+    const fetchCompletion = async (user: User) => {
       // RLS lets the user read rows linked by user_id OR matching email.
       const { data, error } = await supabase
         .from("assessment_completions")
         .select("archetype_id, archetype_name, role, created_at")
         .order("created_at", { ascending: false })
         .limit(1);
+      if (error) console.error("Failed to load past completion", error);
+      return (data?.[0] as CompletionRow | undefined) ?? null;
+    };
 
-      if (error) {
-        console.error("Failed to load past completion", error);
+    const load = async (user: User | null, force = false) => {
+      if (!user) {
+        loadedForUserId.current = null;
+        if (active) setState({ loading: false, user: null, completion: null });
+        return;
       }
-      const completion = (data?.[0] as CompletionRow | undefined) ?? null;
+      if (!force && loadedForUserId.current === user.id) {
+        if (active) setState((s) => ({ ...s, loading: false, user }));
+        return;
+      }
+      loadedForUserId.current = user.id;
+      const completion = await fetchCompletion(user);
       if (active) setState({ loading: false, user, completion });
     };
 
     supabase.auth.getSession().then(({ data }) => {
-      load(data.session?.user ?? null);
+      // refreshTick > 0 means caller asked to force a refetch.
+      load(data.session?.user ?? null, refreshTick > 0);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      // Only react to meaningful auth changes; ignore TOKEN_REFRESHED / USER_UPDATED churn.
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "INITIAL_SESSION") {
         return;
       }
       const nextUser = session?.user ?? null;
-      // For SIGNED_IN of the same user we already loaded, skip the loading flicker.
       if (nextUser && loadedForUserId.current === nextUser.id) {
         setState((s) => ({ ...s, user: nextUser, loading: false }));
         return;
@@ -201,9 +203,9 @@ export const useReturningUserProfile = (): ReturningUserState => {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [refreshTick]);
 
-  return state;
+  return { ...state, refresh: () => setRefreshTick((n) => n + 1) };
 };
 
 export default ReturningUserHome;

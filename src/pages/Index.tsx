@@ -91,8 +91,10 @@ const Index = () => {
     setQuizState({ role: "", answers: {}, sprinterAnswer: null });
     setCurrentQuestion(0);
     setScoringResult(null);
+    // Force the returning-user hook to refetch the latest completion when we land back.
+    returning.refresh();
     setScreen("landing");
-  }, []);
+  }, [returning]);
 
   const pageTransition = {
     initial: { opacity: 0, y: 20 },

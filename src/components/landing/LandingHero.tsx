@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -31,7 +31,7 @@ const fadeUp = {
   }),
 };
 
-const LandingHero = ({ onStart }: LandingHeroProps) => {
+const LandingHero = forwardRef<HTMLDivElement, LandingHeroProps>(({ onStart }, ref) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
     "";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
+    <div ref={ref} className="min-h-screen flex flex-col bg-background relative overflow-hidden">
       {/* Warm radial gradient background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[50%] translate-x-[-50%] w-[140%] h-[70%] rounded-full bg-gradient-to-b from-primary/15 via-accent/10 to-transparent blur-3xl" />
@@ -158,6 +158,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
       </motion.section>
     </div>
   );
-};
+});
+LandingHero.displayName = "LandingHero";
 
 export default LandingHero;
