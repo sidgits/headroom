@@ -154,6 +154,16 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
         >
           A 2-minute assessment that reveals your cognitive load pattern — and what to do about it.
         </motion.p>
+        {user && (
+          <motion.p
+            className="mt-6 text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45, duration: 0.5 }}
+          >
+            Welcome{displayName ? `, ${displayName.split(" ")[0]}` : ""} 👋
+          </motion.p>
+        )}
         <motion.button
           onClick={onStart}
           className="mt-8 w-full max-w-xs h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
@@ -163,7 +173,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
-          Click to Discover your Pattern
+          {user ? "Discover your Pattern" : "Click to Discover your Pattern"}
         </motion.button>
       </section>
 
