@@ -327,7 +327,7 @@ const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) =>
             <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider">
               Save your archetype
             </p>
-            <div className="flex justify-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={async () => {
                   const oauthResult = await lovable.auth.signInWithOAuth("google", {
@@ -346,6 +346,25 @@ const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) =>
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
                 </svg>
                 Sign in with Google
+              </button>
+              <button
+                onClick={async () => {
+                  const oauthResult = await lovable.auth.signInWithOAuth("microsoft", {
+                    redirect_uri: window.location.origin,
+                  });
+                  if (oauthResult.error) {
+                    toast.error("Sign-in failed. Please try again.");
+                  }
+                }}
+                className="flex items-center justify-center gap-3 py-3 px-6 rounded-2xl bg-card border border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all text-sm font-medium text-foreground"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 23 23">
+                  <path fill="#F25022" d="M1 1h10v10H1z"/>
+                  <path fill="#7FBA00" d="M12 1h10v10H12z"/>
+                  <path fill="#00A4EF" d="M1 12h10v10H1z"/>
+                  <path fill="#FFB900" d="M12 12h10v10H12z"/>
+                </svg>
+                Sign in with Microsoft
               </button>
             </div>
             <p className="text-center text-xs italic text-muted-foreground">
