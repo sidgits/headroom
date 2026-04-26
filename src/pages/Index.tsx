@@ -103,6 +103,7 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ProfileBadge />
       <div className="flex-1">
         <AnimatePresence mode="wait">
           {screen === "landing" && (
