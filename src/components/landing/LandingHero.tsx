@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -49,24 +47,6 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
     (user?.user_metadata?.name as string | undefined) ??
     user?.email ??
     "";
-  const avatarUrl =
-    (user?.user_metadata?.avatar_url as string | undefined) ??
-    (user?.user_metadata?.picture as string | undefined) ??
-    null;
-
-  const handleSignIn = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Sign-in failed. Please try again.");
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast.success("Signed out");
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
