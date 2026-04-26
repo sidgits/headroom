@@ -48,7 +48,7 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
         <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] rounded-full bg-gradient-to-tl from-warm-red/10 via-deep-orange/8 to-transparent blur-3xl" />
       </div>
 
-      <ProfileBadge />
+      
 
       <div className="relative max-w-lg mx-auto px-6 pt-20 pb-16 space-y-8">
         {/* Greeting */}
