@@ -156,7 +156,6 @@ export const useReturningUserProfile = (): ReturningUserState => {
         if (active) setState({ loading: false, user: null, completion: null });
         return;
       }
-      const email = user.email?.toLowerCase() ?? "";
       // RLS lets the user read rows linked by user_id OR matching email.
       const { data, error } = await supabase
         .from("assessment_completions")
@@ -179,19 +178,13 @@ export const useReturningUserProfile = (): ReturningUserState => {
       load(session?.user ?? null);
     });
 
-    // suppress unused var warning; email is referenced inside load() via user
-    void email;
     return () => {
       active = false;
       sub.subscription.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return state;
 };
-
-// helper var referenced above to silence linters when destructuring
-const email = "";
 
 export default ReturningUserHome;
