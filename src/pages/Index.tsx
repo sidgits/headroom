@@ -23,6 +23,7 @@ interface QuizState {
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("landing");
+  const returning = useReturningUserProfile();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizState, setQuizState] = useState<QuizState>({
     role: "",
@@ -106,7 +107,15 @@ const Index = () => {
         <AnimatePresence mode="wait">
           {screen === "landing" && (
             <motion.div key="landing" {...pageTransition}>
-              <LandingHero onStart={handleStart} />
+              {returning.user && returning.completion ? (
+                <ReturningUserHome
+                  user={returning.user}
+                  completion={returning.completion}
+                  onRetake={handleStart}
+                />
+              ) : (
+                <LandingHero onStart={handleStart} />
+              )}
             </motion.div>
           )}
           {screen === "role" && (
