@@ -34,6 +34,40 @@ const fadeUp = {
 };
 
 const LandingHero = ({ onStart }: LandingHeroProps) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined) ??
+    (user?.user_metadata?.name as string | undefined) ??
+    user?.email ??
+    "";
+  const avatarUrl =
+    (user?.user_metadata?.avatar_url as string | undefined) ??
+    (user?.user_metadata?.picture as string | undefined) ??
+    null;
+
+  const handleSignIn = async () => {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error("Sign-in failed. Please try again.");
+    }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
       {/* Warm radial gradient background */}
