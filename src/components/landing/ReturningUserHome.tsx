@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -147,15 +147,24 @@ export const useReturningUserProfile = (): ReturningUserState => {
     user: null,
     completion: null,
   });
+  // Track the user id we've already loaded for so we don't refetch on token refresh.
+  const loadedForUserId = useRef<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
     const load = async (user: User | null) => {
       if (!user) {
+        loadedForUserId.current = null;
         if (active) setState({ loading: false, user: null, completion: null });
         return;
       }
+      if (loadedForUserId.current === user.id) {
+        // Already loaded for this user — just refresh the user object, keep completion.
+        if (active) setState((s) => ({ ...s, loading: false, user }));
+        return;
+      }
+      loadedForUserId.current = user.id;
       // RLS lets the user read rows linked by user_id OR matching email.
       const { data, error } = await supabase
         .from("assessment_completions")
@@ -173,9 +182,19 @@ export const useReturningUserProfile = (): ReturningUserState => {
     supabase.auth.getSession().then(({ data }) => {
       load(data.session?.user ?? null);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only react to meaningful auth changes; ignore TOKEN_REFRESHED / USER_UPDATED churn.
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "INITIAL_SESSION") {
+        return;
+      }
+      const nextUser = session?.user ?? null;
+      // For SIGNED_IN of the same user we already loaded, skip the loading flicker.
+      if (nextUser && loadedForUserId.current === nextUser.id) {
+        setState((s) => ({ ...s, user: nextUser, loading: false }));
+        return;
+      }
       setState((s) => ({ ...s, loading: true }));
-      load(session?.user ?? null);
+      load(nextUser);
     });
 
     return () => {
