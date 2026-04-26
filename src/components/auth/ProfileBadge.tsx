@@ -18,6 +18,15 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const MicrosoftIcon = () => (
+  <svg className="w-4 h-4" viewBox="0 0 23 23" aria-hidden>
+    <path fill="#F25022" d="M1 1h10v10H1z"/>
+    <path fill="#7FBA00" d="M12 1h10v10H12z"/>
+    <path fill="#00A4EF" d="M1 12h10v10H1z"/>
+    <path fill="#FFB900" d="M12 12h10v10H12z"/>
+  </svg>
+);
+
 const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgeProps) => {
   const [user, setUser] = useState<User | null>(null);
 
