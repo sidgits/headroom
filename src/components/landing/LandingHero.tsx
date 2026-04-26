@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { lovable } from "@/integrations/lovable/index";
 
 interface LandingHeroProps {
   onStart: () => void;
