@@ -2,12 +2,14 @@ import { useState, useCallback } from "react";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingHero from "@/components/landing/LandingHero";
+import ReturningUserHome, { useReturningUserProfile } from "@/components/landing/ReturningUserHome";
 import RoleSelector from "@/components/quiz/RoleSelector";
 import Disclaimer from "@/components/quiz/Disclaimer";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
 import EmailCapture from "@/components/quiz/EmailCapture";
+import ProfileBadge from "@/components/auth/ProfileBadge";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 
