@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getArchetypeMeta, burnoutLevelStyles } from "@/lib/archetypeProfile";
-import ProfileBadge from "@/components/auth/ProfileBadge";
+
 
 interface CompletionRow {
   archetype_id: string;
