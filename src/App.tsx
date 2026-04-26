@@ -35,11 +35,17 @@ const useLogSignin = () => {
   }, []);
 };
 
+const AuthLogger = () => {
+  useLogSignin();
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AuthLogger />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
