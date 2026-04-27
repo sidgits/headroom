@@ -39,7 +39,7 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
     (user?.user_metadata?.picture as string | undefined) ??
     null;
 
-  const handleSignIn = async (provider: "google" | "microsoft") => {
+  const handleSignIn = async (provider: "google") => {
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
