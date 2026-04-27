@@ -100,15 +100,6 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
             <span className="hidden sm:inline">Sign in with Google</span>
             <span className="sm:hidden">Sign in</span>
           </button>
-          <button
-            onClick={() => handleSignIn("microsoft")}
-            className="flex items-center gap-2 py-2 px-3 sm:px-4 rounded-xl bg-card/90 backdrop-blur-md border border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all text-xs sm:text-sm font-medium text-foreground shadow-sm"
-            aria-label="Sign in with Microsoft"
-          >
-            <MicrosoftIcon />
-            <span className="hidden sm:inline">Sign in with Microsoft</span>
-            <span className="sm:hidden">Sign in</span>
-          </button>
         </div>
       )}
     </div>
