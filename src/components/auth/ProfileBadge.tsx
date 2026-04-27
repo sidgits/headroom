@@ -18,15 +18,6 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const MicrosoftIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 23 23" aria-hidden>
-    <path fill="#F25022" d="M1 1h10v10H1z"/>
-    <path fill="#7FBA00" d="M12 1h10v10H12z"/>
-    <path fill="#00A4EF" d="M1 12h10v10H1z"/>
-    <path fill="#FFB900" d="M12 12h10v10H12z"/>
-  </svg>
-);
-
 const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgeProps) => {
   const [user, setUser] = useState<User | null>(null);
 
@@ -48,7 +39,7 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
     (user?.user_metadata?.picture as string | undefined) ??
     null;
 
-  const handleSignIn = async (provider: "google" | "microsoft") => {
+  const handleSignIn = async (provider: "google") => {
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
@@ -98,15 +89,6 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
           >
             <GoogleIcon />
             <span className="hidden sm:inline">Sign in with Google</span>
-            <span className="sm:hidden">Sign in</span>
-          </button>
-          <button
-            onClick={() => handleSignIn("microsoft")}
-            className="flex items-center gap-2 py-2 px-3 sm:px-4 rounded-xl bg-card/90 backdrop-blur-md border border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all text-xs sm:text-sm font-medium text-foreground shadow-sm"
-            aria-label="Sign in with Microsoft"
-          >
-            <MicrosoftIcon />
-            <span className="hidden sm:inline">Sign in with Microsoft</span>
             <span className="sm:hidden">Sign in</span>
           </button>
         </div>
