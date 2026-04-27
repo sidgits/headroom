@@ -98,7 +98,7 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
           >
             <GoogleIcon />
             <span className="hidden sm:inline">Sign in with Google</span>
-            <span className="sm:hidden">Google</span>
+            <span className="sm:hidden">Sign in</span>
           </button>
           <button
             onClick={() => handleSignIn("microsoft")}
@@ -107,7 +107,7 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
           >
             <MicrosoftIcon />
             <span className="hidden sm:inline">Sign in with Microsoft</span>
-            <span className="sm:hidden">Microsoft</span>
+            <span className="sm:hidden">Sign in</span>
           </button>
         </div>
       )}
