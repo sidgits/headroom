@@ -1,0 +1,8 @@
+# Headroom
+
+> Headroom is a cognitive load assessment platform that helps you discover your Work Pattern archetype. Answer a short quiz about how you experience mental workload, task switching, and focus — and get personalized insights into how you work best.
+
+## Pages
+
+- [/](/): Take the cognitive load assessment quiz and discover your Work Pattern archetype.
+- [/admin](/admin): Admin dashboard for reviewing assessment completion analytics.
