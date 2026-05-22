@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingHero from "@/components/landing/LandingHero";
@@ -105,6 +106,14 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <Helmet>
+        <title>Headroom — Cognitive Load Assessment</title>
+        <meta name="description" content="Discover your Work Pattern archetype by assessing your Cognitive Load." />
+        <link rel="canonical" href="https://headroomapp.co/" />
+        <meta property="og:title" content="Headroom — Cognitive Load Assessment" />
+        <meta property="og:description" content="Discover your Work Pattern archetype by assessing your Cognitive Load." />
+        <meta property="og:url" content="https://headroomapp.co/" />
+      </Helmet>
       <ProfileBadge />
       <div className="flex-1">
         <AnimatePresence mode="wait">
