@@ -12,6 +12,8 @@ import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
 
+import type { ScoringResult } from "@/lib/scoring";
+
 interface Completion {
   id: string;
   role: string;
@@ -20,8 +22,25 @@ interface Completion {
   created_at: string;
   name: string | null;
   email: string | null;
-  result_data?: any | null;
+  result_data?: unknown;
 }
+
+// Best-effort runtime check that a JSON blob matches the ScoringResult shape
+// the PDF generator expects. Older completions may not have result_data, and
+// stored shapes can drift over time, so we guard before passing to the PDF.
+function isScoringResult(value: unknown): value is ScoringResult {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    !!v.archetype &&
+    !!v.burnoutRisk &&
+    Array.isArray(v.dimensionScores) &&
+    Array.isArray(v.recommendations) &&
+    !!v.mirror &&
+    !!v.shadowArchetype
+  );
+}
+
 
 interface Checkin {
   id: string;
@@ -379,7 +398,10 @@ const Dashboard = () => {
               <ShareButtons archetypeName={archetypeProfile.name} />
             </div>
             <motion.button
-              onClick={() => generateResultsPDF(latest?.result_data ?? buildResultFromMeta(archetypeProfile), latest?.role ?? "—")}
+              onClick={() => generateResultsPDF(
+                isScoringResult(latest?.result_data) ? latest!.result_data : buildResultFromMeta(archetypeProfile),
+                latest?.role ?? "—",
+              )}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 whitespace-nowrap"
