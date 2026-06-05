@@ -93,9 +93,6 @@ Deno.serve(async (req) => {
       customer: customerId,
       customer_email: customerId ? undefined : effectiveEmail,
       mode: "subscription",
-      // Restrict to card only. This disables Stripe Link, which otherwise
-      // emails buyers a 6-digit "Link verification code" during checkout.
-      payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
