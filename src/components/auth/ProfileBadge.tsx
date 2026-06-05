@@ -53,6 +53,9 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
     toast.success("Signed out");
   };
 
+  // Only show when signed in. Sign-in happens once at the end of the quiz.
+  if (!user) return null;
+
   return (
     <div className={className}>
       {user ? (
