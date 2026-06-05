@@ -20,6 +20,7 @@ interface Completion {
   created_at: string;
   name: string | null;
   email: string | null;
+  result_data?: any | null;
 }
 
 interface Checkin {
@@ -100,7 +101,7 @@ const Dashboard = () => {
         const [completionsRes, checkinsRes] = await Promise.all([
           supabase
             .from("assessment_completions")
-            .select("id, role, archetype_id, archetype_name, created_at, name, email")
+            .select("id, role, archetype_id, archetype_name, created_at, name, email, result_data")
             .order("created_at", { ascending: false })
             .limit(50),
           supabase
@@ -378,7 +379,7 @@ const Dashboard = () => {
               <ShareButtons archetypeName={archetypeProfile.name} />
             </div>
             <motion.button
-              onClick={() => generateResultsPDF(buildResultFromMeta(archetypeProfile), latest?.role ?? "—")}
+              onClick={() => generateResultsPDF(latest?.result_data ?? buildResultFromMeta(archetypeProfile), latest?.role ?? "—")}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 whitespace-nowrap"

@@ -37,6 +37,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
           archetype_name: archetype.name,
           email,
           name,
+          result_data: result,
         },
       }).catch(() => {});
     }
