@@ -81,7 +81,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
         >
           Your brain has a capacity.{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red">
-            Nobody told you what's filling it.
+            Nobody told you what's filling it!
           </span>
         </motion.h1>
         {user && (
