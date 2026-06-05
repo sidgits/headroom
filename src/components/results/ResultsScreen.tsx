@@ -176,7 +176,13 @@ interface UpgradeModalProps {
 const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
   const [checkingOut, setCheckingOut] = useState(false);
 
+  const isPreview = typeof window !== "undefined" && window.location.hostname.includes("lovable.app");
+
   const handleSubscribe = async () => {
+    if (isPreview) {
+      window.location.href = "/dashboard";
+      return;
+    }
     setCheckingOut(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout");
