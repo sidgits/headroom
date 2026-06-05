@@ -310,7 +310,21 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 </p>
               </div>
               <motion.button
-                onClick={() => navigate("/dashboard")}
+                onClick={async () => {
+                  try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session) {
+                      toast.error("Please sign in to upgrade");
+                      return;
+                    }
+                    const { data, error } = await supabase.functions.invoke("create-checkout");
+                    if (error) throw error;
+                    if (data?.url) window.location.href = data.url;
+                  } catch (err) {
+                    console.error(err);
+                    toast.error("Could not start checkout. Please try again.");
+                  }
+                }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20"
@@ -319,7 +333,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 Upgrade to access Full Dashboard
               </motion.button>
               <p className="text-[11px] text-muted-foreground italic">
-                Payment opens soon — early users get free dashboard access.
+                Monthly subscription. Cancel anytime.
               </p>
             </div>
           </motion.div>
