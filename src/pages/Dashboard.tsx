@@ -150,15 +150,15 @@ const Dashboard = () => {
       icon: Activity,
       tint: "bg-primary/10 border-primary/30 text-primary",
       body: latest && archetypeProfile ? (
-        <div className="flex items-start gap-2">
-          <span className="text-2xl leading-none">{archetypeProfile.emoji}</span>
+        <div className="flex items-start gap-3">
+          <span className="text-3xl sm:text-4xl leading-none">{archetypeProfile.emoji}</span>
           <div className="min-w-0">
-            <p className="text-[13px] font-bold text-foreground truncate">{archetypeProfile.name}</p>
-            <p className="text-[10px] text-muted-foreground line-clamp-2">{archetypeProfile.headline}</p>
+            <p className="text-base sm:text-lg font-bold text-foreground truncate">{archetypeProfile.name}</p>
+            <p className="text-sm text-muted-foreground line-clamp-3">{archetypeProfile.headline}</p>
           </div>
         </div>
       ) : (
-        <button onClick={() => navigate("/")} className="text-[11px] text-foreground underline underline-offset-2">
+        <button onClick={() => navigate("/")} className="text-sm text-foreground underline underline-offset-2">
           Take assessment →
         </button>
       ),
@@ -170,11 +170,11 @@ const Dashboard = () => {
       tint: "bg-[hsl(var(--warm-red)/0.12)] border-[hsl(var(--warm-red)/0.35)] text-[hsl(var(--warm-red))]",
       body: archetypeProfile ? (
         <div>
-          <p className="text-[12px] font-semibold text-foreground">{archetypeProfile.defaultBurnout.label}</p>
-          <p className="text-[10px] text-muted-foreground line-clamp-2">{archetypeProfile.defaultBurnout.signal}</p>
+          <p className="text-base font-semibold text-foreground">{archetypeProfile.defaultBurnout.label}</p>
+          <p className="text-sm text-muted-foreground line-clamp-3">{archetypeProfile.defaultBurnout.signal}</p>
         </div>
       ) : (
-        <p className="text-[11px] text-muted-foreground">Complete assessment to see</p>
+        <p className="text-sm text-muted-foreground">Complete assessment to see</p>
       ),
     },
     {
@@ -183,15 +183,15 @@ const Dashboard = () => {
       icon: TrendingUp,
       tint: "bg-accent/10 border-accent/30 text-accent",
       body: (
-        <div className="space-y-1.5">
-          <p className="text-[11px] text-foreground">
-            <span className="font-bold">{completions.length}</span>
+        <div className="space-y-2">
+          <p className="text-sm text-foreground">
+            <span className="text-xl font-bold">{completions.length}</span>
             <span className="text-muted-foreground"> / {MIN_LONGITUDINAL_CHECKINS} assessments</span>
           </p>
-          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+          <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-primary to-accent" style={{ width: `${progressPct}%` }} />
           </div>
-          <p className="text-[10px] text-muted-foreground italic">Retake fortnightly</p>
+          <p className="text-xs text-muted-foreground italic">Retake fortnightly</p>
         </div>
       ),
     },
@@ -202,8 +202,8 @@ const Dashboard = () => {
       tint: "bg-[hsl(var(--golden)/0.15)] border-[hsl(var(--golden)/0.4)] text-[hsl(var(--golden))]",
       body: (
         <div>
-          <p className="text-2xl font-bold text-foreground leading-none">{totalCheckins}</p>
-          <p className="text-[10px] text-muted-foreground mt-1">
+          <p className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{totalCheckins}</p>
+          <p className="text-sm text-muted-foreground mt-2">
             {checkins[0] ? `Last: ${new Date(checkins[0].created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}` : "First today"}
           </p>
         </div>
@@ -215,8 +215,8 @@ const Dashboard = () => {
       icon: Calendar,
       tint: "bg-[hsl(var(--deep-orange)/0.12)] border-[hsl(var(--deep-orange)/0.35)] text-[hsl(var(--deep-orange))]",
       body: (
-        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-          <Lock className="w-3 h-3" /> Connect — soon
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Lock className="w-4 h-4" /> Connect — soon
         </div>
       ),
     },
@@ -226,7 +226,7 @@ const Dashboard = () => {
       icon: LineChart,
       tint: "bg-secondary border-border text-foreground",
       body: (
-        <p className="text-[11px] text-muted-foreground italic">Awaiting calendar</p>
+        <p className="text-sm text-muted-foreground italic">Awaiting calendar</p>
       ),
     },
     {
@@ -235,34 +235,34 @@ const Dashboard = () => {
       icon: MessageCircle,
       tint: "bg-primary/10 border-primary/30 text-primary",
       body: (
-        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-          <Sparkles className="w-3 h-3" /> Agent — soon
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Sparkles className="w-4 h-4" /> Agent — soon
         </div>
       ),
     },
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>Dashboard — Headroom</title>
         <meta name="description" content="Your full Headroom cognitive-load dashboard." />
       </Helmet>
       <ProfileBadge />
 
-      <div className="flex-1 max-w-3xl w-full mx-auto px-4 pt-2 pb-3 flex flex-col gap-2.5 min-h-0">
+      <div className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-6 flex flex-col gap-4">
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
-          <h1 className="text-lg font-bold text-foreground leading-tight">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
             Welcome{latest?.name ? `, ${latest.name.split(" ")[0]}` : ""} 👋
           </h1>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-2 flex-1 min-h-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 flex-1">
           {tiles.map((t, i) => {
             const Icon = t.icon;
             return (
@@ -271,13 +271,13 @@ const Dashboard = () => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.04 }}
-                className={`rounded-xl border p-2.5 flex flex-col gap-1.5 ${t.tint}`}
+                className={`rounded-2xl border p-4 sm:p-5 flex flex-col gap-3 min-h-[140px] ${t.tint}`}
               >
-                <div className="flex items-center gap-1.5">
-                  <Icon className="w-3.5 h-3.5" />
-                  <h2 className="text-[10px] font-bold uppercase tracking-wider">{t.title}</h2>
+                <div className="flex items-center gap-2">
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider">{t.title}</h2>
                 </div>
-                <div className="flex-1 min-h-0">{t.body}</div>
+                <div className="flex-1">{t.body}</div>
               </motion.div>
             );
           })}
