@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Activity, Calendar, CheckCircle2, LineChart, Lock, MessageCircle, Sparkles, TrendingUp } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, Flame, LineChart, Lock, MessageCircle, Shield, Sparkles, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
-import { getArchetypeMeta } from "@/lib/archetypeProfile";
+import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 
 interface Completion {
   id: string;
