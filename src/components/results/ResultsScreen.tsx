@@ -24,6 +24,10 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
   useEffect(() => {
     window.scrollTo(0, 0);
 
+    if (email) {
+      try { localStorage.setItem("headroom_assessment_email", email); } catch {}
+    }
+
     if (!logged.current) {
       logged.current = true;
       supabase.functions.invoke("log-assessment", {
