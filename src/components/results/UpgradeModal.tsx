@@ -23,11 +23,6 @@ const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
   const handleSubscribe = async () => {
     setLoading(true);
     try {
-      // Skip Stripe on preview domains for testing
-      if (typeof window !== "undefined" && window.location.hostname.includes("lovable.app")) {
-        window.location.href = "/dashboard";
-        return;
-      }
       const { data, error } = await supabase.functions.invoke("create-checkout");
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
