@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
+import UpgradeModal from "./UpgradeModal";
+
 
 interface ResultsScreenProps {
   result: ScoringResult;
