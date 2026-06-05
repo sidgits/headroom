@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { role, archetype_id, archetype_name, email } = await req.json();
+    const { role, archetype_id, archetype_name, email, name } = await req.json();
 
     if (!role || !archetype_id || !archetype_name) {
       return new Response(
@@ -83,6 +83,7 @@ Deno.serve(async (req) => {
       archetype_name,
       // Prefer the verified signed-in email; fall back to the value provided in the body.
       email: user_email || email || null,
+      name: typeof name === "string" && name.trim() ? name.trim().slice(0, 80) : null,
       user_id,
       ip_address: ip,
       city,

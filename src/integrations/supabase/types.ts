@@ -24,6 +24,7 @@ export type Database = {
           email: string | null
           id: string
           ip_address: string | null
+          name: string | null
           region: string | null
           role: string
           user_id: string | null
@@ -37,6 +38,7 @@ export type Database = {
           email?: string | null
           id?: string
           ip_address?: string | null
+          name?: string | null
           region?: string | null
           role: string
           user_id?: string | null
@@ -50,9 +52,31 @@ export type Database = {
           email?: string | null
           id?: string
           ip_address?: string | null
+          name?: string | null
           region?: string | null
           role?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      dashboard_checkins: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
