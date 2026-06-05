@@ -1,5 +1,6 @@
 // Creates a Stripe Checkout Session (monthly subscription)
 // Picks the India price for India IPs, global price otherwise.
+// No auth required — Stripe collects the email during checkout.
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
@@ -36,35 +37,46 @@ Deno.serve(async (req) => {
     if (!stripeKey) throw new Error("Stripe secret key not configured");
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
 
+    // Optional auth — reuse user email/customer if signed in, otherwise let Stripe collect it.
+    let userEmail: string | undefined;
+    let userId: string | undefined;
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization");
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.email) throw new Error("Not authenticated");
+    if (authHeader && !authHeader.includes("Bearer undefined")) {
+      try {
+        const supabase = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: authHeader } } }
+        );
+        const { data } = await supabase.auth.getUser();
+        userEmail = data.user?.email ?? undefined;
+        userId = data.user?.id ?? undefined;
+      } catch (_) {
+        // Ignore — proceed as guest
+      }
+    }
 
     const isIndia = await detectIndia(req);
     const priceId = isIndia ? PRICE_INDIA : PRICE_GLOBAL;
     const region = isIndia ? "IN" : "GLOBAL";
 
-    // Reuse existing customer if any
-    const existing = await stripe.customers.list({ email: user.email, limit: 1 });
-    const customerId = existing.data[0]?.id;
+    let customerId: string | undefined;
+    if (userEmail) {
+      const existing = await stripe.customers.list({ email: userEmail, limit: 1 });
+      customerId = existing.data[0]?.id;
+    }
 
     const origin = req.headers.get("origin") || "https://headroomapp.co";
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : userEmail,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
-      metadata: { user_id: user.id, region },
-      subscription_data: { metadata: { user_id: user.id, region } },
+      metadata: { user_id: userId ?? "guest", region },
+      subscription_data: { metadata: { user_id: userId ?? "guest", region } },
     });
 
     return new Response(JSON.stringify({ url: session.url, region }), {
