@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingHero from "@/components/landing/LandingHero";
@@ -10,9 +11,10 @@ import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
 import EmailCapture from "@/components/quiz/EmailCapture";
-import ProfileBadge from "@/components/auth/ProfileBadge";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
 
@@ -21,6 +23,8 @@ interface QuizState {
   answers: Record<number, string>;
   sprinterAnswer: string | null;
 }
+
+const PENDING_KEY = "headroom_pending_quiz";
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("landing");
@@ -32,6 +36,43 @@ const Index = () => {
     sprinterAnswer: null,
   });
   const [scoringResult, setScoringResult] = useState<ScoringResult | null>(null);
+  const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
+
+  // Restore pending quiz state after OAuth redirect.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const raw = sessionStorage.getItem(PENDING_KEY);
+      if (!raw) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (!session?.user) return;
+
+      try {
+        const parsed = JSON.parse(raw) as QuizState;
+        sessionStorage.removeItem(PENDING_KEY);
+        const email = session.user.email ?? "";
+        const meta = session.user.user_metadata as Record<string, unknown> | undefined;
+        const name =
+          (typeof meta?.full_name === "string" && meta.full_name) ||
+          (typeof meta?.name === "string" && meta.name) ||
+          email.split("@")[0] ||
+          "";
+
+        const result = calculateResults(parsed.answers, parsed.sprinterAnswer);
+        setQuizState(parsed);
+        setScoringResult(result);
+        setUserEmail(email);
+        setUserName(String(name));
+        try { localStorage.setItem("headroom_assessment_email", email); } catch {}
+        setScreen("results");
+      } catch {
+        sessionStorage.removeItem(PENDING_KEY);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleStart = useCallback(() => setScreen("role"), []);
 
@@ -55,7 +96,6 @@ const Index = () => {
       if (currentQuestion < quizQuestions.length - 1) {
         setCurrentQuestion((prev) => prev + 1);
       } else {
-        // Last question — check for sprinter pattern: Q4=B AND Q6=A
         if (updatedAnswers[4] === "B" && updatedAnswers[6] === "A") {
           setScreen("sprinterCheck");
         } else {
@@ -78,23 +118,35 @@ const Index = () => {
     [quizState.answers]
   );
 
-  const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState("");
-
   const handleEmailSubmit = useCallback(
     ({ name, email }: { name: string; email: string }) => {
       setUserName(name);
       setUserEmail(email);
+      try { localStorage.setItem("headroom_assessment_email", email); } catch {}
       setScreen("results");
     },
     []
   );
 
+  const handleGoogleSignIn = useCallback(async () => {
+    // Persist current quiz state so we can restore after OAuth redirect.
+    try {
+      sessionStorage.setItem(PENDING_KEY, JSON.stringify(quizState));
+    } catch {}
+    const res = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (res.error) {
+      sessionStorage.removeItem(PENDING_KEY);
+      toast.error("Sign-in failed. Please try again.");
+    }
+    // If redirected, browser navigates away.
+  }, [quizState]);
+
   const handleRetake = useCallback(() => {
     setQuizState({ role: "", answers: {}, sprinterAnswer: null });
     setCurrentQuestion(0);
     setScoringResult(null);
-    // Force the returning-user hook to refetch the latest completion when we land back.
     returning.refresh();
     setScreen("landing");
   }, [returning]);
@@ -116,13 +168,11 @@ const Index = () => {
         <meta property="og:description" content="Discover your Work Pattern archetype by assessing your Cognitive Load." />
         <meta property="og:url" content="https://headroomapp.co/" />
       </Helmet>
-      <ProfileBadge />
       <div className="flex-1">
         <AnimatePresence mode="wait">
           {screen === "landing" && (
             <motion.div key="landing" {...pageTransition}>
               {returning.loading ? (
-                // Avoid flashing LandingHero before we know whether the user has a past completion.
                 <div className="min-h-screen bg-background" aria-hidden />
               ) : returning.user && returning.completion ? (
                 <ReturningUserHome
@@ -162,7 +212,7 @@ const Index = () => {
           )}
           {screen === "email" && (
             <motion.div key="email" {...pageTransition}>
-              <EmailCapture onSubmit={handleEmailSubmit} />
+              <EmailCapture onSubmit={handleEmailSubmit} onGoogleSignIn={handleGoogleSignIn} />
             </motion.div>
           )}
           {screen === "results" && scoringResult && (
