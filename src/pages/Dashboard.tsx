@@ -351,6 +351,30 @@ const Dashboard = () => {
             );
           })}
         </div>
+
+        {/* SHARE + DOWNLOAD ROW */}
+        {archetypeProfile && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.25 }}
+            className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Share your result</p>
+              <ShareButtons archetypeName={archetypeProfile.name} />
+            </div>
+            <motion.button
+              onClick={() => generateResultsPDF(buildResultFromMeta(archetypeProfile), latest?.role ?? "—")}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 whitespace-nowrap"
+            >
+              <Download className="w-4 h-4" />
+              Download full profile
+            </motion.button>
+          </motion.div>
+        )}
       </div>
     </div>
   );
