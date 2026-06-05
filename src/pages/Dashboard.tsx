@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Activity, Calendar, CheckCircle2, LineChart, Lock, MessageCircle, Sparkles, TrendingUp } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, Flame, LineChart, Lock, MessageCircle, Shield, Sparkles, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
-import { getArchetypeMeta } from "@/lib/archetypeProfile";
+import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 
 interface Completion {
   id: string;
@@ -136,47 +136,16 @@ const Dashboard = () => {
   const totalCheckins = checkins.length;
   const progressPct = Math.min(100, (completions.length / MIN_LONGITUDINAL_CHECKINS) * 100);
 
-  // Classy tinted card palette (semantic tokens only)
+  const burnoutStyle = archetypeProfile ? burnoutLevelStyles[archetypeProfile.defaultBurnout.level] : null;
+
+  // Secondary tiles (below the two hero highlights)
   const tiles: Array<{
     key: string;
     title: string;
-    icon: typeof Activity;
-    tint: string; // bg + border + icon color classes
+    icon: typeof TrendingUp;
+    tint: string;
     body: React.ReactNode;
   }> = [
-    {
-      key: "archetype",
-      title: "Archetype",
-      icon: Activity,
-      tint: "bg-primary/10 border-primary/30 text-primary",
-      body: latest && archetypeProfile ? (
-        <div className="flex items-start gap-3">
-          <span className="text-3xl sm:text-4xl leading-none">{archetypeProfile.emoji}</span>
-          <div className="min-w-0">
-            <p className="text-base sm:text-lg font-bold text-foreground truncate">{archetypeProfile.name}</p>
-            <p className="text-sm text-muted-foreground line-clamp-3">{archetypeProfile.headline}</p>
-          </div>
-        </div>
-      ) : (
-        <button onClick={() => navigate("/")} className="text-sm text-foreground underline underline-offset-2">
-          Take assessment →
-        </button>
-      ),
-    },
-    {
-      key: "burnout",
-      title: "Burnout Marker",
-      icon: Sparkles,
-      tint: "bg-[hsl(var(--warm-red)/0.12)] border-[hsl(var(--warm-red)/0.35)] text-[hsl(var(--warm-red))]",
-      body: archetypeProfile ? (
-        <div>
-          <p className="text-base font-semibold text-foreground">{archetypeProfile.defaultBurnout.label}</p>
-          <p className="text-sm text-muted-foreground line-clamp-3">{archetypeProfile.defaultBurnout.signal}</p>
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">Complete assessment to see</p>
-      ),
-    },
     {
       key: "longitudinal",
       title: "Pattern Shifts",
@@ -185,7 +154,7 @@ const Dashboard = () => {
       body: (
         <div className="space-y-2">
           <p className="text-sm text-foreground">
-            <span className="text-xl font-bold">{completions.length}</span>
+            <span className="text-2xl font-bold">{completions.length}</span>
             <span className="text-muted-foreground"> / {MIN_LONGITUDINAL_CHECKINS} assessments</span>
           </p>
           <div className="h-2 bg-secondary rounded-full overflow-hidden">
@@ -221,9 +190,9 @@ const Dashboard = () => {
       ),
     },
     {
-      key: "clt",
-      title: "Today's CLT",
-      icon: LineChart,
+      key: "todays_burnout",
+      title: "Today's Burnout Risk",
+      icon: Flame,
       tint: "bg-secondary border-border text-foreground",
       body: (
         <p className="text-sm text-muted-foreground italic">Awaiting calendar</p>
@@ -262,7 +231,104 @@ const Dashboard = () => {
           </h1>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 flex-1">
+        {/* HERO ROW — Archetype + Burnout Risk (the highlight) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Archetype Profile */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/5 p-5 sm:p-6 flex flex-col gap-4"
+          >
+            {archetypeProfile && latest ? (
+              <>
+                <div className="flex items-start gap-4">
+                  <span className="text-5xl sm:text-6xl leading-none">{archetypeProfile.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Your Archetype</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">{archetypeProfile.name}</h2>
+                    <p className="text-sm sm:text-base text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red font-semibold italic mt-1 leading-snug">
+                      {archetypeProfile.headline}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-xl bg-card/60 border border-border/40 p-3">
+                    <p className="text-[10px] uppercase tracking-wider text-primary font-bold mb-1">At your best</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-5">{archetypeProfile.atYourBest}</p>
+                  </div>
+                  <div className="rounded-xl bg-card/60 border border-border/40 p-3">
+                    <p className="text-[10px] uppercase tracking-wider text-accent font-bold mb-1">Working against you</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-5">{archetypeProfile.workingAgainstYou}</p>
+                  </div>
+                  <div className="rounded-xl bg-card/60 border border-border/40 p-3">
+                    <p className="text-[10px] uppercase tracking-wider text-warm-red font-bold mb-1">Pattern unnoticed</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-5">{archetypeProfile.patternNotNoticed}</p>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-primary font-bold">Your unlock</p>
+                    <p className="text-xs sm:text-sm text-foreground leading-relaxed">{archetypeProfile.unlock}</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-start justify-center gap-3">
+                <p className="text-sm text-muted-foreground">No assessment on file yet.</p>
+                <button onClick={() => navigate("/")} className="text-sm font-semibold text-primary underline underline-offset-4">
+                  Take the assessment →
+                </button>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Burnout Risk — detailed */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.05 }}
+            className={`rounded-2xl border p-5 sm:p-6 flex flex-col gap-4 bg-gradient-to-br ${burnoutStyle?.bg ?? "from-muted/20 to-muted/5"} ${burnoutStyle?.border ?? "border-border"}`}
+          >
+            {archetypeProfile ? (
+              <>
+                <div className="flex items-start gap-3">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-background/40 border ${burnoutStyle?.border}`}>
+                    <AlertTriangle className={`w-6 h-6 sm:w-7 sm:h-7 ${burnoutStyle?.text}`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-[11px] uppercase tracking-widest font-semibold ${burnoutStyle?.text}`}>Detailed Burnout Risk</p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{archetypeProfile.defaultBurnout.label}</h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground italic mt-1">{archetypeProfile.defaultBurnout.signal}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-card/60 border border-border/40 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-foreground font-bold mb-1">What's happening</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-6">{archetypeProfile.defaultBurnout.description}</p>
+                </div>
+
+                <div className={`rounded-xl border p-3 flex items-start gap-2 ${burnoutStyle?.tile}`}>
+                  <Shield className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider font-bold">Early intervention</p>
+                    <p className="text-xs sm:text-sm text-foreground leading-relaxed">{archetypeProfile.defaultBurnout.earlyIntervention}</p>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-muted-foreground italic">
+                  Shadow archetype under stress: <span className="text-foreground font-medium">{archetypeProfile.shadowName}</span>
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">Complete the assessment to see your detailed burnout read.</p>
+            )}
+          </motion.div>
+        </div>
+
+        {/* SECONDARY TILES */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
           {tiles.map((t, i) => {
             const Icon = t.icon;
             return (
@@ -270,8 +336,8 @@ const Dashboard = () => {
                 key={t.key}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.04 }}
-                className={`rounded-2xl border p-4 sm:p-5 flex flex-col gap-3 min-h-[140px] ${t.tint}`}
+                transition={{ duration: 0.3, delay: 0.1 + i * 0.04 }}
+                className={`rounded-2xl border p-4 sm:p-5 flex flex-col gap-3 min-h-[130px] ${t.tint}`}
               >
                 <div className="flex items-center gap-2">
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -288,3 +354,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
