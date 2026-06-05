@@ -18,6 +18,8 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
