@@ -8,6 +8,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 import ShareButtons from "@/components/dashboard/ShareButtons";
+import Footer from "@/components/Footer";
 import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
@@ -337,6 +338,7 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };
@@ -448,6 +450,7 @@ function SignInGate() {
           </Link>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
