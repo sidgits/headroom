@@ -163,7 +163,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
               onClick={() => setShowUpgradeModal(true)}
               className="px-6 py-4 rounded-2xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-base sm:text-lg shadow-xl hover:opacity-90 transition text-center"
             >
-              Access your full Headroom profile in the Dashboard for a Nominal Fees!
+              Access full Headroom Profile & Deeper Insights in the Dashboard for a Nominal Fees!
             </button>
           </motion.div>
         </div>
