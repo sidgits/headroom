@@ -415,7 +415,7 @@ function SignInGate() {
               disabled={sending}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm disabled:opacity-60"
             >
-              {sending ? "Sending link…" : "Continue with email"}
+              {sending ? "Sending email…" : "Continue with email"}
             </button>
           </form>
 
