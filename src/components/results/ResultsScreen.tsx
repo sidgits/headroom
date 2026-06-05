@@ -483,7 +483,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20"
               >
                 <Sparkles className="w-4 h-4" />
-                See what you get — Upgrade
+                Access the Headroom Dashboard - Nominal fees!
               </motion.button>
 
               <p className="text-[11px] text-muted-foreground italic">
