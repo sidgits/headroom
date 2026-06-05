@@ -67,6 +67,10 @@ const EmailCapture = ({ onSubmit, onGoogleSignIn }: EmailCaptureProps) => {
           Sign in with Google or enter your details to see your results
         </p>
 
+        <p className="text-xs text-muted-foreground italic leading-relaxed px-2">
+          No data or response is shared with any company or employer. For the best unrestricted experience, continue with your personal email address.
+        </p>
+
         <button
           onClick={handleGoogle}
           disabled={googleLoading}
