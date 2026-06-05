@@ -297,6 +297,7 @@ const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
 const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
   const navigate = useNavigate();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
