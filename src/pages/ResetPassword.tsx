@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import Footer from "@/components/Footer";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 
 const ResetPassword = () => {
@@ -94,8 +95,8 @@ const ResetPassword = () => {
               {saving ? "Saving…" : "Save password"}
             </button>
           </form>
-        </div>
       </div>
+      <Footer />
     </div>
   );
 };

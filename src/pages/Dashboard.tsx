@@ -338,6 +338,7 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };
@@ -449,6 +450,7 @@ function SignInGate() {
           </Link>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
