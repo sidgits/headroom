@@ -36,6 +36,27 @@ const Dashboard = () => {
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
+  const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      setShowCheckoutSuccess(true);
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("checkout");
+      window.history.replaceState({}, "", url.toString());
+      // Auto-close after 5s
+      const t = setTimeout(() => setShowCheckoutSuccess(false), 5000);
+      return () => clearTimeout(t);
+    }
+    if (params.get("checkout") === "cancelled") {
+      toast.info("Checkout cancelled.");
+      const url = new URL(window.location.href);
+      url.searchParams.delete("checkout");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
