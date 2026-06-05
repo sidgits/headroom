@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Calendar, CheckCircle2, Download, Flame, Lock, MessageCircle, Shield, Sparkles, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -36,6 +36,27 @@ const Dashboard = () => {
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
+  const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      setShowCheckoutSuccess(true);
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("checkout");
+      window.history.replaceState({}, "", url.toString());
+      // Auto-close after 5s
+      const t = setTimeout(() => setShowCheckoutSuccess(false), 5000);
+      return () => clearTimeout(t);
+    }
+    if (params.get("checkout") === "cancelled") {
+      toast.info("Checkout cancelled.");
+      const url = new URL(window.location.href);
+      url.searchParams.delete("checkout");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -339,6 +360,38 @@ const Dashboard = () => {
         )}
       </div>
       <Footer />
+
+      <AnimatePresence>
+        {showCheckoutSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm px-4"
+            onClick={() => setShowCheckoutSuccess(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 12, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 240, damping: 22 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-2xl border border-primary/30 bg-card p-6 text-center shadow-2xl shadow-primary/20"
+            >
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent">
+                <CheckCircle2 className="h-7 w-7 text-primary-foreground" />
+              </div>
+              <h2 className="text-lg font-bold text-foreground">Payment successful</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Your subscription is active. A confirmation email is on its way.
+              </p>
+              <p className="mt-4 text-[11px] uppercase tracking-widest text-muted-foreground/70">
+                Closing automatically…
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
