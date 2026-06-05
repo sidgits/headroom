@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     const [completionsRes, checkinsRes, subRes] = await Promise.all([
       supabase
         .from("assessment_completions")
-        .select("id, role, archetype_id, archetype_name, created_at, name, email")
+        .select("id, role, archetype_id, archetype_name, created_at, name, email, result_data")
         .ilike("email", trimmed)
         .order("created_at", { ascending: false })
         .limit(50),

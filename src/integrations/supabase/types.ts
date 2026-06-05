@@ -26,6 +26,7 @@ export type Database = {
           ip_address: string | null
           name: string | null
           region: string | null
+          result_data: Json | null
           role: string
           user_id: string | null
         }
@@ -40,6 +41,7 @@ export type Database = {
           ip_address?: string | null
           name?: string | null
           region?: string | null
+          result_data?: Json | null
           role: string
           user_id?: string | null
         }
@@ -54,6 +56,7 @@ export type Database = {
           ip_address?: string | null
           name?: string | null
           region?: string | null
+          result_data?: Json | null
           role?: string
           user_id?: string | null
         }
