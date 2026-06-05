@@ -123,6 +123,177 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   );
 };
 
+const features = [
+  {
+    icon: Activity,
+    title: "Full Archetype Profile",
+    description: "Complete work pattern analysis with burnout markers and early intervention signals.",
+    color: "text-primary",
+    bg: "bg-primary/10",
+  },
+  {
+    icon: TrendingUp,
+    title: "Pattern Shifts Over Time",
+    description: "Track how your cognitive load changes across retakes with longitudinal trend charts.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Check-In Tracker",
+    description: "Log and monitor your daily headroom status and build consistency habits.",
+    color: "text-primary",
+    bg: "bg-primary/10",
+  },
+  {
+    icon: Calendar,
+    title: "Calendar Integration",
+    description: "Connect Google Calendar or upload .ics files to score the cognitive load of your day.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+  },
+  {
+    icon: LineChart,
+    title: "Daily Cognitive Load Analysis",
+    description: "CLT-based daily burnout risk classification with actionable suggestions on what to cut or protect.",
+    color: "text-warm-red",
+    bg: "bg-warm-red/10",
+  },
+  {
+    icon: MessageCircle,
+    title: "Burnout Mitigation Chat",
+    description: "A CLT-grounded chat agent that knows your archetype and helps reduce cognitive load in real time.",
+    color: "text-primary",
+    bg: "bg-primary/10",
+  },
+];
+
+interface UpgradeModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  const handleSubscribe = async () => {
+    setCheckingOut(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please sign in to upgrade");
+        setCheckingOut(false);
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("create-checkout");
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not start checkout. Please try again.");
+      setCheckingOut(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
+
+          {/* Modal card */}
+          <motion.div
+            className="relative w-full max-w-md bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 16 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Header */}
+            <div className="relative bg-gradient-to-r from-primary/20 via-accent/15 to-warm-red/15 p-6 pb-4 text-center">
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 hover:bg-black/30 flex items-center justify-center text-foreground/80 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="flex justify-center mb-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Sparkles className="w-5 h-5 text-primary-foreground" />
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-foreground">Unlock your full dashboard</h2>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                Everything you need to stay ahead of burnout, grounded in Cognitive Load Theory.
+              </p>
+            </div>
+
+            {/* Feature list */}
+            <div className="p-5 space-y-3 max-h-[55vh] overflow-y-auto">
+              {features.map((feature, i) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.div
+                    key={feature.title}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + i * 0.06, duration: 0.35 }}
+                    className="flex items-start gap-3 p-3 rounded-xl bg-secondary/40 border border-border/40 hover:border-primary/30 transition-colors"
+                  >
+                    <div className={`w-9 h-9 rounded-lg ${feature.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <Icon className={`w-4 h-4 ${feature.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground">{feature.title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{feature.description}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* CTA */}
+            <div className="p-5 pt-2 space-y-3 border-t border-border/40">
+              <motion.button
+                onClick={handleSubscribe}
+                disabled={checkingOut}
+                whileHover={{ scale: checkingOut ? 1 : 1.02 }}
+                whileTap={{ scale: checkingOut ? 1 : 0.98 }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 disabled:opacity-60"
+              >
+                {checkingOut ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-primary-foreground/40 border-t-primary-foreground rounded-full animate-spin" />
+                    Redirecting to secure checkout…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Subscribe now — Monthly billing
+                  </>
+                )}
+              </motion.button>
+              <p className="text-[11px] text-center text-muted-foreground italic">
+                Cancel anytime. No long-term commitment.
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
   const navigate = useNavigate();
