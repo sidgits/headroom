@@ -8,7 +8,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 import Footer from "@/components/Footer";
-import { archetypeProfiles } from "@/lib/archetypeProfile";
+import { getArchetypeMeta } from "@/lib/archetypeProfile";
 
 interface Completion {
   id: string;
@@ -135,7 +135,7 @@ const Dashboard = () => {
   }
 
   const latest = completions[0];
-  const archetypeProfile = latest ? archetypeProfiles[latest.archetype_id] : null;
+  const archetypeProfile = latest ? getArchetypeMeta(latest.archetype_id, latest.archetype_name) : null;
   const totalCheckins = checkins.length;
   const hasEnoughForLongitudinal = completions.length >= MIN_LONGITUDINAL_CHECKINS;
 
@@ -179,10 +179,12 @@ const Dashboard = () => {
                   <p className="text-sm italic text-muted-foreground">{archetypeProfile.headline}</p>
                 </div>
               </div>
-              <p className="text-[15px] text-foreground/85 leading-relaxed">{archetypeProfile.mirror.atYourBest}</p>
+              <p className="text-[15px] text-foreground/85 leading-relaxed">{archetypeProfile.headline}</p>
               <div className="pt-3 border-t border-border/40">
-                <p className="text-xs font-bold uppercase tracking-wider text-warm-red mb-1">Burnout markers</p>
-                <p className="text-sm text-foreground/80 leading-relaxed">{archetypeProfile.mirror.workingAgainstYou}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-warm-red mb-1">Burnout marker</p>
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  {archetypeProfile.defaultBurnout.label} — {archetypeProfile.defaultBurnout.signal}
+                </p>
               </div>
               <button
                 onClick={() => navigate("/")}
