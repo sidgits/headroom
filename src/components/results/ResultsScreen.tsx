@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Download } from "lucide-react";
+import { Download, Lock, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { ScoringResult } from "@/lib/scoring";
 import { generateResultsPDF } from "@/lib/generatePDF";
@@ -11,6 +12,7 @@ interface ResultsScreenProps {
   result: ScoringResult;
   role: string;
   email: string;
+  name?: string;
   onRetake: () => void;
 }
 
