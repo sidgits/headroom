@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
+import UpgradeModal from "./UpgradeModal";
+
 
 interface ResultsScreenProps {
   result: ScoringResult;
@@ -16,6 +18,8 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -103,61 +107,67 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
           </div>
         </motion.div>
 
-        {/* LAYER 3 — DIMENSION BARS (digital lexicon) */}
-        <motion.div
-          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-5"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-            Your Headroom Dimensions
-          </h3>
-          {dimensionScores.map((dim, i) => {
-            const pct = (dim.score / dim.maxScore) * 100;
-            return (
-              <div key={dim.name} className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium text-foreground">{dim.name} ({dim.code})</span>
-                  <span className="text-muted-foreground">
-                    {dim.score}/{dim.maxScore}
-                  </span>
-                </div>
-                <p className="text-xs italic text-muted-foreground -mt-1">
-                  {dim.code === "E" ? "Extraneous Cognitive Load" : dim.code === "I" ? "Intrinsic Cognitive Load" : "Germane Cognitive Load"}
-                </p>
-                <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${pct}%` }}
-                    transition={{ delay: 0.7 + i * 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">{dim.plainLanguage}</p>
-                <p className="text-sm text-foreground/80">{dim.interpretation}</p>
-              </div>
-            );
-          })}
-        </motion.div>
-
-        {/* Retake link */}
-        <motion.div
-          className="text-center pt-2 pb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.4 }}
-        >
-          <button
-            onClick={onRetake}
-            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
+        {/* LAYER 3 — DIMENSION BARS (digital lexicon) — blurred behind upgrade gate */}
+        <div className="relative">
+          <motion.div
+            className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-5 blur-md pointer-events-none select-none"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            aria-hidden="true"
           >
-            Retake the assessment
-          </button>
-        </motion.div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Your Headroom Dimensions
+            </h3>
+            {dimensionScores.map((dim, i) => {
+              const pct = (dim.score / dim.maxScore) * 100;
+              return (
+                <div key={dim.name} className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-foreground">{dim.name} ({dim.code})</span>
+                    <span className="text-muted-foreground">
+                      {dim.score}/{dim.maxScore}
+                    </span>
+                  </div>
+                  <p className="text-xs italic text-muted-foreground -mt-1">
+                    {dim.code === "E" ? "Extraneous Cognitive Load" : dim.code === "I" ? "Intrinsic Cognitive Load" : "Germane Cognitive Load"}
+                  </p>
+                  <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ delay: 0.7 + i * 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">{dim.plainLanguage}</p>
+                  <p className="text-sm text-foreground/80">{dim.interpretation}</p>
+                </div>
+              );
+            })}
+          </motion.div>
+
+          {/* Upgrade CTA overlay */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center p-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.4 }}
+          >
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className="px-6 py-4 rounded-2xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-base sm:text-lg shadow-xl hover:opacity-90 transition text-center"
+            >
+              Access the Headroom Dashboard - Nominal fees!
+            </button>
+          </motion.div>
+        </div>
       </div>
+
+      <UpgradeModal open={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>
   );
 };
+
 
 export default ResultsScreen;
