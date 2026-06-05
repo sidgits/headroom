@@ -114,9 +114,8 @@ const HomepageLoginMenu = () => {
             <span className="sm:hidden">Email</span>
           </button>
         </div>
-        <p className="text-[11px] sm:text-xs font-medium tracking-wide text-right">
-          <span className="text-golden">Returning</span>{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-warm-red">Users</span>
+        <p className="text-sm sm:text-base font-semibold tracking-wide text-right text-black">
+          Returning Users
         </p>
       </div>
 
