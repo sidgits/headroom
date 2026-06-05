@@ -349,7 +349,7 @@ function SignInGate() {
   });
   const [sending, setSending] = useState(false);
 
-  const sendLink = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
@@ -358,16 +358,30 @@ function SignInGate() {
     }
     setSending(true);
     try { localStorage.setItem("headroom_assessment_email", trimmed); } catch {}
-    const { error } = await supabase.auth.signInWithOtp({
+
+    // 1) Create the account with an auto-generated password (idempotent — ignore "already exists")
+    const tempPassword = `Hr_${crypto.randomUUID()}!${Math.random().toString(36).slice(2, 8)}`;
+    const { error: signUpError } = await supabase.auth.signUp({
       email: trimmed,
-      options: { emailRedirectTo: window.location.origin + "/dashboard" },
+      password: tempPassword,
+      options: { emailRedirectTo: window.location.origin + "/reset-password" },
     });
-    setSending(false);
-    if (error) {
-      toast.error(error.message || "Could not send link.");
+    if (signUpError && !/already|registered|exists/i.test(signUpError.message)) {
+      setSending(false);
+      toast.error(signUpError.message);
       return;
     }
-    toast.success("Magic link sent — check your inbox.");
+
+    // 2) Send a password-reset email so the user can pick their own password
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmed, {
+      redirectTo: window.location.origin + "/reset-password",
+    });
+    setSending(false);
+    if (resetError) {
+      toast.error(resetError.message);
+      return;
+    }
+    toast.success("Check your inbox — we sent a link to set your password.");
   };
 
   return (
@@ -383,11 +397,11 @@ function SignInGate() {
           <div className="space-y-1.5 text-center">
             <h1 className="text-xl font-bold text-foreground">Access your dashboard</h1>
             <p className="text-xs text-muted-foreground">
-              Enter the email you used for the assessment — we'll email you a one-tap sign-in link.
+              Enter the email you used for the assessment. We'll create your account and email you a link to set your password.
             </p>
           </div>
 
-          <form onSubmit={sendLink} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="email"
               required
@@ -401,7 +415,7 @@ function SignInGate() {
               disabled={sending}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm disabled:opacity-60"
             >
-              {sending ? "Sending link…" : "Continue with email"}
+              {sending ? "Sending email…" : "Continue with email"}
             </button>
           </form>
 
