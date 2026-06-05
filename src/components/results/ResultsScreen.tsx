@@ -179,12 +179,6 @@ const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
   const handleSubscribe = async () => {
     setCheckingOut(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Please sign in to upgrade");
-        setCheckingOut(false);
-        return;
-      }
       const { data, error } = await supabase.functions.invoke("create-checkout");
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
@@ -194,6 +188,7 @@ const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
       setCheckingOut(false);
     }
   };
+
 
   return (
     <AnimatePresence>
@@ -482,19 +477,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 </p>
               </div>
               <motion.button
-                onClick={async () => {
-                  try {
-                    const { data: { session } } = await supabase.auth.getSession();
-                    if (!session) {
-                      toast.error("Please sign in to upgrade");
-                      return;
-                    }
-                    setShowUpgradeModal(true);
-                  } catch (err) {
-                    console.error(err);
-                    toast.error("Something went wrong. Please try again.");
-                  }
-                }}
+                onClick={() => setShowUpgradeModal(true)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20"
@@ -502,6 +485,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 <Sparkles className="w-4 h-4" />
                 See what you get — Upgrade
               </motion.button>
+
               <p className="text-[11px] text-muted-foreground italic">
                 Monthly subscription. Cancel anytime.
               </p>
