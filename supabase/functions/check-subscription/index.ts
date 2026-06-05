@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const stripeKey = Deno.env.get("Stripe");
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("Stripe");
     if (!stripeKey) throw new Error("Stripe secret key not configured");
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
 

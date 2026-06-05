@@ -33,9 +33,27 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const stripeKey = Deno.env.get("Stripe");
-    if (!stripeKey) throw new Error("Stripe secret key not configured");
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("Stripe");
+    if (!stripeKey) {
+      return new Response(JSON.stringify({ error: "Stripe is not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
+
+    // Optional body: email-only users (no session) can pass their stored email
+    // so checkout/customer is linked to the same address as their completions.
+    let bodyEmail: string | undefined;
+    try {
+      const body = await req.json();
+      if (body && typeof body.email === "string") {
+        const trimmed = body.email.trim().toLowerCase();
+        if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) bodyEmail = trimmed;
+      }
+    } catch (_) {
+      // No JSON body — fine.
+    }
 
     // Optional auth — reuse user email/customer if signed in, otherwise let Stripe collect it.
     let userEmail: string | undefined;
@@ -46,7 +64,7 @@ Deno.serve(async (req) => {
         const supabase = createClient(
           Deno.env.get("SUPABASE_URL")!,
           Deno.env.get("SUPABASE_ANON_KEY")!,
-          { global: { headers: { Authorization: authHeader } } }
+          { global: { headers: { Authorization: authHeader } } },
         );
         const { data } = await supabase.auth.getUser();
         userEmail = data.user?.email ?? undefined;
@@ -56,13 +74,16 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Prefer the verified session email; fall back to the email-only value.
+    const effectiveEmail = userEmail ?? bodyEmail;
+
     const isIndia = await detectIndia(req);
     const priceId = isIndia ? PRICE_INDIA : PRICE_GLOBAL;
     const region = isIndia ? "IN" : "GLOBAL";
 
     let customerId: string | undefined;
-    if (userEmail) {
-      const existing = await stripe.customers.list({ email: userEmail, limit: 1 });
+    if (effectiveEmail) {
+      const existing = await stripe.customers.list({ email: effectiveEmail, limit: 1 });
       customerId = existing.data[0]?.id;
     }
 
@@ -70,13 +91,13 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : userEmail,
+      customer_email: customerId ? undefined : effectiveEmail,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
-      metadata: { user_id: userId ?? "guest", region },
-      subscription_data: { metadata: { user_id: userId ?? "guest", region } },
+      metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" },
+      subscription_data: { metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" } },
     });
 
     return new Response(JSON.stringify({ url: session.url, region }), {
@@ -87,7 +108,7 @@ Deno.serve(async (req) => {
     console.error("create-checkout error", e);
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
+      status: 500,
     });
   }
 });

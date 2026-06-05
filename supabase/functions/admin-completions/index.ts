@@ -52,9 +52,11 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Enumerate only the columns the Admin UI renders. Avoids surfacing
+    // raw IP addresses or other PII beyond what's actually displayed.
     const { data, error } = await supabase
       .from("assessment_completions")
-      .select("*")
+      .select("id, role, archetype_id, archetype_name, email, name, city, region, country, created_at")
       .order("created_at", { ascending: false });
 
     if (error) {

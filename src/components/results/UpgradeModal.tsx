@@ -23,7 +23,13 @@ const UpgradeModal = ({ open, onClose }: UpgradeModalProps) => {
   const handleSubscribe = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-checkout");
+      // For email-only users (no session) pass the stored email so the
+      // Stripe customer + subscriber row link back to the same address.
+      let storedEmail: string | null = null;
+      try { storedEmail = localStorage.getItem("headroom_assessment_email"); } catch {}
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: storedEmail ? { email: storedEmail } : {},
+      });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
     } catch (e) {
