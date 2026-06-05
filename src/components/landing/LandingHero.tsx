@@ -84,14 +84,6 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
             Nobody told you what's filling it.
           </span>
         </motion.h1>
-        <motion.p
-          className="mt-5 text-3xl md:text-4xl text-muted-foreground max-w-xl font-semibold"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          A 2-minute assessment that reveals your cognitive load pattern — and what to do about it.
-        </motion.p>
         {user && (
           <motion.p
             className="mt-6 text-sm text-muted-foreground"
