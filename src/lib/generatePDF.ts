@@ -120,57 +120,59 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
     y += lines.length * 5 + 8;
   }
 
-  // LAYER 3 — Dimensions
-  if (y > pageHeight - 70) {
-    doc.addPage();
-    y = 20;
-  }
+  // LAYER 3 — Dimensions (only when we have stored E/I/G scores)
+  if (dimensionScores.length > 0) {
+    if (y > pageHeight - 70) {
+      doc.addPage();
+      y = 20;
+    }
 
-  doc.setDrawColor(220, 210, 195);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 8;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(...muted);
-  doc.text("YOUR HEADROOM DIMENSIONS", margin, y);
-  y += 10;
-
-  dimensionScores.forEach((dim) => {
-    const pct = (dim.score / dim.maxScore) * 100;
+    doc.setDrawColor(220, 210, 195);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
 
     doc.setFont("helvetica", "bold");
-    const cogLoadLabel = dim.code === "E" ? "Extraneous Cognitive Load" : dim.code === "I" ? "Intrinsic Cognitive Load" : "Germane Cognitive Load";
-    doc.setFontSize(10);
-    doc.setTextColor(...dark);
-    doc.setFont("helvetica", "bold");
-    doc.text(`${dim.name} (${dim.code})`, margin, y);
-    const labelWidth = doc.getTextWidth(`${dim.name} (${dim.code}) `);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(...muted);
-    doc.text(`— ${cogLoadLabel}`, margin + labelWidth, y);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...muted);
-    doc.text(`${dim.score}/${dim.maxScore}`, pageWidth - margin, y, { align: "right" });
-    y += 5;
-
-    // Bar
-    const barHeight = 4;
-    doc.setFillColor(235, 228, 218);
-    doc.roundedRect(margin, y, contentWidth, barHeight, 2, 2, "F");
-    doc.setFillColor(...golden);
-    const fillWidth = (pct / 100) * contentWidth;
-    if (fillWidth > 0) doc.roundedRect(margin, y, fillWidth, barHeight, 2, 2, "F");
-    y += 6;
-
-    // Interpretation
-    doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(...muted);
-    const interpLines = doc.splitTextToSize(dim.interpretation, contentWidth);
-    doc.text(interpLines, margin, y);
-    y += interpLines.length * 4 + 6;
-  });
+    doc.text("YOUR HEADROOM DIMENSIONS", margin, y);
+    y += 10;
+
+    dimensionScores.forEach((dim) => {
+      const pct = (dim.score / dim.maxScore) * 100;
+
+      doc.setFont("helvetica", "bold");
+      const cogLoadLabel = dim.code === "E" ? "Extraneous Cognitive Load" : dim.code === "I" ? "Intrinsic Cognitive Load" : "Germane Cognitive Load";
+      doc.setFontSize(10);
+      doc.setTextColor(...dark);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${dim.name} (${dim.code})`, margin, y);
+      const labelWidth = doc.getTextWidth(`${dim.name} (${dim.code}) `);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(...muted);
+      doc.text(`— ${cogLoadLabel}`, margin + labelWidth, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...muted);
+      doc.text(`${dim.score}/${dim.maxScore}`, pageWidth - margin, y, { align: "right" });
+      y += 5;
+
+      // Bar
+      const barHeight = 4;
+      doc.setFillColor(235, 228, 218);
+      doc.roundedRect(margin, y, contentWidth, barHeight, 2, 2, "F");
+      doc.setFillColor(...golden);
+      const fillWidth = (pct / 100) * contentWidth;
+      if (fillWidth > 0) doc.roundedRect(margin, y, fillWidth, barHeight, 2, 2, "F");
+      y += 6;
+
+      // Interpretation
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...muted);
+      const interpLines = doc.splitTextToSize(dim.interpretation, contentWidth);
+      doc.text(interpLines, margin, y);
+      y += interpLines.length * 4 + 6;
+    });
+  }
 
   // LAYER 4 — Shadow Archetype
   if (y > pageHeight - 40) {
@@ -194,12 +196,16 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   doc.text(shadowArchetype.name, margin, y);
   y += 7;
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(...dark);
-  const shadowLines = doc.splitTextToSize(shadowArchetype.description, contentWidth);
-  doc.text(shadowLines, margin, y);
-  y += shadowLines.length * 5 + 8;
+  if (shadowArchetype.description && shadowArchetype.description.trim().length > 0) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(...dark);
+    const shadowLines = doc.splitTextToSize(shadowArchetype.description, contentWidth);
+    doc.text(shadowLines, margin, y);
+    y += shadowLines.length * 5 + 8;
+  } else {
+    y += 4;
+  }
 
   // LAYER 5 — One Unlock
   if (y > pageHeight - 40) {
@@ -282,7 +288,7 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...muted);
-  doc.text("headroom — cognitive load assessment • theheadroom.co", margin, y);
+  doc.text("headroom — cognitive load assessment • headroomapp.co", margin, y);
   doc.text(new Date().toLocaleDateString(), pageWidth - margin, y, { align: "right" });
 
   doc.save("headroom-results.pdf");
