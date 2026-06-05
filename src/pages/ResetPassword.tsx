@@ -95,6 +95,7 @@ const ResetPassword = () => {
               {saving ? "Saving…" : "Save password"}
             </button>
           </form>
+        </div>
       </div>
       <Footer />
     </div>
