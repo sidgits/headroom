@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Activity, Calendar, CheckCircle2, LineChart, Lock, MessageCircle, RefreshCw, Sparkles, TrendingUp } from "lucide-react";
+import { Activity, Calendar, CheckCircle2, LineChart, Lock, MessageCircle, Sparkles, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
-import Footer from "@/components/Footer";
 import { getArchetypeMeta } from "@/lib/archetypeProfile";
 
 interface Completion {
@@ -47,7 +46,6 @@ const Dashboard = () => {
       }
       setUser({ id: session.user.id, email: session.user.email });
 
-      // Log this dashboard visit as a check-in (one per session marker)
       const marker = `dashboard_checkin:${session.user.id}:${new Date().toDateString()}`;
       if (!sessionStorage.getItem(marker)) {
         sessionStorage.setItem(marker, "1");
@@ -84,27 +82,27 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground text-sm">Loading your dashboard…</div>
+      <div className="h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground text-sm">Loading…</div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col overflow-hidden">
         <ProfileBadge />
         <div className="flex-1 flex items-center justify-center px-6">
-          <div className="max-w-md w-full text-center space-y-6 bg-card/60 border border-border/50 rounded-2xl p-8">
+          <div className="max-w-md w-full text-center space-y-5 bg-card/60 border border-border/50 rounded-2xl p-7">
             <div className="flex justify-center">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Lock className="w-6 h-6 text-primary-foreground" />
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Lock className="w-5 h-5 text-primary-foreground" />
               </div>
             </div>
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-foreground">Sign in to access your dashboard</h1>
-              <p className="text-sm text-muted-foreground">
-                Your full archetype, burnout markers, longitudinal pattern view, calendar analysis and chat agent live here.
+            <div className="space-y-1.5">
+              <h1 className="text-xl font-bold text-foreground">Sign in to your dashboard</h1>
+              <p className="text-xs text-muted-foreground">
+                Archetype, burnout markers, pattern view, calendar & chat agent.
               </p>
             </div>
             <button
@@ -112,11 +110,11 @@ const Dashboard = () => {
                 const res = await lovable.auth.signInWithOAuth("google", {
                   redirect_uri: window.location.origin + "/dashboard",
                 });
-                if (res.error) toast.error("Sign-in failed. Please try again.");
+                if (res.error) toast.error("Sign-in failed.");
               }}
-              className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-card border border-border hover:border-primary/40 transition-all text-sm font-medium text-foreground"
+              className="w-full flex items-center justify-center gap-3 py-2.5 rounded-xl bg-card border border-border hover:border-primary/40 transition-all text-sm font-medium text-foreground"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.61z"/>
@@ -129,7 +127,6 @@ const Dashboard = () => {
             </Link>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -137,198 +134,155 @@ const Dashboard = () => {
   const latest = completions[0];
   const archetypeProfile = latest ? getArchetypeMeta(latest.archetype_id, latest.archetype_name) : null;
   const totalCheckins = checkins.length;
-  const hasEnoughForLongitudinal = completions.length >= MIN_LONGITUDINAL_CHECKINS;
+  const progressPct = Math.min(100, (completions.length / MIN_LONGITUDINAL_CHECKINS) * 100);
+
+  // Classy tinted card palette (semantic tokens only)
+  const tiles: Array<{
+    key: string;
+    title: string;
+    icon: typeof Activity;
+    tint: string; // bg + border + icon color classes
+    body: React.ReactNode;
+  }> = [
+    {
+      key: "archetype",
+      title: "Archetype",
+      icon: Activity,
+      tint: "bg-primary/10 border-primary/30 text-primary",
+      body: latest && archetypeProfile ? (
+        <div className="flex items-start gap-2">
+          <span className="text-2xl leading-none">{archetypeProfile.emoji}</span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold text-foreground truncate">{archetypeProfile.name}</p>
+            <p className="text-[10px] text-muted-foreground line-clamp-2">{archetypeProfile.headline}</p>
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => navigate("/")} className="text-[11px] text-foreground underline underline-offset-2">
+          Take assessment →
+        </button>
+      ),
+    },
+    {
+      key: "burnout",
+      title: "Burnout Marker",
+      icon: Sparkles,
+      tint: "bg-[hsl(var(--warm-red)/0.12)] border-[hsl(var(--warm-red)/0.35)] text-[hsl(var(--warm-red))]",
+      body: archetypeProfile ? (
+        <div>
+          <p className="text-[12px] font-semibold text-foreground">{archetypeProfile.defaultBurnout.label}</p>
+          <p className="text-[10px] text-muted-foreground line-clamp-2">{archetypeProfile.defaultBurnout.signal}</p>
+        </div>
+      ) : (
+        <p className="text-[11px] text-muted-foreground">Complete assessment to see</p>
+      ),
+    },
+    {
+      key: "longitudinal",
+      title: "Pattern Shifts",
+      icon: TrendingUp,
+      tint: "bg-accent/10 border-accent/30 text-accent",
+      body: (
+        <div className="space-y-1.5">
+          <p className="text-[11px] text-foreground">
+            <span className="font-bold">{completions.length}</span>
+            <span className="text-muted-foreground"> / {MIN_LONGITUDINAL_CHECKINS} assessments</span>
+          </p>
+          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-primary to-accent" style={{ width: `${progressPct}%` }} />
+          </div>
+          <p className="text-[10px] text-muted-foreground italic">Retake fortnightly</p>
+        </div>
+      ),
+    },
+    {
+      key: "checkins",
+      title: "Check-Ins",
+      icon: CheckCircle2,
+      tint: "bg-[hsl(var(--golden)/0.15)] border-[hsl(var(--golden)/0.4)] text-[hsl(var(--golden))]",
+      body: (
+        <div>
+          <p className="text-2xl font-bold text-foreground leading-none">{totalCheckins}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            {checkins[0] ? `Last: ${new Date(checkins[0].created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}` : "First today"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: "calendar",
+      title: "Calendar",
+      icon: Calendar,
+      tint: "bg-[hsl(var(--deep-orange)/0.12)] border-[hsl(var(--deep-orange)/0.35)] text-[hsl(var(--deep-orange))]",
+      body: (
+        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Lock className="w-3 h-3" /> Connect — soon
+        </div>
+      ),
+    },
+    {
+      key: "clt",
+      title: "Today's CLT",
+      icon: LineChart,
+      tint: "bg-secondary border-border text-foreground",
+      body: (
+        <p className="text-[11px] text-muted-foreground italic">Awaiting calendar</p>
+      ),
+    },
+    {
+      key: "chat",
+      title: "Mitigation Chat",
+      icon: MessageCircle,
+      tint: "bg-primary/10 border-primary/30 text-primary",
+      body: (
+        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Sparkles className="w-3 h-3" /> Agent — soon
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Helmet>
         <title>Dashboard — Headroom</title>
         <meta name="description" content="Your full Headroom cognitive-load dashboard." />
       </Helmet>
       <ProfileBadge />
 
-      <div className="flex-1 max-w-3xl w-full mx-auto px-5 py-10 space-y-8">
-        {/* Header */}
+      <div className="flex-1 max-w-3xl w-full mx-auto px-4 pt-2 pb-3 flex flex-col gap-2.5 min-h-0">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="space-y-1"
+          transition={{ duration: 0.3 }}
         >
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Your Headroom Dashboard</p>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            Welcome{latest?.name ? `, ${latest.name}` : ""} 👋
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
+          <h1 className="text-lg font-bold text-foreground leading-tight">
+            Welcome{latest?.name ? `, ${latest.name.split(" ")[0]}` : ""} 👋
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Track your work pattern, cognitive load and burnout signal over time.
-          </p>
         </motion.div>
 
-        {/* a. Full Archetype + Burnout */}
-        <section className="bg-card/60 border border-border/50 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center gap-2 text-primary">
-            <Activity className="w-4 h-4" />
-            <h2 className="text-sm font-bold uppercase tracking-wider">Your Work Pattern Archetype</h2>
-          </div>
-          {latest && archetypeProfile ? (
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="text-4xl">{archetypeProfile.emoji}</div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">{archetypeProfile.name}</h3>
-                  <p className="text-sm italic text-muted-foreground">{archetypeProfile.headline}</p>
+        <div className="grid grid-cols-2 gap-2 flex-1 min-h-0">
+          {tiles.map((t, i) => {
+            const Icon = t.icon;
+            return (
+              <motion.div
+                key={t.key}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.04 }}
+                className={`rounded-xl border p-2.5 flex flex-col gap-1.5 ${t.tint}`}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Icon className="w-3.5 h-3.5" />
+                  <h2 className="text-[10px] font-bold uppercase tracking-wider">{t.title}</h2>
                 </div>
-              </div>
-              <p className="text-[15px] text-foreground/85 leading-relaxed">{archetypeProfile.headline}</p>
-              <div className="pt-3 border-t border-border/40">
-                <p className="text-xs font-bold uppercase tracking-wider text-warm-red mb-1">Burnout marker</p>
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {archetypeProfile.defaultBurnout.label} — {archetypeProfile.defaultBurnout.signal}
-                </p>
-              </div>
-              <button
-                onClick={() => navigate("/")}
-                className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors inline-flex items-center gap-1"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Retake assessment
-              </button>
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground space-y-3">
-              <p>You haven't completed an assessment yet.</p>
-              <button
-                onClick={() => navigate("/")}
-                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
-              >
-                Take the assessment
-              </button>
-            </div>
-          )}
-        </section>
-
-        {/* b. Longitudinal view */}
-        <section className="bg-card/60 border border-border/50 rounded-2xl p-6 space-y-3">
-          <div className="flex items-center gap-2 text-accent">
-            <TrendingUp className="w-4 h-4" />
-            <h2 className="text-sm font-bold uppercase tracking-wider">Pattern Shifts Over Time</h2>
-          </div>
-          {hasEnoughForLongitudinal ? (
-            <div className="space-y-2">
-              <p className="text-sm text-foreground/80">
-                {completions.length} completed assessments. Trend chart coming soon.
-              </p>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                {completions.slice(0, 8).map((c) => (
-                  <li key={c.id} className="flex justify-between">
-                    <span>{new Date(c.created_at).toLocaleDateString()}</span>
-                    <span className="text-foreground/70">{c.archetype_name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Your longitudinal pattern view unlocks after <span className="text-foreground font-medium">{MIN_LONGITUDINAL_CHECKINS} completed assessments</span>.
-                You're at <span className="text-foreground font-medium">{completions.length} / {MIN_LONGITUDINAL_CHECKINS}</span>.
-              </p>
-              <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-primary to-accent"
-                  style={{ width: `${Math.min(100, (completions.length / MIN_LONGITUDINAL_CHECKINS) * 100)}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground italic">
-                Retake the assessment periodically — fortnightly works well — to surface how your work pattern is shifting.
-              </p>
-            </div>
-          )}
-        </section>
-
-        {/* c. Check-in tracker */}
-        <section className="bg-card/60 border border-border/50 rounded-2xl p-6 space-y-3">
-          <div className="flex items-center gap-2 text-primary">
-            <CheckCircle2 className="w-4 h-4" />
-            <h2 className="text-sm font-bold uppercase tracking-wider">Check-In Tracker</h2>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {totalCheckins === 0
-              ? "This is your first check-in."
-              : `${totalCheckins} check-in${totalCheckins === 1 ? "" : "s"} so far.`}
-          </p>
-          {checkins.length > 0 && (
-            <ul className="text-xs text-muted-foreground space-y-1 max-h-48 overflow-y-auto">
-              {checkins.slice(0, 12).map((c) => (
-                <li key={c.id} className="flex justify-between border-b border-border/30 py-1">
-                  <span>{new Date(c.created_at).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
-                  <span>{new Date(c.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        {/* d. Calendar integration */}
-        <section className="bg-card/60 border border-border/50 rounded-2xl p-6 space-y-3 relative overflow-hidden">
-          <div className="flex items-center gap-2 text-accent">
-            <Calendar className="w-4 h-4" />
-            <h2 className="text-sm font-bold uppercase tracking-wider">Calendar Integration</h2>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Sync your schedule so Headroom can score the cognitive load of your day.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-3 pt-1">
-            <button
-              disabled
-              className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border/60 text-sm text-muted-foreground/70 cursor-not-allowed"
-            >
-              <Lock className="w-3.5 h-3.5" /> Connect Google Calendar
-            </button>
-            <button
-              disabled
-              className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border/60 text-sm text-muted-foreground/70 cursor-not-allowed"
-            >
-              <Lock className="w-3.5 h-3.5" /> Upload .ics file
-            </button>
-          </div>
-          <p className="text-[11px] text-muted-foreground italic">Coming next.</p>
-        </section>
-
-        {/* e. Daily CLT analysis */}
-        <section className="bg-card/60 border border-border/50 rounded-2xl p-6 space-y-3">
-          <div className="flex items-center gap-2 text-warm-red">
-            <LineChart className="w-4 h-4" />
-            <h2 className="text-sm font-bold uppercase tracking-wider">Today's Cognitive Load</h2>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Once your calendar is connected, Headroom will classify each day's burnout risk using Cognitive Load Theory
-            (Extraneous / Intrinsic / Germane) and suggest what to cut, reorder or protect.
-          </p>
-          <div className="rounded-xl border border-dashed border-border/60 p-4 text-center text-xs text-muted-foreground italic">
-            Awaiting calendar data
-          </div>
-        </section>
-
-        {/* f. Chat agent */}
-        <section className="bg-card/60 border border-border/50 rounded-2xl p-6 space-y-3">
-          <div className="flex items-center gap-2 text-primary">
-            <MessageCircle className="w-4 h-4" />
-            <h2 className="text-sm font-bold uppercase tracking-wider">Burnout Mitigation Chat</h2>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            A CLT-grounded chat agent that knows your archetype and helps you reduce cognitive load in real time.
-          </p>
-          <button
-            disabled
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-border/60 text-sm text-muted-foreground/70 cursor-not-allowed"
-          >
-            <Sparkles className="w-3.5 h-3.5" /> Chat agent — coming soon
-          </button>
-        </section>
+                <div className="flex-1 min-h-0">{t.body}</div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
-
-      <Footer />
     </div>
   );
 };
