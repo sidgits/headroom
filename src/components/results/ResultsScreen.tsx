@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { Download, Lock, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Activity, Calendar, CheckCircle2, Download, LineChart, Lock, MessageCircle, Sparkles, TrendingUp, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { ScoringResult } from "@/lib/scoring";
