@@ -123,8 +123,9 @@ const ShareButtons = ({ archetype }: { archetype: ScoringResult["archetype"] }) 
   );
 };
 
-const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) => {
+const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
   const { archetype, burnoutRisk, dimensionScores, recommendations, mirror, shadowArchetype } = result;
+  const navigate = useNavigate();
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
@@ -140,6 +141,7 @@ const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) =>
           archetype_id: archetype.id,
           archetype_name: archetype.name,
           email,
+          name,
         },
       }).catch(() => {});
     }
@@ -154,6 +156,7 @@ const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) =>
       </div>
 
       <div className="relative max-w-lg mx-auto px-6 py-12 space-y-8">
+
         {/* LAYER 1 — THE REVEAL */}
         <motion.div
           ref={archetypeRef}
@@ -251,59 +254,77 @@ const ResultsScreen = ({ result, role, email, onRetake }: ResultsScreenProps) =>
           })}
         </motion.div>
 
-        {/* LAYER 4 — SHADOW ARCHETYPE */}
-        <motion.div
-          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-        >
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-            Under pressure you shift toward
-          </h3>
-          <p className="text-lg font-semibold text-foreground">{shadowArchetype.name}</p>
-          <p className="text-muted-foreground leading-relaxed text-[15px]">{shadowArchetype.description}</p>
-        </motion.div>
+        {/* PREMIUM SECTION — blurred behind upgrade CTA */}
+        <div className="relative">
+          <div className="space-y-8 pointer-events-none select-none blur-md opacity-70" aria-hidden="true">
+            {/* LAYER 4 — SHADOW ARCHETYPE */}
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                Under pressure you shift toward
+              </h3>
+              <p className="text-lg font-semibold text-foreground">{shadowArchetype.name}</p>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{shadowArchetype.description}</p>
+            </div>
 
-        {/* LAYER 5 — THE ONE UNLOCK */}
-        <motion.div
-          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-            What to do next
-          </h3>
-          <p className="text-foreground/90 leading-relaxed text-[15px]">{recommendations[0]}</p>
-        </motion.div>
+            {/* LAYER 5 — THE ONE UNLOCK */}
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                What to do next
+              </h3>
+              <p className="text-foreground/90 leading-relaxed text-[15px]">{recommendations[0]}</p>
+            </div>
 
-        {/* LAYER 6 — BURNOUT RISK SIGNAL */}
-        <motion.div
-          className={`rounded-2xl p-6 bg-gradient-to-br ${burnoutBgColors[burnoutRisk.level]} border border-border/30 space-y-3`}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65, duration: 0.5 }}
-        >
-          <div className="flex items-center gap-3 mb-1">
-            <div className={`text-sm font-bold uppercase tracking-wider ${burnoutColors[burnoutRisk.level]}`}>
-              Burnout Risk: {burnoutRisk.label}
+            {/* LAYER 6 — BURNOUT RISK SIGNAL */}
+            <div className={`rounded-2xl p-6 bg-gradient-to-br ${burnoutBgColors[burnoutRisk.level]} border border-border/30 space-y-3`}>
+              <div className="flex items-center gap-3 mb-1">
+                <div className={`text-sm font-bold uppercase tracking-wider ${burnoutColors[burnoutRisk.level]}`}>
+                  Burnout Risk: {burnoutRisk.label}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground italic">Signal: {burnoutRisk.signal}</p>
+              <p className="text-foreground/80 text-sm leading-relaxed">{burnoutRisk.description}</p>
+              <div className="pt-2 border-t border-border/30">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Early intervention</p>
+                <p className="text-foreground/80 text-sm leading-relaxed">{burnoutRisk.earlyIntervention}</p>
+              </div>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground italic">
-            Signal: {burnoutRisk.signal}
-          </p>
-          <p className="text-foreground/80 text-sm leading-relaxed">
-            {burnoutRisk.description}
-          </p>
-          <div className="pt-2 border-t border-border/30">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Early intervention</p>
-            <p className="text-foreground/80 text-sm leading-relaxed">{burnoutRisk.earlyIntervention}</p>
-          </div>
-          <p className="text-xs text-muted-foreground pt-1">
-            Derived from your E / I / G score signature. Not a diagnosis — an early pattern signal.
-          </p>
-        </motion.div>
+
+          {/* Upgrade overlay */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center p-4"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <div className="w-full max-w-sm bg-card/95 backdrop-blur-sm border border-primary/30 rounded-2xl p-6 shadow-2xl shadow-primary/20 text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <Lock className="w-5 h-5 text-primary-foreground" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-bold text-foreground">Unlock your full profile</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Shadow archetype, burnout signal, daily cognitive-load analysis, longitudinal pattern shifts, calendar sync and a CLT-grounded chat agent.
+                </p>
+              </div>
+              <motion.button
+                onClick={() => navigate("/dashboard")}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20"
+              >
+                <Sparkles className="w-4 h-4" />
+                Upgrade to access Full Dashboard
+              </motion.button>
+              <p className="text-[11px] text-muted-foreground italic">
+                Payment opens soon — early users get free dashboard access.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
 
         {/* LAYER 7 — SHARE + RETURN */}
         <motion.div
