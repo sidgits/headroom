@@ -65,39 +65,69 @@ const Dashboard = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!isMounted) return;
 
-      if (!session?.user) {
+      // Resolve identity: session email, else fall back to stored email from the quiz flow.
+      let identityEmail: string | null = session?.user?.email ?? null;
+      if (!identityEmail) {
+        try { identityEmail = localStorage.getItem("headroom_assessment_email"); } catch {}
+      }
+
+      if (session?.user) {
+        setUser({ id: session.user.id, email: session.user.email });
+      } else if (identityEmail) {
+        // Email-only user — synthesise a minimal user object so the dashboard renders.
+        setUser({ id: "email-only", email: identityEmail });
+      } else {
+        // No identity at all — let them take the assessment first.
         setLoading(false);
         return;
       }
-      setUser({ id: session.user.id, email: session.user.email });
 
-      const marker = `dashboard_checkin:${session.user.id}:${new Date().toDateString()}`;
-      if (!sessionStorage.getItem(marker)) {
-        sessionStorage.setItem(marker, "1");
-        supabase.from("dashboard_checkins").insert({
-          user_id: session.user.id,
-          email: session.user.email ?? null,
-        }).then(({ error }) => {
-          if (error) console.error("checkin insert failed", error);
+      // Daily checkin marker (avoid duplicate inserts per browser per day)
+      const markerId = session?.user?.id ?? identityEmail ?? "anon";
+      const marker = `dashboard_checkin:${markerId}:${new Date().toDateString()}`;
+      const alreadyChecked = !!sessionStorage.getItem(marker);
+      if (!alreadyChecked) sessionStorage.setItem(marker, "1");
+
+      if (session?.user) {
+        if (!alreadyChecked) {
+          supabase.from("dashboard_checkins").insert({
+            user_id: session.user.id,
+            email: session.user.email ?? null,
+          }).then(({ error }) => {
+            if (error) console.error("checkin insert failed", error);
+          });
+        }
+
+        const [completionsRes, checkinsRes] = await Promise.all([
+          supabase
+            .from("assessment_completions")
+            .select("id, role, archetype_id, archetype_name, created_at, name, email")
+            .order("created_at", { ascending: false })
+            .limit(50),
+          supabase
+            .from("dashboard_checkins")
+            .select("id, created_at")
+            .order("created_at", { ascending: false })
+            .limit(50),
+        ]);
+
+        if (!isMounted) return;
+        if (completionsRes.data) setCompletions(completionsRes.data as Completion[]);
+        if (checkinsRes.data) setCheckins(checkinsRes.data as Checkin[]);
+      } else if (identityEmail) {
+        // Email-only path — fetch via edge function (service role bypasses RLS).
+        const { data, error } = await supabase.functions.invoke("get-user-dashboard", {
+          body: { email: identityEmail },
         });
+        if (!isMounted) return;
+        if (error) {
+          console.error("get-user-dashboard failed", error);
+        } else if (data) {
+          if (Array.isArray(data.completions)) setCompletions(data.completions as Completion[]);
+          if (Array.isArray(data.checkins)) setCheckins(data.checkins as Checkin[]);
+        }
       }
 
-      const [completionsRes, checkinsRes] = await Promise.all([
-        supabase
-          .from("assessment_completions")
-          .select("id, role, archetype_id, archetype_name, created_at, name, email")
-          .order("created_at", { ascending: false })
-          .limit(50),
-        supabase
-          .from("dashboard_checkins")
-          .select("id, created_at")
-          .order("created_at", { ascending: false })
-          .limit(50),
-      ]);
-
-      if (!isMounted) return;
-      if (completionsRes.data) setCompletions(completionsRes.data as Completion[]);
-      if (checkinsRes.data) setCheckins(checkinsRes.data as Checkin[]);
       setLoading(false);
     };
 
@@ -114,8 +144,9 @@ const Dashboard = () => {
   }
 
   if (!user) {
-    return <SignInGate />;
+    return <NoAssessmentGate />;
   }
+
 
   const latest = completions[0];
   const archetypeProfile = latest ? getArchetypeMeta(latest.archetype_id, latest.archetype_name) : null;
