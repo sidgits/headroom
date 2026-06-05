@@ -1,23 +1,12 @@
+import { checkRateLimit, clientIp } from "../_shared/rateLimit.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Simple in-memory rate limiter (per Deno isolate)
-const attempts = new Map<string, { count: number; resetAt: number }>();
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const record = attempts.get(ip);
-  if (!record || now > record.resetAt) {
-    attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-  record.count++;
-  return record.count > MAX_ATTEMPTS;
-}
 
 function timingSafeEqual(a: string, b: string): boolean {
   const encoder = new TextEncoder();
@@ -44,7 +33,7 @@ async function createToken(secret: string): Promise<string> {
     encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["sign"],
   );
   const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(timestamp));
   const sigHex = Array.from(new Uint8Array(signature))
@@ -59,15 +48,27 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("cf-connecting-ip") ||
-      "unknown";
+    const ip = clientIp(req);
 
-    if (isRateLimited(ip)) {
+    // DB-backed limiter — survives cold-starts (the previous in-memory Map
+    // reset on every fresh isolate and could be brute-forced in bursts).
+    const limit = await checkRateLimit({
+      action: "verify-admin",
+      identifier: ip,
+      max: MAX_ATTEMPTS,
+      windowMs: WINDOW_MS,
+    });
+    if (limit.limited) {
       return new Response(
         JSON.stringify({ valid: false, error: "Too many attempts. Try again later." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)),
+          },
+        },
       );
     }
 
@@ -76,7 +77,7 @@ Deno.serve(async (req) => {
     if (!password || typeof password !== "string") {
       return new Response(
         JSON.stringify({ valid: false }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -85,7 +86,7 @@ Deno.serve(async (req) => {
     if (!adminPassword) {
       return new Response(
         JSON.stringify({ valid: false, error: "Admin password not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -96,7 +97,7 @@ Deno.serve(async (req) => {
       await new Promise((r) => setTimeout(r, 500));
       return new Response(
         JSON.stringify({ valid: false }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -105,12 +106,12 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({ valid: true, token }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch {
     return new Response(
       JSON.stringify({ valid: false }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
