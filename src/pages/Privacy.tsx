@@ -39,8 +39,8 @@ const Privacy = () => {
             <p className="text-sm leading-relaxed">
               Digital Lexicon Corp, registered in Delaware, USA, is the data controller responsible for your
               personal data. For any privacy-related inquiries, contact us at{" "}
-              <a href="mailto:privacy@headroomapp.co" className="text-primary underline underline-offset-2">
-                privacy@headroomapp.co
+              <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
+                sid@headroomapp.co
               </a>
               .
             </p>
@@ -159,8 +159,8 @@ const Privacy = () => {
             </ul>
             <p className="text-sm leading-relaxed">
               To exercise any right, email{" "}
-              <a href="mailto:privacy@headroomapp.co" className="text-primary underline underline-offset-2">
-                privacy@headroomapp.co
+              <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
+                sid@headroomapp.co
               </a>
               . We will respond within 30 days (GDPR) or 45 days (CCPA).
             </p>
@@ -195,8 +195,8 @@ const Privacy = () => {
             <h2 className="text-xl font-semibold">11. Contact</h2>
             <p className="text-sm leading-relaxed">
               Digital Lexicon Corp · Delaware, USA · {" "}
-              <a href="mailto:privacy@headroomapp.co" className="text-primary underline underline-offset-2">
-                privacy@headroomapp.co
+              <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
+                sid@headroomapp.co
               </a>
             </p>
           </section>
