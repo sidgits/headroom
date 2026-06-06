@@ -121,6 +121,13 @@ const EmailCapture = ({ onSubmit, onGoogleSignIn }: EmailCaptureProps) => {
         >
           See My Results
         </button>
+        <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
+          By continuing, you agree to our{" "}
+          <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground">
+            Privacy Policy
+          </Link>
+          . We only use your name and email to deliver your results.
+        </p>
       </div>
     </div>
   );
