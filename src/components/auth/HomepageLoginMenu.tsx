@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -158,6 +158,13 @@ const HomepageLoginMenu = () => {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
             </Button>
+            <p className="text-center text-[11px] text-muted-foreground leading-relaxed">
+              By continuing, you agree to our{" "}
+              <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground" onClick={() => setEmailOpen(false)}>
+                Privacy Policy
+              </Link>
+              .
+            </p>
             <p className="text-center text-xs text-muted-foreground">
               {mode === "signin" ? (
                 <>
