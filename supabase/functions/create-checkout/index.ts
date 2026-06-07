@@ -89,10 +89,15 @@ Deno.serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://headroomapp.co";
 
+    // For India subscriptions, enable UPI Autopay (e-mandate) alongside cards.
+    // UPI on recurring requires explicit payment_method_types + mandate options.
+    const paymentMethodTypes = isIndia ? ["card", "upi"] : undefined;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : effectiveEmail,
       mode: "subscription",
+      payment_method_types: paymentMethodTypes as any,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
