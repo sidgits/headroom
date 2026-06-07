@@ -30,8 +30,28 @@ const PENDING_KEY = "headroom_pending_quiz";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [screen, setScreen] = useState<Screen>("landing");
+  const [screen, setScreen] = useState<Screen>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("retake") === "1" || sessionStorage.getItem("headroom_retake") === "1") {
+        sessionStorage.removeItem("headroom_retake");
+        return "role";
+      }
+    } catch {}
+    return "landing";
+  });
   const returning = useReturningUserProfile();
+
+  // Clean ?retake=1 from the URL once we've consumed it.
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("retake")) {
+        url.searchParams.delete("retake");
+        window.history.replaceState({}, "", url.toString());
+      }
+    } catch {}
+  }, []);
 
   // Returning signed-in users should land on their dashboard, not the marketing page,
   // unless they're mid-quiz (PENDING_KEY) or actively retaking (screen !== "landing").
@@ -45,6 +65,7 @@ const Index = () => {
     if (hasPending) return;
     navigate("/dashboard", { replace: true });
   }, [returning.loading, returning.user, screen, navigate]);
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizState, setQuizState] = useState<QuizState>({
     role: "",
