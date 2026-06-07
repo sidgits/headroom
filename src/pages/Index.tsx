@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
