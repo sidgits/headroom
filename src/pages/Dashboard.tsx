@@ -78,10 +78,7 @@ const Dashboard = () => {
       })();
       if (sessionId && !hasLocalEmail) {
         setRecoveringIdentity(true);
-        supabase.functions
-          .invoke("get-checkout-session", { method: "GET" as never, body: undefined })
-          .catch(() => null);
-        // invoke() doesn't pass query params reliably; use fetch directly.
+        // Use fetch directly so we can pass session_id as a query param.
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-checkout-session?session_id=${encodeURIComponent(sessionId)}`;
         fetch(url, { headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } })
           .then((r) => r.json())
