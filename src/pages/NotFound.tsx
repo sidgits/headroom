@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import Footer from "@/components/Footer";
 
 const NotFound = () => {
@@ -11,6 +12,11 @@ const NotFound = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-muted">
+      <Helmet>
+        <title>Page not found (404) — Headroom</title>
+        <meta name="description" content="The page you're looking for doesn't exist on Headroom. Head back to the homepage to take your cognitive load assessment." />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <div className="flex flex-1 items-center justify-center">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold">404</h1>
