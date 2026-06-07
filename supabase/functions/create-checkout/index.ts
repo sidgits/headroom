@@ -92,12 +92,23 @@ Deno.serve(async (req) => {
     // For India subscriptions, enable UPI Autopay (e-mandate) alongside cards.
     // UPI on recurring requires explicit payment_method_types + mandate options.
     const paymentMethodTypes = isIndia ? ["card", "upi"] : undefined;
+    const paymentMethodOptions = isIndia
+      ? {
+          upi: {
+            mandate_options: {
+              amount: 50000,        // ₹500 cap in paise (above ₹300 price)
+              amount_type: "maximum",
+            },
+          },
+        }
+      : undefined;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : effectiveEmail,
       mode: "subscription",
       payment_method_types: paymentMethodTypes as any,
+      payment_method_options: paymentMethodOptions as any,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
