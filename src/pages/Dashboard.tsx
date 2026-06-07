@@ -185,10 +185,12 @@ const Dashboard = () => {
     return () => { isMounted = false; };
   }, []);
 
-  if (loading) {
+  if (loading || recoveringIdentity) {
     return (
       <div className="h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground text-sm">Loading…</div>
+        <div className="text-muted-foreground text-sm">
+          {recoveringIdentity ? "Finalizing your subscription…" : "Loading…"}
+        </div>
       </div>
     );
   }
