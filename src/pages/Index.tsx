@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,8 +29,22 @@ interface QuizState {
 const PENDING_KEY = "headroom_pending_quiz";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [screen, setScreen] = useState<Screen>("landing");
   const returning = useReturningUserProfile();
+
+  // Returning signed-in users should land on their dashboard, not the marketing page,
+  // unless they're mid-quiz (PENDING_KEY) or actively retaking (screen !== "landing").
+  useEffect(() => {
+    if (returning.loading) return;
+    if (!returning.user) return;
+    if (screen !== "landing") return;
+    const hasPending = (() => {
+      try { return !!sessionStorage.getItem(PENDING_KEY); } catch { return false; }
+    })();
+    if (hasPending) return;
+    navigate("/dashboard", { replace: true });
+  }, [returning.loading, returning.user, screen, navigate]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizState, setQuizState] = useState<QuizState>({
     role: "",
