@@ -226,7 +226,6 @@ const Dashboard = () => {
           <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-primary to-accent" style={{ width: `${progressPct}%` }} />
           </div>
-          <p className="text-xs text-muted-foreground italic">Retake fortnightly</p>
         </div>
       ),
     },
