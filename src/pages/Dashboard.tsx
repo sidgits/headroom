@@ -56,24 +56,55 @@ const Dashboard = () => {
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+  const [recoveringIdentity, setRecoveringIdentity] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("checkout") === "success") {
-      setShowCheckoutSuccess(true);
-      // Clean URL
+    const checkout = params.get("checkout");
+    const sessionId = params.get("session_id");
+
+    const cleanUrl = () => {
       const url = new URL(window.location.href);
       url.searchParams.delete("checkout");
+      url.searchParams.delete("session_id");
       window.history.replaceState({}, "", url.toString());
-      // Auto-close after 5s
+    };
+
+    if (checkout === "success") {
+      setShowCheckoutSuccess(true);
+      // Recover identity from Stripe if we have a session_id and no local email.
+      const hasLocalEmail = (() => {
+        try { return !!localStorage.getItem("headroom_assessment_email"); } catch { return false; }
+      })();
+      if (sessionId && !hasLocalEmail) {
+        setRecoveringIdentity(true);
+        supabase.functions
+          .invoke("get-checkout-session", { method: "GET" as never, body: undefined })
+          .catch(() => null);
+        // invoke() doesn't pass query params reliably; use fetch directly.
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-checkout-session?session_id=${encodeURIComponent(sessionId)}`;
+        fetch(url, { headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data?.email) {
+              try { localStorage.setItem("headroom_assessment_email", data.email); } catch {}
+              // Trigger reload so the main load() effect picks up the identity.
+              cleanUrl();
+              window.location.reload();
+            } else {
+              setRecoveringIdentity(false);
+            }
+          })
+          .catch(() => setRecoveringIdentity(false));
+      } else {
+        cleanUrl();
+      }
       const t = setTimeout(() => setShowCheckoutSuccess(false), 5000);
       return () => clearTimeout(t);
     }
-    if (params.get("checkout") === "cancelled") {
+    if (checkout === "cancelled") {
       toast.info("Checkout cancelled.");
-      const url = new URL(window.location.href);
-      url.searchParams.delete("checkout");
-      window.history.replaceState({}, "", url.toString());
+      cleanUrl();
     }
   }, []);
 
