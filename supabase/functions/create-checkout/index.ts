@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       mode: "subscription",
       payment_method_types: paymentMethodTypes as any,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/dashboard?checkout=success`,
+      success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
       metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" },
       subscription_data: { metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" } },
