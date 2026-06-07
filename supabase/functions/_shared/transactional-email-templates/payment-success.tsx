@@ -38,9 +38,6 @@ const PaymentSuccessEmail = ({ name, amount, dashboardUrl }: Props) => (
         <Text style={text}>
           A Stripe receipt will arrive separately with your invoice details.
         </Text>
-        <Text style={footer}>
-          Questions? Just reply to this email and we'll help.
-        </Text>
         <Text style={companyFooter}>Headroom is a Digital Lexicon Corp Production.</Text>
       </Container>
     </Body>
