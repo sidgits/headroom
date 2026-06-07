@@ -103,7 +103,15 @@ const footer: React.CSSProperties = {
 const companyFooter: React.CSSProperties = {
   fontSize: '12px',
   color: '#999999',
-  margin: '24px 0 0',
+  margin: '8px 0 0',
   borderTop: '1px solid #eeeeee',
   paddingTop: '16px',
+  textAlign: 'center',
+}
+
+const contactFooter: React.CSSProperties = {
+  fontSize: '13px',
+  color: '#666666',
+  margin: '24px 0 8px',
+  textAlign: 'center',
 }
