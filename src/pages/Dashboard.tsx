@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Calendar, CheckCircle2, Download, Flame, Lock, MessageCircle, Shield, Sparkles, TrendingUp } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, Download, Flame, Lock, MessageCircle, RefreshCw, Shield, Sparkles, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
@@ -290,12 +290,28 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
         >
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
-            Welcome{latest?.name ? `, ${latest.name.split(" ")[0]}` : ""} 👋
-          </h1>
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+              Welcome{latest?.name ? `, ${latest.name.split(" ")[0]}` : ""} 👋
+            </h1>
+          </div>
+          <motion.button
+            onClick={() => {
+              try { sessionStorage.setItem("headroom_retake", "1"); } catch {}
+              navigate("/?retake=1");
+            }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="inline-flex items-center justify-center gap-2 self-start sm:self-auto py-2.5 px-4 rounded-xl border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/15 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retake Assessment for Free
+          </motion.button>
         </motion.div>
+
 
         {/* HERO ROW — Archetype + Burnout Risk (the highlight) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
