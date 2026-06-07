@@ -200,10 +200,10 @@ const Index = () => {
       {screen === "landing" && <HomepageLoginMenu />}
       <Helmet>
         <title>Headroom — Cognitive Load Assessment</title>
-        <meta name="description" content="Discover your Work Pattern archetype by assessing your Cognitive Load." />
+        <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
         <link rel="canonical" href="https://headroomapp.co/" />
         <meta property="og:title" content="Headroom — Cognitive Load Assessment" />
-        <meta property="og:description" content="Discover your Work Pattern archetype by assessing your Cognitive Load." />
+        <meta property="og:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
         <meta property="og:url" content="https://headroomapp.co/" />
       </Helmet>
       <div className="flex-1">
