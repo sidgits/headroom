@@ -9,7 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PRICE_INDIA = "price_1Telss6bE2gY9hpWcQjGdG3I";
+const PRICE_INDIA = "price_1TfXhF6bE2gY9hpWkTpCYauh";
 const PRICE_GLOBAL = "price_1Telga6bE2gY9hpWP0hKjCWJ";
 
 async function detectIndia(req: Request): Promise<boolean> {
