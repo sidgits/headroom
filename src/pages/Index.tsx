@@ -11,6 +11,7 @@ import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
 import EmailCapture from "@/components/quiz/EmailCapture";
+import HomepageLoginMenu from "@/components/auth/HomepageLoginMenu";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
@@ -159,7 +160,8 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col relative">
+      {screen === "landing" && <HomepageLoginMenu />}
       <Helmet>
         <title>Headroom — Cognitive Load Assessment</title>
         <meta name="description" content="Discover your Work Pattern archetype by assessing your Cognitive Load." />

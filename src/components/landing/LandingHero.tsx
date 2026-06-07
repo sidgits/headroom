@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import HomepageLoginMenu from "@/components/auth/HomepageLoginMenu";
 
 interface LandingHeroProps {
   onStart: () => void;
@@ -60,10 +59,6 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
 
       {/* Subtle grain texture overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E")' }} />
-
-      {/* Top-right: login options (hidden when signed in; ProfileBadge takes over) */}
-      <HomepageLoginMenu />
-
 
       {/* Hero */}
       <section className="relative flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-12 text-center">
