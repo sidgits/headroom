@@ -280,7 +280,12 @@ const Dashboard = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>Dashboard — Headroom</title>
-        <meta name="description" content="Your full Headroom cognitive-load dashboard." />
+        <meta name="description" content="Your personal Headroom dashboard — track cognitive load, review past assessments, and see how your burnout patterns shift over time." />
+        <meta name="robots" content="noindex" />
+        <link rel="canonical" href="https://headroomapp.co/dashboard" />
+        <meta property="og:title" content="Dashboard — Headroom" />
+        <meta property="og:description" content="Track your cognitive load and burnout patterns over time on your personal Headroom dashboard." />
+        <meta property="og:url" content="https://headroomapp.co/dashboard" />
       </Helmet>
       <ProfileBadge />
 

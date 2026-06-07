@@ -143,9 +143,12 @@ const Admin = () => {
     <>
       <Helmet>
         <title>Admin Dashboard — Headroom</title>
-        <meta name="description" content="Headroom admin dashboard for assessment completions." />
+        <meta name="description" content="Internal Headroom admin dashboard for reviewing assessment completions and user activity." />
         <meta name="robots" content="noindex" />
         <link rel="canonical" href="https://headroomapp.co/admin" />
+        <meta property="og:title" content="Admin Dashboard — Headroom" />
+        <meta property="og:description" content="Internal Headroom admin dashboard for reviewing assessment completions and user activity." />
+        <meta property="og:url" content="https://headroomapp.co/admin" />
       </Helmet>
       <div className="min-h-screen bg-background">
         <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">

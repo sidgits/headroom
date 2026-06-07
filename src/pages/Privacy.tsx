@@ -12,6 +12,9 @@ const Privacy = () => {
           content="How Headroom collects, uses, and protects your personal data. GDPR & CCPA compliant."
         />
         <link rel="canonical" href="https://headroomapp.co/privacy" />
+        <meta property="og:title" content="Privacy Policy — Headroom" />
+        <meta property="og:description" content="How Headroom collects, uses, and protects your personal data. GDPR & CCPA compliant." />
+        <meta property="og:url" content="https://headroomapp.co/privacy" />
       </Helmet>
 
       <main className="flex-1 px-6 py-12">
