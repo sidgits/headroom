@@ -45,9 +45,20 @@ Deno.serve(async (req) => {
       for (const u of users) {
         total++;
         if (!paidIds.has(u.id)) {
-          const { error: soErr } = await admin.auth.admin.signOut(u.id, "global");
-          if (!soErr) signedOut++;
-          else console.error("signOut failed", u.id, soErr.message);
+          const r = await fetch(
+            `${Deno.env.get("SUPABASE_URL")}/auth/v1/admin/users/${u.id}/logout`,
+            {
+              method: "POST",
+              headers: {
+                apikey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+                Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ scope: "global" }),
+            },
+          );
+          if (r.ok) signedOut++;
+          else console.error("logout failed", u.id, r.status, await r.text());
         }
       }
       if (users.length < perPage) break;
