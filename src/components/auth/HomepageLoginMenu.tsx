@@ -11,14 +11,14 @@ import { Button } from "@/components/ui/button";
 
 /**
  * Top-right login menu shown on the homepage only.
- * Offers "Sign in with Google" and "Sign in with Email".
- * Hidden once a user is authenticated (ProfileBadge takes over).
+ * Only existing paid users can sign in here. New users are directed to take the
+ * assessment first (sign-in happens at the end of the quiz / after payment).
  */
 const HomepageLoginMenu = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [emailOpen, setEmailOpen] = useState(false);
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [noticeOpen, setNoticeOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,8 +26,24 @@ const HomepageLoginMenu = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
+      // Gate: if the user signed in but has no active subscription, sign them out.
+      if (event === "SIGNED_IN" && session?.user) {
+        const { data: row } = await supabase
+          .from("subscribers")
+          .select("status,current_period_end")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        const active =
+          row &&
+          ["active", "trialing"].includes(row.status ?? "") &&
+          (!row.current_period_end || new Date(row.current_period_end) > new Date());
+        if (!active) {
+          await supabase.auth.signOut();
+          setNoticeOpen(true);
+        }
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -44,7 +60,6 @@ const HomepageLoginMenu = () => {
         toast.error("Google sign-in failed. Please try again.");
         setGoogleLoading(false);
       }
-      // If redirected, browser navigates away.
     } catch {
       toast.error("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
@@ -59,27 +74,24 @@ const HomepageLoginMenu = () => {
     }
     setLoading(true);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          toast.error(error.message);
-          return;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      setEmailOpen(false);
+      // Subscription gate runs in onAuthStateChange. If active, route to dashboard.
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        const { data: row } = await supabase
+          .from("subscribers")
+          .select("status")
+          .eq("user_id", data.session.user.id)
+          .maybeSingle();
+        if (row && ["active", "trialing"].includes(row.status ?? "")) {
+          toast.success("Signed in");
+          navigate("/dashboard");
         }
-        toast.success("Signed in");
-        setEmailOpen(false);
-        navigate("/dashboard");
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-        toast.success("Account created. Check your email to confirm.");
-        setEmailOpen(false);
       }
     } finally {
       setLoading(false);
@@ -106,7 +118,7 @@ const HomepageLoginMenu = () => {
             <span className="sm:hidden">Google</span>
           </button>
           <button
-            onClick={() => { setMode("signin"); setEmailOpen(true); }}
+            onClick={() => setEmailOpen(true)}
             className="inline-flex items-center gap-2 h-9 px-3 rounded-lg bg-primary text-primary-foreground shadow-sm text-xs sm:text-sm font-medium hover:opacity-90 transition-opacity"
             aria-label="Sign in with Email"
           >
@@ -122,11 +134,9 @@ const HomepageLoginMenu = () => {
       <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{mode === "signin" ? "Sign in with Email" : "Create your account"}</DialogTitle>
+            <DialogTitle>Sign in with Email</DialogTitle>
             <DialogDescription>
-              {mode === "signin"
-                ? "Welcome back. Enter your details to continue."
-                : "Sign up to save your results and access your dashboard."}
+              Welcome back. Enter your details to continue.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEmailSubmit} className="space-y-4">
@@ -147,7 +157,7 @@ const HomepageLoginMenu = () => {
               <Input
                 id="login-password"
                 type="password"
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -156,7 +166,7 @@ const HomepageLoginMenu = () => {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              {loading ? "Please wait…" : "Sign in"}
             </Button>
             <p className="text-center text-[11px] text-muted-foreground leading-relaxed">
               By continuing, you agree to our{" "}
@@ -166,31 +176,30 @@ const HomepageLoginMenu = () => {
               .
             </p>
             <p className="text-center text-xs text-muted-foreground">
-              {mode === "signin" ? (
-                <>
-                  No account?{" "}
-                  <button
-                    type="button"
-                    className="underline underline-offset-2 hover:text-foreground"
-                    onClick={() => setMode("signup")}
-                  >
-                    Create one
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    className="underline underline-offset-2 hover:text-foreground"
-                    onClick={() => setMode("signin")}
-                  >
-                    Sign in
-                  </button>
-                </>
-              )}
+              New here? Take the assessment below to get started.
             </p>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={noticeOpen} onOpenChange={setNoticeOpen}>
+        <DialogContent className="sm:max-w-sm text-center">
+          <DialogHeader>
+            <DialogTitle>Take the assessment first</DialogTitle>
+            <DialogDescription>
+              Sign-in is for returning users with an active subscription. To get started,
+              please take the assessment below — your account is created at the end.
+            </DialogDescription>
+          </DialogHeader>
+          <Button
+            className="w-full"
+            onClick={() => {
+              setNoticeOpen(false);
+              navigate("/");
+            }}
+          >
+            Start the assessment
+          </Button>
         </DialogContent>
       </Dialog>
     </>
