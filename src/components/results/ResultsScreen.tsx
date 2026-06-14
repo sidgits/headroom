@@ -90,6 +90,17 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
+          {burnoutRisk && (
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-warm-red">
+                Burnout Risk — {burnoutRisk.label}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{burnoutRisk.description}</p>
+              <p className="text-xs text-muted-foreground italic">Early signal: {burnoutRisk.signal}</p>
+              <p className="text-xs text-muted-foreground">Intervention: {burnoutRisk.earlyIntervention}</p>
+            </div>
+          )}
+
           <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
             <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
               At your best
