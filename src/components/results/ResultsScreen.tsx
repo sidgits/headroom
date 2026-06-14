@@ -14,7 +14,7 @@ interface ResultsScreenProps {
 }
 
 const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
-  const { archetype, dimensionScores, mirror } = result;
+  const { archetype, dimensionScores, mirror, burnoutRisk } = result;
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
