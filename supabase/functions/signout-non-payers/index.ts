@@ -19,6 +19,10 @@ Deno.serve(async (req) => {
       });
     }
 
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
     const { data, error } = await admin.rpc("admin_revoke_non_payer_sessions");
     if (error) throw error;
     return new Response(JSON.stringify({ ok: true, sessionsRevoked: data }), {
