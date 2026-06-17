@@ -111,8 +111,12 @@ Deno.serve(async (req) => {
     // Prefer the verified session email; fall back to the email-only value.
     const effectiveEmail = userEmail ?? bodyEmail;
 
-    const isIndia = await detectIndia(req);
+    const country = await detectCountry(req);
+    const isIndia = country === "IN";
     const region = isIndia ? "IN" : "GLOBAL";
+    // For non-India, pick a local currency from the global price's currency_options
+    // when the buyer's country maps to one; otherwise default to USD.
+    const localCurrency = !isIndia && country ? COUNTRY_TO_CURRENCY[country] : undefined;
 
     // ─── TEST BYPASS branch ───────────────────────────────────────────────────
     if (isTestEnv) {
