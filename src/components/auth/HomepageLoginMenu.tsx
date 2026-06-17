@@ -28,8 +28,13 @@ const HomepageLoginMenu = () => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
-      // Gate: if the user signed in but has no active subscription, sign them out.
+      // Gate: only apply when the sign-in was initiated from THIS menu's button.
+      // (Sign-ins from the quiz flow must NOT be revoked here — otherwise the
+      // user is signed out before they pay and loses their session post-checkout.)
       if (event === "SIGNED_IN" && session?.user) {
+        const fromMenu = sessionStorage.getItem("homepage_login_attempt") === "1";
+        if (!fromMenu) return;
+        sessionStorage.removeItem("homepage_login_attempt");
         const { data: row } = await supabase
           .from("subscribers")
           .select("status,current_period_end")
@@ -53,14 +58,17 @@ const HomepageLoginMenu = () => {
   const handleGoogle = async () => {
     setGoogleLoading(true);
     try {
+      sessionStorage.setItem("homepage_login_attempt", "1");
       const res = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/dashboard`,
       });
       if (res.error) {
+        sessionStorage.removeItem("homepage_login_attempt");
         toast.error("Google sign-in failed. Please try again.");
         setGoogleLoading(false);
       }
     } catch {
+      sessionStorage.removeItem("homepage_login_attempt");
       toast.error("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
     }
@@ -74,6 +82,7 @@ const HomepageLoginMenu = () => {
     }
     setLoading(true);
     try {
+      sessionStorage.setItem("homepage_login_attempt", "1");
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error(error.message);
