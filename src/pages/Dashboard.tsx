@@ -247,89 +247,14 @@ const Dashboard = () => {
 
   const burnoutStyle = archetypeProfile ? burnoutLevelStyles[archetypeProfile.defaultBurnout.level] : null;
 
-  // Secondary tiles (below the two hero highlights)
-  const tiles: Array<{
-    key: string;
-    title: string;
-    icon: typeof TrendingUp;
-    tint: string;
-    body: React.ReactNode;
-  }> = [
-    {
-      key: "longitudinal",
-      title: "Pattern Shifts",
-      icon: TrendingUp,
-      tint: "bg-accent/10 border-accent/30 text-accent",
-      body: (
-        <div className="space-y-2">
-          <p className="text-sm text-foreground">
-            <span className="text-2xl font-bold">{completions.length}</span>
-            <span className="text-muted-foreground"> / {MIN_LONGITUDINAL_CHECKINS} assessments</span>
-          </p>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary to-accent" style={{ width: `${progressPct}%` }} />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "checkins",
-      title: "Check-Ins",
-      icon: CheckCircle2,
-      tint: "bg-[hsl(var(--golden)/0.15)] border-[hsl(var(--golden)/0.4)] text-[hsl(var(--golden))]",
-      body: (
-        <div>
-          <p className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{totalCheckins}</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {checkins[0] ? `Last: ${new Date(checkins[0].created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}` : "First today"}
-          </p>
-        </div>
-      ),
-    },
-    {
-      key: "calendar",
-      title: "Calendar",
-      icon: Calendar,
-      tint: "bg-[hsl(var(--deep-orange)/0.12)] border-[hsl(var(--deep-orange)/0.35)] text-[hsl(var(--deep-orange))]",
-      body: isSubscribed ? (
-        <Link to="/dashboard/calendar" className="text-sm font-semibold underline underline-offset-4">
-          Open calendar view →
-        </Link>
-      ) : (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Lock className="w-4 h-4" /> Unlock with upgrade
-        </div>
-      ),
-    },
-    {
-      key: "todays_burnout",
-      title: "Today's Load",
-      icon: Flame,
-      tint: "bg-secondary border-border text-foreground",
-      body: isSubscribed ? (
-        <Link to="/dashboard/calendar" className="text-sm font-semibold text-primary underline underline-offset-4">
-          See daily load score →
-        </Link>
-      ) : (
-        <p className="text-sm text-muted-foreground italic">Awaiting calendar</p>
-      ),
-    },
-    {
-      key: "chat",
-      title: "AI Productivity Coach",
-      icon: MessageCircle,
-      tint: "bg-primary/10 border-primary/30 text-primary",
-      body: isSubscribed ? (
-        <Link to="/dashboard/coach" className="text-sm font-semibold underline underline-offset-4">
-          Chat with your coach →
-        </Link>
-      ) : (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Lock className="w-4 h-4" /> Unlock with upgrade
-        </div>
-      ),
-    },
-  ];
+  const firstName = (latest?.name?.split(" ")[0]) || "Your";
+
+  const handleSignOut = async () => {
+    try { await supabase.auth.signOut(); } catch { /**/ }
+    try { localStorage.removeItem("headroom_assessment_email"); } catch { /**/ }
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
