@@ -213,6 +213,7 @@ const Dashboard = () => {
         } else if (data) {
           if (Array.isArray(data.completions)) setCompletions(data.completions as Completion[]);
           if (Array.isArray(data.checkins)) setCheckins(data.checkins as Checkin[]);
+          if (data.subscribed) setIsSubscribed(true);
         }
       }
 

@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const [completionsRes, checkinsRes] = await Promise.all([
+    const [completionsRes, checkinsRes, subRes] = await Promise.all([
       supabase
         .from("assessment_completions")
         .select("id, role, archetype_id, archetype_name, created_at, name, email, result_data")
@@ -87,7 +87,19 @@ Deno.serve(async (req) => {
         .ilike("email", trimmed)
         .order("created_at", { ascending: false })
         .limit(50),
+      supabase
+        .from("subscribers")
+        .select("status, current_period_end")
+        .ilike("email", trimmed)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
+
+    const sub = subRes.data;
+    const subscribed = !!sub
+      && ["active", "trialing"].includes(sub.status as string)
+      && (!sub.current_period_end || new Date(sub.current_period_end as string) > new Date());
 
     // Best-effort daily check-in log. user_id is nullable now, so email-only
     // visits record a checkin without a session.
@@ -107,6 +119,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         completions: completionsRes.data ?? [],
         checkins: checkinsRes.data ?? [],
+        subscribed,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
     );
