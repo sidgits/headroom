@@ -183,13 +183,14 @@ Deno.serve(async (req) => {
       payment_method_types: paymentMethodTypes as any,
       payment_method_options: paymentMethodOptions as any,
       line_items: [{ price: priceId, quantity: 1 }],
+      currency: localCurrency, // undefined => Stripe uses price's base currency (USD / INR)
       success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
-      metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" },
-      subscription_data: { metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" } },
+      metadata: { user_id: userId ?? "guest", region, country: country ?? "", currency: localCurrency ?? (isIndia ? "inr" : "usd"), email: effectiveEmail ?? "" },
+      subscription_data: { metadata: { user_id: userId ?? "guest", region, country: country ?? "", currency: localCurrency ?? (isIndia ? "inr" : "usd"), email: effectiveEmail ?? "" } },
     });
 
-    return new Response(JSON.stringify({ url: session.url, region }), {
+    return new Response(JSON.stringify({ url: session.url, region, country, currency: localCurrency ?? (isIndia ? "inr" : "usd") }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
