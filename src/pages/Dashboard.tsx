@@ -505,7 +505,7 @@ export default Dashboard;
 function NoAssessmentGate() {
   return (
     <div className="min-h-screen flex flex-col">
-      <ProfileBadge />
+      
       <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="max-w-md w-full space-y-5 bg-card/60 border border-border/50 rounded-2xl p-7 text-center">
           <div className="flex justify-center">
