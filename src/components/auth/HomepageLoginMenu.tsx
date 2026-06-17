@@ -28,8 +28,13 @@ const HomepageLoginMenu = () => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
-      // Gate: if the user signed in but has no active subscription, sign them out.
+      // Gate: only apply when the sign-in was initiated from THIS menu's button.
+      // (Sign-ins from the quiz flow must NOT be revoked here — otherwise the
+      // user is signed out before they pay and loses their session post-checkout.)
       if (event === "SIGNED_IN" && session?.user) {
+        const fromMenu = sessionStorage.getItem("homepage_login_attempt") === "1";
+        if (!fromMenu) return;
+        sessionStorage.removeItem("homepage_login_attempt");
         const { data: row } = await supabase
           .from("subscribers")
           .select("status,current_period_end")
