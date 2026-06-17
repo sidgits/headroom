@@ -454,6 +454,34 @@ const Dashboard = () => {
           </motion.div>
         </div>
 
+        {/* UPGRADE CTA */}
+        {!isSubscribed && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.15 }}
+            className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/15 via-accent/10 to-warm-red/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          >
+            <div className="space-y-1">
+              <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Go deeper</p>
+              <p className="text-sm sm:text-base text-foreground leading-snug">
+                Unlock real-time cognitive load tracking from your work schedule, plus your personalised AI Productivity Coach.
+              </p>
+            </div>
+            <motion.button
+              onClick={handleUpgrade}
+              disabled={checkoutLoading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center justify-center text-center py-3 px-5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg shadow-primary/20 disabled:opacity-60 whitespace-normal sm:whitespace-nowrap"
+            >
+              {checkoutLoading
+                ? "Redirecting…"
+                : `Track real-time picture basis your work schedule for ${isIndia ? "₹300" : "$9"} (Personalized AI Productivity Coach included)`}
+            </motion.button>
+          </motion.div>
+        )}
+
         {/* SECONDARY TILES */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
           {tiles.map((t, i) => {
