@@ -394,13 +394,30 @@ const Dashboard = () => {
             <motion.button
               onClick={handleUpgrade}
               disabled={checkoutLoading}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center justify-center text-center py-3 px-5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg shadow-primary/20 disabled:opacity-60 whitespace-normal sm:whitespace-nowrap"
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="group relative inline-flex flex-col items-center justify-center text-center py-4 px-8 sm:px-10 rounded-[2rem] bg-gradient-to-br from-primary via-accent to-warm-red text-primary-foreground font-semibold shadow-[0_20px_50px_-12px_rgba(var(--primary),0.45)] hover:shadow-[0_30px_70px_-10px_rgba(var(--warm-red),0.55)] disabled:opacity-60 transition-shadow duration-500"
             >
-              {checkoutLoading
-                ? "Redirecting…"
-                : `Track real-time picture basis your work schedule for ${isIndia ? "₹300" : "$9"} (Personalized AI Productivity Coach included)`}
+              {/* Main CTA */}
+              <span className="text-base sm:text-[17px] tracking-tight leading-tight">
+                {checkoutLoading
+                  ? "Redirecting…"
+                  : `Track real-time schedule for ${isIndia ? "₹300" : "$9"}`}
+              </span>
+              {/* Subtext */}
+              {!checkoutLoading && (
+                <span className="flex items-center gap-2 mt-1">
+                  <span className="h-px w-3 bg-white/25" />
+                  <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/75 group-hover:text-white/90 transition-colors">
+                    AI Coach Included
+                  </span>
+                  <span className="h-px w-3 bg-white/25" />
+                </span>
+              )}
+              {/* Ambient glow */}
+              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              {/* Inner border */}
+              <div className="absolute inset-0 rounded-[2rem] border border-black/5 pointer-events-none" />
             </motion.button>
           </motion.div>
         )}
