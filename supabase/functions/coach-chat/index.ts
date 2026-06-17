@@ -65,7 +65,7 @@ Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.scor
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-5.5",
         messages,
         tools: [{
           type: "function",
