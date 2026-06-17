@@ -47,14 +47,19 @@ Deno.serve(async (req) => {
     const updated = await stripe.prices.update(PRICE_GLOBAL, {
       currency_options,
     } as any);
+    // Re-fetch with expand to verify what actually persisted.
+    const verified = await stripe.prices.retrieve(PRICE_GLOBAL, {
+      expand: ["currency_options"],
+    } as any);
     return new Response(
       JSON.stringify({
         ok: true,
         price_id: updated.id,
         base_currency: updated.currency,
         base_amount: updated.unit_amount,
-        currency_options: Object.keys(updated.currency_options ?? {}),
-      }),
+        update_returned_currency_options: updated.currency_options ?? null,
+        verified_currency_options: verified.currency_options ?? null,
+      }, null, 2),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
