@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Calendar, CheckCircle2, Download, Flame, Lock, MessageCircle, RefreshCw, Shield, Sparkles, TrendingUp } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Download, LogOut, RefreshCw, Shield, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import ProfileBadge from "@/components/auth/ProfileBadge";
 import ShareButtons from "@/components/dashboard/ShareButtons";
+import CalendarSection from "@/components/dashboard/CalendarSection";
+import CoachSection from "@/components/dashboard/CoachSection";
 import Footer from "@/components/Footer";
 import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
@@ -246,89 +247,14 @@ const Dashboard = () => {
 
   const burnoutStyle = archetypeProfile ? burnoutLevelStyles[archetypeProfile.defaultBurnout.level] : null;
 
-  // Secondary tiles (below the two hero highlights)
-  const tiles: Array<{
-    key: string;
-    title: string;
-    icon: typeof TrendingUp;
-    tint: string;
-    body: React.ReactNode;
-  }> = [
-    {
-      key: "longitudinal",
-      title: "Pattern Shifts",
-      icon: TrendingUp,
-      tint: "bg-accent/10 border-accent/30 text-accent",
-      body: (
-        <div className="space-y-2">
-          <p className="text-sm text-foreground">
-            <span className="text-2xl font-bold">{completions.length}</span>
-            <span className="text-muted-foreground"> / {MIN_LONGITUDINAL_CHECKINS} assessments</span>
-          </p>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary to-accent" style={{ width: `${progressPct}%` }} />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "checkins",
-      title: "Check-Ins",
-      icon: CheckCircle2,
-      tint: "bg-[hsl(var(--golden)/0.15)] border-[hsl(var(--golden)/0.4)] text-[hsl(var(--golden))]",
-      body: (
-        <div>
-          <p className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{totalCheckins}</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {checkins[0] ? `Last: ${new Date(checkins[0].created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}` : "First today"}
-          </p>
-        </div>
-      ),
-    },
-    {
-      key: "calendar",
-      title: "Calendar",
-      icon: Calendar,
-      tint: "bg-[hsl(var(--deep-orange)/0.12)] border-[hsl(var(--deep-orange)/0.35)] text-[hsl(var(--deep-orange))]",
-      body: isSubscribed ? (
-        <Link to="/dashboard/calendar" className="text-sm font-semibold underline underline-offset-4">
-          Open calendar view →
-        </Link>
-      ) : (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Lock className="w-4 h-4" /> Unlock with upgrade
-        </div>
-      ),
-    },
-    {
-      key: "todays_burnout",
-      title: "Today's Load",
-      icon: Flame,
-      tint: "bg-secondary border-border text-foreground",
-      body: isSubscribed ? (
-        <Link to="/dashboard/calendar" className="text-sm font-semibold text-primary underline underline-offset-4">
-          See daily load score →
-        </Link>
-      ) : (
-        <p className="text-sm text-muted-foreground italic">Awaiting calendar</p>
-      ),
-    },
-    {
-      key: "chat",
-      title: "AI Productivity Coach",
-      icon: MessageCircle,
-      tint: "bg-primary/10 border-primary/30 text-primary",
-      body: isSubscribed ? (
-        <Link to="/dashboard/coach" className="text-sm font-semibold underline underline-offset-4">
-          Chat with your coach →
-        </Link>
-      ) : (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Lock className="w-4 h-4" /> Unlock with upgrade
-        </div>
-      ),
-    },
-  ];
+  const firstName = (latest?.name?.split(" ")[0]) || "Your";
+
+  const handleSignOut = async () => {
+    try { await supabase.auth.signOut(); } catch { /**/ }
+    try { localStorage.removeItem("headroom_assessment_email"); } catch { /**/ }
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -341,33 +267,17 @@ const Dashboard = () => {
         <meta property="og:description" content="Track your cognitive load and burnout patterns over time on your personal Headroom dashboard." />
         <meta property="og:url" content="https://headroomapp.co/dashboard" />
       </Helmet>
-      <ProfileBadge />
 
-      <div className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-6 flex flex-col gap-4">
+      <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-6 flex flex-col gap-4">
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
         >
-          <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
-              Welcome{latest?.name ? `, ${latest.name.split(" ")[0]}` : ""} 👋
-            </h1>
-          </div>
-          <motion.button
-            onClick={() => {
-              try { sessionStorage.setItem("headroom_retake", "1"); } catch {}
-              navigate("/?retake=1");
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center justify-center gap-2 self-start sm:self-auto py-2.5 px-4 rounded-xl border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/15 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Retake Assessment for Free
-          </motion.button>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Headroom Dashboard</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+            Welcome{latest?.name ? `, ${firstName}` : ""} 👋
+          </h1>
         </motion.div>
 
 
@@ -495,52 +405,61 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* SECONDARY TILES */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
-          {tiles.map((t, i) => {
-            const Icon = t.icon;
-            return (
-              <motion.div
-                key={t.key}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 + i * 0.04 }}
-                className={`rounded-2xl border p-4 sm:p-5 flex flex-col gap-3 min-h-[130px] ${t.tint}`}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider">{t.title}</h2>
-                </div>
-                <div className="flex-1">{t.body}</div>
-              </motion.div>
-            );
-          })}
-        </div>
+        {/* CALENDAR + COACH (inline, for subscribers) */}
+        {isSubscribed && user?.email && (
+          <>
+            <CalendarSection email={user.email} />
+            <CoachSection email={user.email} firstName={firstName} />
+          </>
+        )}
 
-        {/* SHARE + DOWNLOAD ROW */}
+        {/* SHARE + ACTION ROW — exactly 3 buttons besides social share */}
         {archetypeProfile && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.25 }}
-            className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+            className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5 flex flex-col gap-4"
           >
             <div className="space-y-2">
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Share your result</p>
               <ShareButtons archetypeName={archetypeProfile.name} />
             </div>
-            <motion.button
-              onClick={() => generateResultsPDF(
-                isScoringResult(latest?.result_data) ? latest!.result_data : buildResultFromMeta(archetypeProfile),
-                latest?.role ?? "—",
-              )}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 whitespace-nowrap"
-            >
-              <Download className="w-4 h-4" />
-              Download full profile
-            </motion.button>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <motion.button
+                onClick={() => {
+                  try { sessionStorage.setItem("headroom_retake", "1"); } catch { /**/ }
+                  navigate("/?retake=1");
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/15 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Retake Assessment for Free
+              </motion.button>
+              <motion.button
+                onClick={() => generateResultsPDF(
+                  isScoringResult(latest?.result_data) ? latest!.result_data : buildResultFromMeta(archetypeProfile),
+                  latest?.role ?? "—",
+                )}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20"
+              >
+                <Download className="w-4 h-4" />
+                Download Profile
+              </motion.button>
+              <motion.button
+                onClick={handleSignOut}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-background text-foreground font-semibold text-sm hover:bg-secondary transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </div>
@@ -586,7 +505,7 @@ export default Dashboard;
 function NoAssessmentGate() {
   return (
     <div className="min-h-screen flex flex-col">
-      <ProfileBadge />
+      
       <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="max-w-md w-full space-y-5 bg-card/60 border border-border/50 rounded-2xl p-7 text-center">
           <div className="flex justify-center">
