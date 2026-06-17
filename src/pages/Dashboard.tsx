@@ -289,18 +289,26 @@ const Dashboard = () => {
       title: "Calendar",
       icon: Calendar,
       tint: "bg-[hsl(var(--deep-orange)/0.12)] border-[hsl(var(--deep-orange)/0.35)] text-[hsl(var(--deep-orange))]",
-      body: (
+      body: isSubscribed ? (
+        <Link to="/dashboard/calendar" className="text-sm font-semibold underline underline-offset-4">
+          Open calendar view →
+        </Link>
+      ) : (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Lock className="w-4 h-4" /> Connect — soon
+          <Lock className="w-4 h-4" /> Unlock with upgrade
         </div>
       ),
     },
     {
       key: "todays_burnout",
-      title: "Today's Burnout Risk",
+      title: "Today's Load",
       icon: Flame,
       tint: "bg-secondary border-border text-foreground",
-      body: (
+      body: isSubscribed ? (
+        <Link to="/dashboard/calendar" className="text-sm font-semibold text-primary underline underline-offset-4">
+          See daily load score →
+        </Link>
+      ) : (
         <p className="text-sm text-muted-foreground italic">Awaiting calendar</p>
       ),
     },
@@ -309,7 +317,11 @@ const Dashboard = () => {
       title: "AI Productivity Coach",
       icon: MessageCircle,
       tint: "bg-primary/10 border-primary/30 text-primary",
-      body: (
+      body: isSubscribed ? (
+        <Link to="/dashboard/coach" className="text-sm font-semibold underline underline-offset-4">
+          Chat with your coach →
+        </Link>
+      ) : (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Lock className="w-4 h-4" /> Unlock with upgrade
         </div>
