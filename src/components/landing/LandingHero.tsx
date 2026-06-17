@@ -95,7 +95,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          Understand how work impacts{" "}
+          Understand how your work impacts{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red">
             your mind
           </span>
