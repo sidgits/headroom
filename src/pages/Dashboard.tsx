@@ -57,6 +57,33 @@ const Dashboard = () => {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
   const [recoveringIdentity, setRecoveringIdentity] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const isIndia = (() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      return tz === "Asia/Kolkata" || tz === "Asia/Calcutta";
+    } catch {
+      return false;
+    }
+  })();
+
+  const handleUpgrade = async () => {
+    setCheckoutLoading(true);
+    try {
+      let storedEmail: string | null = null;
+      try { storedEmail = localStorage.getItem("headroom_assessment_email"); } catch {}
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: storedEmail ? { email: storedEmail } : {},
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (e) {
+      console.error("checkout failed", e);
+      toast.error("Could not start checkout. Please try again.");
+      setCheckoutLoading(false);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -161,6 +188,20 @@ const Dashboard = () => {
         if (!isMounted) return;
         if (completionsRes.data) setCompletions(completionsRes.data as Completion[]);
         if (checkinsRes.data) setCheckins(checkinsRes.data as Checkin[]);
+
+        // Subscription status (drives the upgrade CTA visibility).
+        const { data: subRow } = await supabase
+          .from("subscribers")
+          .select("status, current_period_end")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        if (
+          subRow &&
+          ["active", "trialing"].includes(subRow.status as string) &&
+          (!subRow.current_period_end || new Date(subRow.current_period_end as string) > new Date())
+        ) {
+          setIsSubscribed(true);
+        }
       } else if (identityEmail) {
         // Email-only path — fetch via edge function (service role bypasses RLS).
         const { data, error } = await supabase.functions.invoke("get-user-dashboard", {
@@ -265,12 +306,12 @@ const Dashboard = () => {
     },
     {
       key: "chat",
-      title: "Mitigation Chat",
+      title: "AI Productivity Coach",
       icon: MessageCircle,
       tint: "bg-primary/10 border-primary/30 text-primary",
       body: (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Sparkles className="w-4 h-4" /> Agent — soon
+          <Lock className="w-4 h-4" /> Unlock with upgrade
         </div>
       ),
     },
@@ -412,6 +453,34 @@ const Dashboard = () => {
             )}
           </motion.div>
         </div>
+
+        {/* UPGRADE CTA */}
+        {!isSubscribed && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.15 }}
+            className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/15 via-accent/10 to-warm-red/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          >
+            <div className="space-y-1">
+              <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Go deeper</p>
+              <p className="text-sm sm:text-base text-foreground leading-snug">
+                Unlock real-time cognitive load tracking from your work schedule, plus your personalised AI Productivity Coach.
+              </p>
+            </div>
+            <motion.button
+              onClick={handleUpgrade}
+              disabled={checkoutLoading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center justify-center text-center py-3 px-5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg shadow-primary/20 disabled:opacity-60 whitespace-normal sm:whitespace-nowrap"
+            >
+              {checkoutLoading
+                ? "Redirecting…"
+                : `Track real-time picture basis your work schedule for ${isIndia ? "₹300" : "$9"} (Personalized AI Productivity Coach included)`}
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* SECONDARY TILES */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
