@@ -405,52 +405,61 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* SECONDARY TILES */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
-          {tiles.map((t, i) => {
-            const Icon = t.icon;
-            return (
-              <motion.div
-                key={t.key}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 + i * 0.04 }}
-                className={`rounded-2xl border p-4 sm:p-5 flex flex-col gap-3 min-h-[130px] ${t.tint}`}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider">{t.title}</h2>
-                </div>
-                <div className="flex-1">{t.body}</div>
-              </motion.div>
-            );
-          })}
-        </div>
+        {/* CALENDAR + COACH (inline, for subscribers) */}
+        {isSubscribed && user?.email && (
+          <>
+            <CalendarSection email={user.email} />
+            <CoachSection email={user.email} firstName={firstName} />
+          </>
+        )}
 
-        {/* SHARE + DOWNLOAD ROW */}
+        {/* SHARE + ACTION ROW — exactly 3 buttons besides social share */}
         {archetypeProfile && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.25 }}
-            className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+            className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5 flex flex-col gap-4"
           >
             <div className="space-y-2">
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Share your result</p>
               <ShareButtons archetypeName={archetypeProfile.name} />
             </div>
-            <motion.button
-              onClick={() => generateResultsPDF(
-                isScoringResult(latest?.result_data) ? latest!.result_data : buildResultFromMeta(archetypeProfile),
-                latest?.role ?? "—",
-              )}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 whitespace-nowrap"
-            >
-              <Download className="w-4 h-4" />
-              Download full profile
-            </motion.button>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <motion.button
+                onClick={() => {
+                  try { sessionStorage.setItem("headroom_retake", "1"); } catch { /**/ }
+                  navigate("/?retake=1");
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/15 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Retake Assessment for Free
+              </motion.button>
+              <motion.button
+                onClick={() => generateResultsPDF(
+                  isScoringResult(latest?.result_data) ? latest!.result_data : buildResultFromMeta(archetypeProfile),
+                  latest?.role ?? "—",
+                )}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20"
+              >
+                <Download className="w-4 h-4" />
+                Download Profile
+              </motion.button>
+              <motion.button
+                onClick={handleSignOut}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-background text-foreground font-semibold text-sm hover:bg-secondary transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </div>
