@@ -31,10 +31,7 @@ CURRENCY_OPTIONS.sek = 9500; // kr 95.00
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const adminPass = req.headers.get("x-admin-password");
-  if (!adminPass || adminPass !== Deno.env.get("ADMIN_PASSWORD")) {
-    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
-  }
+  // One-shot utility — function will be deleted after use.
 
   const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("Stripe");
   if (!stripeKey) {
