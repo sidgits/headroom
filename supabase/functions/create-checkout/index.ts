@@ -33,17 +33,32 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const origin = req.headers.get("origin") || "https://headroomapp.co";
+    // ─── TEST BYPASS ──────────────────────────────────────────────────────────
+    // On lovable preview/test URLs, skip Stripe entirely so we can validate the
+    // post-payment flow end-to-end. Mark the user (or email) as active in
+    // subscribers and route straight to the dashboard success state.
+    const isTestEnv = (() => {
+      try {
+        const host = new URL(origin).hostname;
+        return (
+          host.endsWith(".lovable.app") ||
+          host.endsWith(".lovableproject.com") ||
+          host === "localhost" ||
+          host === "127.0.0.1"
+        );
+      } catch {
+        return false;
+      }
+    })();
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("Stripe");
-    if (!stripeKey) {
+    if (!stripeKey && !isTestEnv) {
       return new Response(JSON.stringify({ error: "Stripe is not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
-
-    // Optional body: email-only users (no session) can pass their stored email
-    // so checkout/customer is linked to the same address as their completions.
     let bodyEmail: string | undefined;
     try {
       const body = await req.json();
@@ -78,8 +93,44 @@ Deno.serve(async (req) => {
     const effectiveEmail = userEmail ?? bodyEmail;
 
     const isIndia = await detectIndia(req);
-    const priceId = isIndia ? PRICE_INDIA : PRICE_GLOBAL;
     const region = isIndia ? "IN" : "GLOBAL";
+
+    // ─── TEST BYPASS branch ───────────────────────────────────────────────────
+    if (isTestEnv) {
+      console.log("create-checkout: TEST BYPASS active for origin", origin);
+      try {
+        const admin = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        if (effectiveEmail) {
+          const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+          await admin.from("subscribers").upsert(
+            {
+              user_id: userId ?? null,
+              email: effectiveEmail,
+              region,
+              status: "active",
+              current_period_end: periodEnd,
+            },
+            { onConflict: "email" },
+          );
+        }
+      } catch (e) {
+        console.error("create-checkout test bypass upsert failed", e);
+      }
+      return new Response(
+        JSON.stringify({
+          url: `${origin}/dashboard?checkout=success&test=1`,
+          region,
+          test: true,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
+      );
+    }
+
+    const stripe = new Stripe(stripeKey!, { apiVersion: "2024-06-20" });
+    const priceId = isIndia ? PRICE_INDIA : PRICE_GLOBAL;
 
     let customerId: string | undefined;
     if (effectiveEmail) {
@@ -87,7 +138,6 @@ Deno.serve(async (req) => {
       customerId = existing.data[0]?.id;
     }
 
-    const origin = req.headers.get("origin") || "https://headroomapp.co";
 
     // For India subscriptions, enable UPI Autopay (e-mandate) alongside cards.
     // UPI on recurring requires explicit payment_method_types + mandate options.
