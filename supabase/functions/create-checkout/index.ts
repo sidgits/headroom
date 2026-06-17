@@ -12,20 +12,39 @@ const corsHeaders = {
 const PRICE_INDIA = "price_1TfXhF6bE2gY9hpWkTpCYauh";
 const PRICE_GLOBAL = "price_1Telga6bE2gY9hpWP0hKjCWJ";
 
-async function detectIndia(req: Request): Promise<boolean> {
+// Supported currency_options on the global price.
+// US (and any country not listed) falls back to USD.
+const COUNTRY_TO_CURRENCY: Record<string, string> = {
+  GB: "gbp",
+  AE: "aed", SA: "aed",
+  SG: "sgd",
+  AU: "aud",
+  CA: "cad",
+  NZ: "nzd",
+  CH: "chf",
+  HK: "hkd",
+  JP: "jpy",
+  SE: "sek",
+  // Eurozone
+  DE: "eur", FR: "eur", ES: "eur", IT: "eur", NL: "eur", BE: "eur",
+  IE: "eur", PT: "eur", AT: "eur", FI: "eur", GR: "eur", LU: "eur",
+  EE: "eur", LV: "eur", LT: "eur", SK: "eur", SI: "eur", CY: "eur", MT: "eur", HR: "eur",
+};
+
+async function detectCountry(req: Request): Promise<string | null> {
   const ip =
     req.headers.get("cf-connecting-ip") ||
     req.headers.get("x-real-ip") ||
     (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
-  if (!ip) return false;
+  if (!ip) return null;
   const key = Deno.env.get("IPSTACK_API_KEY");
-  if (!key) return false;
+  if (!key) return null;
   try {
     const r = await fetch(`https://api.ipstack.com/${ip}?access_key=${key}&fields=country_code`);
     const j = await r.json();
-    return j?.country_code === "IN";
+    return (j?.country_code as string) ?? null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -92,8 +111,12 @@ Deno.serve(async (req) => {
     // Prefer the verified session email; fall back to the email-only value.
     const effectiveEmail = userEmail ?? bodyEmail;
 
-    const isIndia = await detectIndia(req);
+    const country = await detectCountry(req);
+    const isIndia = country === "IN";
     const region = isIndia ? "IN" : "GLOBAL";
+    // For non-India, pick a local currency from the global price's currency_options
+    // when the buyer's country maps to one; otherwise default to USD.
+    const localCurrency = !isIndia && country ? COUNTRY_TO_CURRENCY[country] : undefined;
 
     // ─── TEST BYPASS branch ───────────────────────────────────────────────────
     if (isTestEnv) {
@@ -160,13 +183,14 @@ Deno.serve(async (req) => {
       payment_method_types: paymentMethodTypes as any,
       payment_method_options: paymentMethodOptions as any,
       line_items: [{ price: priceId, quantity: 1 }],
+      currency: localCurrency, // undefined => Stripe uses price's base currency (USD / INR)
       success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
-      metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" },
-      subscription_data: { metadata: { user_id: userId ?? "guest", region, email: effectiveEmail ?? "" } },
+      metadata: { user_id: userId ?? "guest", region, country: country ?? "", currency: localCurrency ?? (isIndia ? "inr" : "usd"), email: effectiveEmail ?? "" },
+      subscription_data: { metadata: { user_id: userId ?? "guest", region, country: country ?? "", currency: localCurrency ?? (isIndia ? "inr" : "usd"), email: effectiveEmail ?? "" } },
     });
 
-    return new Response(JSON.stringify({ url: session.url, region }), {
+    return new Response(JSON.stringify({ url: session.url, region, country, currency: localCurrency ?? (isIndia ? "inr" : "usd") }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
