@@ -58,14 +58,17 @@ const HomepageLoginMenu = () => {
   const handleGoogle = async () => {
     setGoogleLoading(true);
     try {
+      sessionStorage.setItem("homepage_login_attempt", "1");
       const res = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/dashboard`,
       });
       if (res.error) {
+        sessionStorage.removeItem("homepage_login_attempt");
         toast.error("Google sign-in failed. Please try again.");
         setGoogleLoading(false);
       }
     } catch {
+      sessionStorage.removeItem("homepage_login_attempt");
       toast.error("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
     }
