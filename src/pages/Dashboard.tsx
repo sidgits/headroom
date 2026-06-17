@@ -188,6 +188,20 @@ const Dashboard = () => {
         if (!isMounted) return;
         if (completionsRes.data) setCompletions(completionsRes.data as Completion[]);
         if (checkinsRes.data) setCheckins(checkinsRes.data as Checkin[]);
+
+        // Subscription status (drives the upgrade CTA visibility).
+        const { data: subRow } = await supabase
+          .from("subscribers")
+          .select("status, current_period_end")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        if (
+          subRow &&
+          ["active", "trialing"].includes(subRow.status as string) &&
+          (!subRow.current_period_end || new Date(subRow.current_period_end as string) > new Date())
+        ) {
+          setIsSubscribed(true);
+        }
       } else if (identityEmail) {
         // Email-only path — fetch via edge function (service role bypasses RLS).
         const { data, error } = await supabase.functions.invoke("get-user-dashboard", {
@@ -292,12 +306,12 @@ const Dashboard = () => {
     },
     {
       key: "chat",
-      title: "Mitigation Chat",
+      title: "AI Productivity Coach",
       icon: MessageCircle,
       tint: "bg-primary/10 border-primary/30 text-primary",
       body: (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Sparkles className="w-4 h-4" /> Agent — soon
+          <Lock className="w-4 h-4" /> Unlock with upgrade
         </div>
       ),
     },
