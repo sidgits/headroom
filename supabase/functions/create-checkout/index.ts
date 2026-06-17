@@ -33,17 +33,32 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const origin = req.headers.get("origin") || "https://headroomapp.co";
+    // ─── TEST BYPASS ──────────────────────────────────────────────────────────
+    // On lovable preview/test URLs, skip Stripe entirely so we can validate the
+    // post-payment flow end-to-end. Mark the user (or email) as active in
+    // subscribers and route straight to the dashboard success state.
+    const isTestEnv = (() => {
+      try {
+        const host = new URL(origin).hostname;
+        return (
+          host.endsWith(".lovable.app") ||
+          host.endsWith(".lovableproject.com") ||
+          host === "localhost" ||
+          host === "127.0.0.1"
+        );
+      } catch {
+        return false;
+      }
+    })();
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("Stripe");
-    if (!stripeKey) {
+    if (!stripeKey && !isTestEnv) {
       return new Response(JSON.stringify({ error: "Stripe is not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
-
-    // Optional body: email-only users (no session) can pass their stored email
-    // so checkout/customer is linked to the same address as their completions.
     let bodyEmail: string | undefined;
     try {
       const body = await req.json();
