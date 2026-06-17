@@ -82,6 +82,7 @@ const HomepageLoginMenu = () => {
     }
     setLoading(true);
     try {
+      sessionStorage.setItem("homepage_login_attempt", "1");
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error(error.message);
