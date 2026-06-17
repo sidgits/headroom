@@ -267,7 +267,6 @@ const Dashboard = () => {
         <meta property="og:description" content="Track your cognitive load and burnout patterns over time on your personal Headroom dashboard." />
         <meta property="og:url" content="https://headroomapp.co/dashboard" />
       </Helmet>
-      <ProfileBadge />
 
       <div className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-6 flex flex-col gap-4">
         <motion.div
