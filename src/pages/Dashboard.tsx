@@ -57,6 +57,33 @@ const Dashboard = () => {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
   const [recoveringIdentity, setRecoveringIdentity] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const isIndia = (() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      return tz === "Asia/Kolkata" || tz === "Asia/Calcutta";
+    } catch {
+      return false;
+    }
+  })();
+
+  const handleUpgrade = async () => {
+    setCheckoutLoading(true);
+    try {
+      let storedEmail: string | null = null;
+      try { storedEmail = localStorage.getItem("headroom_assessment_email"); } catch {}
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: storedEmail ? { email: storedEmail } : {},
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (e) {
+      console.error("checkout failed", e);
+      toast.error("Could not start checkout. Please try again.");
+      setCheckoutLoading(false);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
