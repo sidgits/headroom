@@ -103,7 +103,17 @@ const Index = () => {
         setUserEmail(email);
         setUserName(String(name));
         try { localStorage.setItem("headroom_assessment_email", email); } catch {}
-        setScreen("results");
+        supabase.functions.invoke("log-assessment", {
+          body: {
+            role: parsed.role,
+            archetype_id: result.archetype.id,
+            archetype_name: result.archetype.name,
+            email,
+            name: String(name),
+            result_data: result,
+          },
+        }).catch(() => {});
+        navigate("/dashboard", { replace: true });
       } catch {
         sessionStorage.removeItem(PENDING_KEY);
       }
@@ -160,9 +170,22 @@ const Index = () => {
       setUserName(name);
       setUserEmail(email);
       try { localStorage.setItem("headroom_assessment_email", email); } catch {}
-      setScreen("results");
+      // Persist the completion before sending the user to the dashboard.
+      if (scoringResult) {
+        supabase.functions.invoke("log-assessment", {
+          body: {
+            role: quizState.role,
+            archetype_id: scoringResult.archetype.id,
+            archetype_name: scoringResult.archetype.name,
+            email,
+            name,
+            result_data: scoringResult,
+          },
+        }).catch(() => {});
+      }
+      navigate("/dashboard");
     },
-    []
+    [scoringResult, quizState.role, navigate]
   );
 
   const handleGoogleSignIn = useCallback(async () => {
