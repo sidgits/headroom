@@ -12,20 +12,39 @@ const corsHeaders = {
 const PRICE_INDIA = "price_1TfXhF6bE2gY9hpWkTpCYauh";
 const PRICE_GLOBAL = "price_1Telga6bE2gY9hpWP0hKjCWJ";
 
-async function detectIndia(req: Request): Promise<boolean> {
+// Supported currency_options on the global price.
+// US (and any country not listed) falls back to USD.
+const COUNTRY_TO_CURRENCY: Record<string, string> = {
+  GB: "gbp",
+  AE: "aed", SA: "aed",
+  SG: "sgd",
+  AU: "aud",
+  CA: "cad",
+  NZ: "nzd",
+  CH: "chf",
+  HK: "hkd",
+  JP: "jpy",
+  SE: "sek",
+  // Eurozone
+  DE: "eur", FR: "eur", ES: "eur", IT: "eur", NL: "eur", BE: "eur",
+  IE: "eur", PT: "eur", AT: "eur", FI: "eur", GR: "eur", LU: "eur",
+  EE: "eur", LV: "eur", LT: "eur", SK: "eur", SI: "eur", CY: "eur", MT: "eur", HR: "eur",
+};
+
+async function detectCountry(req: Request): Promise<string | null> {
   const ip =
     req.headers.get("cf-connecting-ip") ||
     req.headers.get("x-real-ip") ||
     (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
-  if (!ip) return false;
+  if (!ip) return null;
   const key = Deno.env.get("IPSTACK_API_KEY");
-  if (!key) return false;
+  if (!key) return null;
   try {
     const r = await fetch(`https://api.ipstack.com/${ip}?access_key=${key}&fields=country_code`);
     const j = await r.json();
-    return j?.country_code === "IN";
+    return (j?.country_code as string) ?? null;
   } catch {
-    return false;
+    return null;
   }
 }
 
