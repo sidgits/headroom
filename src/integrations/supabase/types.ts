@@ -62,6 +62,173 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_connections: {
+        Row: {
+          created_at: string
+          email: string
+          google_access_token: string | null
+          google_refresh_token: string | null
+          google_token_expires_at: string | null
+          ics_content: string | null
+          ics_url: string | null
+          id: string
+          last_synced_at: string | null
+          provider: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          google_access_token?: string | null
+          google_refresh_token?: string | null
+          google_token_expires_at?: string | null
+          ics_content?: string | null
+          ics_url?: string | null
+          id?: string
+          last_synced_at?: string | null
+          provider: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          google_access_token?: string | null
+          google_refresh_token?: string | null
+          google_token_expires_at?: string | null
+          ics_content?: string | null
+          ics_url?: string | null
+          id?: string
+          last_synced_at?: string | null
+          provider?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      calendar_events: {
+        Row: {
+          attendee_count: number
+          connection_id: string
+          created_at: string
+          description: string | null
+          email: string
+          ends_at: string
+          external_id: string | null
+          id: string
+          is_recurring: boolean
+          location: string | null
+          source: string
+          starts_at: string
+          title: string | null
+        }
+        Insert: {
+          attendee_count?: number
+          connection_id: string
+          created_at?: string
+          description?: string | null
+          email: string
+          ends_at: string
+          external_id?: string | null
+          id?: string
+          is_recurring?: boolean
+          location?: string | null
+          source: string
+          starts_at: string
+          title?: string | null
+        }
+        Update: {
+          attendee_count?: number
+          connection_id?: string
+          created_at?: string
+          description?: string | null
+          email?: string
+          ends_at?: string
+          external_id?: string | null
+          id?: string
+          is_recurring?: boolean
+          location?: string | null
+          source?: string
+          starts_at?: string
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clt_analyses: {
+        Row: {
+          analysis_date: string
+          created_at: string
+          daily_load_score: number
+          email: string
+          extraneous_load: number
+          germane_load: number
+          id: string
+          intrinsic_load: number
+          per_block_tips: Json
+          recommendations: Json
+          summary: string | null
+        }
+        Insert: {
+          analysis_date: string
+          created_at?: string
+          daily_load_score: number
+          email: string
+          extraneous_load?: number
+          germane_load?: number
+          id?: string
+          intrinsic_load?: number
+          per_block_tips?: Json
+          recommendations?: Json
+          summary?: string | null
+        }
+        Update: {
+          analysis_date?: string
+          created_at?: string
+          daily_load_score?: number
+          email?: string
+          extraneous_load?: number
+          germane_load?: number
+          id?: string
+          intrinsic_load?: number
+          per_block_tips?: Json
+          recommendations?: Json
+          summary?: string | null
+        }
+        Relationships: []
+      }
+      coach_messages: {
+        Row: {
+          content: string | null
+          created_at: string
+          email: string
+          id: string
+          parts: Json | null
+          role: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          parts?: Json | null
+          role: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          parts?: Json | null
+          role?: string
+        }
+        Relationships: []
+      }
       dashboard_checkins: {
         Row: {
           created_at: string
