@@ -135,7 +135,7 @@ const HomepageLoginMenu = () => {
             <span className="sm:hidden">Email</span>
           </button>
         </div>
-        <p className="text-sm sm:text-base font-semibold tracking-wide text-right text-black">
+        <p className="text-sm sm:text-base font-semibold tracking-wide text-right text-white">
           Returning Users
         </p>
       </div>
