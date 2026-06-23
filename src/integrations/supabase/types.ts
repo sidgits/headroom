@@ -229,6 +229,30 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_domains: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          domain: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          domain: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          domain?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dashboard_checkins: {
         Row: {
           created_at: string
@@ -490,6 +514,7 @@ export type Database = {
         Returns: number
       }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
+      is_corporate_email: { Args: { _email: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
