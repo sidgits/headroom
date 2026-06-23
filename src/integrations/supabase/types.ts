@@ -514,7 +514,6 @@ export type Database = {
         Returns: number
       }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
-      is_corporate_email: { Args: { _email: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
