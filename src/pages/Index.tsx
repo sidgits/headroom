@@ -266,6 +266,7 @@ const Index = () => {
     setQuizState({ role: "", answers: {}, sprinterAnswer: null });
     setCurrentQuestion(0);
     setScoringResult(null);
+    setIsCorporate(false);
     returning.refresh();
     setScreen("landing");
   }, [returning]);
