@@ -306,6 +306,15 @@ const Index = () => {
               )}
             </motion.div>
           )}
+          {screen === "preAssessment" && (
+            <motion.div key="preAssessment" {...pageTransition}>
+              <PreAssessmentCheck
+                onIndividual={handlePreIndividual}
+                onCorporateVerified={handlePreCorporate}
+                onBack={handlePreBack}
+              />
+            </motion.div>
+          )}
           {screen === "role" && (
             <motion.div key="role" {...pageTransition}>
               <RoleSelector onSelect={handleRoleSelect} onBack={handleBackFromRole} />
