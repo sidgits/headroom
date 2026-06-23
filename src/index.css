@@ -2,96 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/*
+  Headroom — Dark "Glowing Glass Tactile" theme
+  Palette: Burnt Copper
+    bg       #12100E
+    surface  #231D18
+    primary  #B87333 (copper)
+    accent   #FF8C42 (burnt orange)
+  Typography: Space Grotesk (headings) + DM Sans (body)
+  All tokens are HSL.
 */
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
-    --foreground: 20 20% 12%;
+    /* Core surfaces */
+    --background: 24 14% 6%;          /* #12100E */
+    --foreground: 30 20% 92%;         /* warm off-white */
 
-    --card: 40 30% 97%;
-    --card-foreground: 20 20% 12%;
+    --card: 24 18% 12%;               /* #231D18 */
+    --card-foreground: 30 20% 92%;
 
-    --popover: 40 30% 97%;
-    --popover-foreground: 20 20% 12%;
+    --popover: 24 18% 12%;
+    --popover-foreground: 30 20% 92%;
 
-    --primary: 36 85% 47%;
-    --primary-foreground: 40 33% 98%;
+    --primary: 28 56% 46%;            /* #B87333 copper */
+    --primary-foreground: 30 20% 96%;
 
-    --secondary: 40 60% 93%;
-    --secondary-foreground: 20 20% 12%;
+    --secondary: 24 16% 16%;          /* slightly lifted surface */
+    --secondary-foreground: 30 20% 92%;
 
-    --muted: 35 30% 93%;
-    --muted-foreground: 20 10% 45%;
+    --muted: 24 14% 14%;
+    --muted-foreground: 30 10% 65%;
 
-    --accent: 16 80% 55%;
-    --accent-foreground: 40 33% 98%;
+    --accent: 22 100% 63%;            /* #FF8C42 burnt orange */
+    --accent-foreground: 24 14% 6%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 40 33% 98%;
+    --destructive: 4 70% 50%;
+    --destructive-foreground: 30 20% 96%;
 
-    --border: 35 25% 88%;
-    --input: 35 25% 88%;
-    --ring: 36 85% 47%;
+    --border: 28 20% 20%;             /* warm hairline */
+    --input: 28 20% 20%;
+    --ring: 28 56% 46%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 40 30% 96%;
-    --sidebar-foreground: 20 15% 25%;
-    --sidebar-primary: 36 85% 47%;
-    --sidebar-primary-foreground: 40 33% 98%;
-    --sidebar-accent: 35 40% 92%;
-    --sidebar-accent-foreground: 20 15% 15%;
-    --sidebar-border: 35 25% 88%;
-    --sidebar-ring: 36 85% 47%;
+    /* Sidebar (kept consistent with surfaces) */
+    --sidebar-background: 24 18% 10%;
+    --sidebar-foreground: 30 20% 88%;
+    --sidebar-primary: 28 56% 46%;
+    --sidebar-primary-foreground: 24 14% 6%;
+    --sidebar-accent: 24 16% 16%;
+    --sidebar-accent-foreground: 30 20% 92%;
+    --sidebar-border: 28 20% 20%;
+    --sidebar-ring: 28 56% 46%;
 
-    --warm-red: 4 70% 50%;
-    --deep-orange: 24 90% 50%;
-    --golden: 45 95% 55%;
+    /* Brand warm tokens already used across the app */
+    --warm-red: 16 78% 52%;
+    --deep-orange: 22 100% 56%;
+    --golden: 36 85% 55%;
   }
 
+  /* Dark class mirrors :root — the app is dark-by-default */
   .dark {
-    --background: 20 15% 8%;
-    --foreground: 40 30% 92%;
-
-    --card: 20 15% 10%;
-    --card-foreground: 40 30% 92%;
-
-    --popover: 20 15% 10%;
-    --popover-foreground: 40 30% 92%;
-
-    --primary: 36 85% 50%;
-    --primary-foreground: 20 15% 8%;
-
-    --secondary: 20 20% 16%;
-    --secondary-foreground: 40 30% 92%;
-
-    --muted: 20 15% 16%;
-    --muted-foreground: 30 15% 60%;
-
-    --accent: 16 80% 55%;
-    --accent-foreground: 40 33% 98%;
-
-    --destructive: 0 62% 35%;
-    --destructive-foreground: 40 30% 92%;
-
-    --border: 20 15% 18%;
-    --input: 20 15% 18%;
-    --ring: 36 85% 50%;
-    --sidebar-background: 20 15% 10%;
-    --sidebar-foreground: 40 25% 90%;
-    --sidebar-primary: 36 85% 50%;
-    --sidebar-primary-foreground: 20 15% 8%;
-    --sidebar-accent: 20 15% 15%;
-    --sidebar-accent-foreground: 40 25% 90%;
-    --sidebar-border: 20 15% 18%;
-    --sidebar-ring: 36 85% 50%;
-
-    --warm-red: 4 70% 50%;
-    --deep-orange: 24 90% 50%;
-    --golden: 45 95% 55%;
+    --background: 24 14% 6%;
+    --foreground: 30 20% 92%;
+    --card: 24 18% 12%;
+    --card-foreground: 30 20% 92%;
+    --popover: 24 18% 12%;
+    --popover-foreground: 30 20% 92%;
+    --primary: 28 56% 46%;
+    --primary-foreground: 30 20% 96%;
+    --secondary: 24 16% 16%;
+    --secondary-foreground: 30 20% 92%;
+    --muted: 24 14% 14%;
+    --muted-foreground: 30 10% 65%;
+    --accent: 22 100% 63%;
+    --accent-foreground: 24 14% 6%;
+    --destructive: 4 70% 50%;
+    --destructive-foreground: 30 20% 96%;
+    --border: 28 20% 20%;
+    --input: 28 20% 20%;
+    --ring: 28 56% 46%;
+    --sidebar-background: 24 18% 10%;
+    --sidebar-foreground: 30 20% 88%;
+    --sidebar-primary: 28 56% 46%;
+    --sidebar-primary-foreground: 24 14% 6%;
+    --sidebar-accent: 24 16% 16%;
+    --sidebar-accent-foreground: 30 20% 92%;
+    --sidebar-border: 28 20% 20%;
+    --sidebar-ring: 28 56% 46%;
+    --warm-red: 16 78% 52%;
+    --deep-orange: 22 100% 56%;
+    --golden: 36 85% 55%;
   }
 }
 
@@ -100,8 +102,32 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Soothing ambient copper glow on every page */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(60rem 40rem at 50% -10%, hsl(28 56% 46% / 0.10), transparent 60%),
+      radial-gradient(40rem 30rem at 90% 110%, hsl(22 100% 63% / 0.06), transparent 65%);
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
   }
 }
