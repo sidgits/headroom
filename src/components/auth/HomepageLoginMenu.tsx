@@ -109,7 +109,7 @@ const HomepageLoginMenu = () => {
 
   return (
     <>
-      <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-1">
+      <div className="sticky top-4 self-end z-50 flex flex-col items-end gap-1">
         <div className="flex items-center gap-2">
           <button
             onClick={handleGoogle}
