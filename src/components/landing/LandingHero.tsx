@@ -80,75 +80,80 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E")' }} />
 
       {/* Hero */}
-      <section className="relative flex flex-col items-center justify-center px-6 pt-20 pb-20 text-center">
-        <motion.img
-          src="/headroom-logo.png"
-          alt="Headroom"
-          className="w-56 md:w-72 mb-10"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        />
-        <motion.h1
-          className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] max-w-3xl tracking-tight"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          Understand how your work impacts{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red">
-            your mind
-          </span>
-          .
-        </motion.h1>
-        <motion.p
-          className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          Predict burnout risk, uncover your work patterns, and build a more sustainable way of working.
-        </motion.p>
-        {user && (
-          <motion.p
-            className="mt-4 text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.45, duration: 0.5 }}
-          >
-            Welcome{displayName ? `, ${displayName.split(" ")[0]}` : ""} 👋
-          </motion.p>
-        )}
-        <motion.button
-          onClick={onStart}
-          className="mt-10 w-full max-w-sm h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Take Free Assessment
-          <ArrowRight className="w-5 h-5" />
-        </motion.button>
-
-        {/* Hero graphic */}
-        <motion.div
-          className="mt-12 w-full max-w-4xl mx-auto"
-          initial={{ opacity: 0, y: 28, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.62, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="relative rounded-[2rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 bg-card/30 backdrop-blur-sm">
-            <img
-              src="/headroom-hero.jpg"
-              alt="Headroom — make room for your best work"
-              className="w-full h-auto"
-              loading="eager"
+      <section className="relative flex-1 flex items-center px-6 lg:px-16 py-16 lg:py-24">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left: copy + CTA */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1">
+            <motion.img
+              src="/headroom-logo.png"
+              alt="Headroom"
+              className="w-40 md:w-52 mb-8 lg:mb-10"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             />
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+            <motion.h1
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] max-w-3xl tracking-tight"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Understand how your work impacts{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red">
+                your mind
+              </span>
+              .
+            </motion.h1>
+            <motion.p
+              className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Predict burnout risk, uncover your work patterns, and build a more sustainable way of working.
+            </motion.p>
+            {user && (
+              <motion.p
+                className="mt-4 text-sm text-muted-foreground"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.45, duration: 0.5 }}
+              >
+                Welcome{displayName ? `, ${displayName.split(" ")[0]}` : ""} 👋
+              </motion.p>
+            )}
+            <motion.button
+              onClick={onStart}
+              className="mt-10 w-full max-w-sm lg:max-w-none lg:w-auto lg:self-start h-14 px-10 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Take Free Assessment
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
           </div>
-        </motion.div>
+
+          {/* Right: hero graphic */}
+          <motion.div
+            className="order-1 lg:order-2 w-full max-w-2xl mx-auto lg:max-w-none"
+            initial={{ opacity: 0, y: 28, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.62, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="relative rounded-[2rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 bg-card/30 backdrop-blur-sm">
+              <img
+                src="/headroom-hero.jpg"
+                alt="Headroom — make room for your best work"
+                className="w-full h-auto"
+                loading="eager"
+              />
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Section 1 — Why do high performers burn out? */}
