@@ -58,13 +58,13 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <p className="text-sm uppercase tracking-wider text-white/80 font-medium mb-2">
+          <p className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">
             Welcome back{displayName ? `, ${displayName}` : ""} 👋
           </p>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Your Headroom profile
           </h1>
-          <p className="text-xs text-white/60 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             From your assessment on {formatDate(completion.created_at)}
           </p>
         </motion.div>
@@ -78,14 +78,14 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
         >
           <div className="text-5xl">{meta.emoji}</div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-white/70 font-medium">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
               You are
             </p>
             <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red mt-1">
               {meta.name}
             </h2>
           </div>
-          <p className="text-sm text-white/90 italic leading-relaxed">
+          <p className="text-sm text-muted-foreground italic leading-relaxed">
             {meta.headline}
           </p>
         </motion.div>
@@ -97,13 +97,13 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           transition={{ delay: 0.2, duration: 0.5 }}
           className={`rounded-2xl p-6 bg-gradient-to-br ${burnoutStyles.bg} border border-border/40 space-y-2`}
         >
-          <div className="text-xs font-bold uppercase tracking-wider text-white/90">
+          <div className={`text-xs font-bold uppercase tracking-wider ${burnoutStyles.text}`}>
             Burnout signature
           </div>
-          <div className="text-lg font-semibold text-white">
+          <div className="text-lg font-semibold text-foreground">
             {meta.defaultBurnout.label}
           </div>
-          <p className="text-sm text-white/80 leading-relaxed">
+          <p className="text-sm text-foreground/80 leading-relaxed">
             {meta.defaultBurnout.signal}
           </p>
         </motion.div>
@@ -115,7 +115,7 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           transition={{ delay: 0.3, duration: 0.5 }}
           className="space-y-3 text-center"
         >
-          <p className="text-sm text-white/80">
+          <p className="text-sm text-muted-foreground">
             Patterns shift over time. Retake the assessment to see what's changed.
           </p>
           <button
@@ -126,7 +126,7 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           </button>
         </motion.div>
 
-        <p className="text-[11px] text-center text-white/50 italic">
+        <p className="text-[11px] text-center text-muted-foreground italic">
           We don't store any personal data beyond what's needed to load your profile.
         </p>
       </div>
