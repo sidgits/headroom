@@ -144,15 +144,18 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
             transition={{ delay: 0.55, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="relative w-full aspect-square max-w-[520px] xl:max-w-[580px]">
-              <div className="absolute inset-0 rounded-full bg-gradient-radial from-primary/20 via-accent/10 to-transparent blur-3xl" />
-              <img
-                src="/headroom-graphic-v2.png"
-                alt="Cognitive capacity gauge illustration"
-                className="relative w-full h-full object-contain drop-shadow-[0_0_40px_hsl(var(--primary)/0.35)]"
-                loading="eager"
-                width={1024}
-                height={1024}
-              />
+            <div
+              className="absolute inset-0 rounded-full blur-3xl"
+              style={{ background: 'radial-gradient(circle at center, hsl(var(--primary) / 0.22), hsl(var(--accent) / 0.10), transparent 70%)' }}
+            />
+            <img
+              src="/headroom-graphic-v2.png"
+              alt="Cognitive capacity gauge illustration"
+              className="relative w-full h-full object-contain drop-shadow-[0_0_40px_hsl(var(--primary)/0.35)]"
+              loading="eager"
+              width={1024}
+              height={1024}
+            />
             </div>
           </motion.div>
         </div>
