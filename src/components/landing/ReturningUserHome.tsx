@@ -58,13 +58,13 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <p className="text-sm uppercase tracking-wider text-white/80 font-medium mb-2">
+          <p className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">
             Welcome back{displayName ? `, ${displayName}` : ""} 👋
           </p>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Your Headroom profile
           </h1>
-          <p className="text-xs text-white/60 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             From your assessment on {formatDate(completion.created_at)}
           </p>
         </motion.div>
