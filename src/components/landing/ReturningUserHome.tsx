@@ -97,13 +97,13 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           transition={{ delay: 0.2, duration: 0.5 }}
           className={`rounded-2xl p-6 bg-gradient-to-br ${burnoutStyles.bg} border border-border/40 space-y-2`}
         >
-          <div className={`text-xs font-bold uppercase tracking-wider ${burnoutStyles.text}`}>
+          <div className="text-xs font-bold uppercase tracking-wider text-white/90">
             Burnout signature
           </div>
-          <div className="text-lg font-semibold text-foreground">
+          <div className="text-lg font-semibold text-white">
             {meta.defaultBurnout.label}
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed">
+          <p className="text-sm text-white/80 leading-relaxed">
             {meta.defaultBurnout.signal}
           </p>
         </motion.div>
@@ -115,7 +115,7 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           transition={{ delay: 0.3, duration: 0.5 }}
           className="space-y-3 text-center"
         >
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white/80">
             Patterns shift over time. Retake the assessment to see what's changed.
           </p>
           <button
@@ -126,7 +126,7 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           </button>
         </motion.div>
 
-        <p className="text-[11px] text-center text-muted-foreground italic">
+        <p className="text-[11px] text-center text-white/50 italic">
           We don't store any personal data beyond what's needed to load your profile.
         </p>
       </div>
