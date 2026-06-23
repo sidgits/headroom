@@ -8,10 +8,27 @@ export function serviceClient(): SupabaseClient {
   );
 }
 
+export async function isCorporateEmail(
+  supabase: SupabaseClient,
+  email: string,
+): Promise<boolean> {
+  const domain = email.split("@")[1]?.toLowerCase();
+  if (!domain) return false;
+  const { data } = await supabase
+    .from("corporate_domains")
+    .select("domain")
+    .ilike("domain", domain)
+    .maybeSingle();
+  return !!data;
+}
+
 export async function isActiveSubscriber(
   supabase: SupabaseClient,
   email: string,
 ): Promise<boolean> {
+  // Corporate employees of contracted companies get full access automatically.
+  if (await isCorporateEmail(supabase, email)) return true;
+
   const { data } = await supabase
     .from("subscribers")
     .select("status, current_period_end")

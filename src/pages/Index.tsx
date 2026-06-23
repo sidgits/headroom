@@ -12,13 +12,14 @@ import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
 import EmailCapture from "@/components/quiz/EmailCapture";
+import PreAssessmentCheck from "@/components/quiz/PreAssessmentCheck";
 import HomepageLoginMenu from "@/components/auth/HomepageLoginMenu";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
-type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
+type Screen = "landing" | "preAssessment" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
 
 interface QuizState {
   role: string;
@@ -121,9 +122,28 @@ const Index = () => {
     return () => { cancelled = true; };
   }, []);
 
-  const handleStart = useCallback(() => setScreen("role"), []);
+  const [isCorporate, setIsCorporate] = useState(false);
 
-  const handleBackFromRole = useCallback(() => setScreen("landing"), []);
+  const handleStart = useCallback(() => setScreen("preAssessment"), []);
+
+  const handlePreBack = useCallback(() => setScreen("landing"), []);
+
+  const handlePreIndividual = useCallback(() => {
+    setIsCorporate(false);
+    setUserName("");
+    setUserEmail("");
+    setScreen("role");
+  }, []);
+
+  const handlePreCorporate = useCallback(({ name, email }: { name: string; email: string }) => {
+    setIsCorporate(true);
+    setUserName(name);
+    setUserEmail(email);
+    try { localStorage.setItem("headroom_assessment_email", email); } catch {}
+    setScreen("role");
+  }, []);
+
+  const handleBackFromRole = useCallback(() => setScreen("preAssessment"), []);
 
   const handleRoleSelect = useCallback((roleId: string) => {
     setQuizState((prev) => ({ ...prev, role: roleId }));
@@ -149,6 +169,29 @@ const Index = () => {
     setScreen("quiz");
   }, []);
 
+  const finalizeAssessment = useCallback(
+    (result: ScoringResult) => {
+      // Corporate users skip the email capture screen — they already gave name/email
+      // on the pre-assessment page and their domain is verified.
+      if (isCorporate && userEmail && userName) {
+        supabase.functions.invoke("log-assessment", {
+          body: {
+            role: quizState.role,
+            archetype_id: result.archetype.id,
+            archetype_name: result.archetype.name,
+            email: userEmail,
+            name: userName,
+            result_data: result,
+          },
+        }).catch(() => {});
+        navigate("/dashboard");
+      } else {
+        setScreen("email");
+      }
+    },
+    [isCorporate, userEmail, userName, quizState.role, navigate]
+  );
+
   const handleAnswer = useCallback(
     (answerId: string) => {
       const questionId = quizQuestions[currentQuestion].id;
@@ -164,11 +207,11 @@ const Index = () => {
         } else {
           const result = calculateResults(updatedAnswers, null);
           setScoringResult(result);
-          setScreen("email");
+          finalizeAssessment(result);
         }
       }
     },
-    [currentQuestion, quizState.answers]
+    [currentQuestion, quizState.answers, finalizeAssessment]
   );
 
   const handleSprinterAnswer = useCallback(
@@ -176,9 +219,9 @@ const Index = () => {
       setQuizState((prev) => ({ ...prev, sprinterAnswer: answerId }));
       const result = calculateResults(quizState.answers, answerId);
       setScoringResult(result);
-      setScreen("email");
+      finalizeAssessment(result);
     },
-    [quizState.answers]
+    [quizState.answers, finalizeAssessment]
   );
 
   const handleEmailSubmit = useCallback(
@@ -223,6 +266,7 @@ const Index = () => {
     setQuizState({ role: "", answers: {}, sprinterAnswer: null });
     setCurrentQuestion(0);
     setScoringResult(null);
+    setIsCorporate(false);
     returning.refresh();
     setScreen("landing");
   }, [returning]);
@@ -260,6 +304,15 @@ const Index = () => {
               ) : (
                 <LandingHero onStart={handleStart} />
               )}
+            </motion.div>
+          )}
+          {screen === "preAssessment" && (
+            <motion.div key="preAssessment" {...pageTransition}>
+              <PreAssessmentCheck
+                onIndividual={handlePreIndividual}
+                onCorporateVerified={handlePreCorporate}
+                onBack={handlePreBack}
+              />
             </motion.div>
           )}
           {screen === "role" && (

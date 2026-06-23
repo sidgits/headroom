@@ -229,6 +229,30 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_domains: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          domain: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          domain: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          domain?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dashboard_checkins: {
         Row: {
           created_at: string
