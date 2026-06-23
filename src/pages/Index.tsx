@@ -123,13 +123,29 @@ const Index = () => {
 
   const handleStart = useCallback(() => setScreen("role"), []);
 
+  const handleBackFromRole = useCallback(() => setScreen("landing"), []);
+
   const handleRoleSelect = useCallback((roleId: string) => {
     setQuizState((prev) => ({ ...prev, role: roleId }));
     setScreen("disclaimer");
   }, []);
 
+  const handleBackFromDisclaimer = useCallback(() => setScreen("role"), []);
+
   const handleDisclaimerStart = useCallback(() => {
     setCurrentQuestion(0);
+    setScreen("quiz");
+  }, []);
+
+  const handleBackFromQuiz = useCallback(() => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion((prev) => prev - 1);
+    } else {
+      setScreen("disclaimer");
+    }
+  }, [currentQuestion]);
+
+  const handleBackFromSprintCheck = useCallback(() => {
     setScreen("quiz");
   }, []);
 
@@ -248,12 +264,12 @@ const Index = () => {
           )}
           {screen === "role" && (
             <motion.div key="role" {...pageTransition}>
-              <RoleSelector onSelect={handleRoleSelect} />
+              <RoleSelector onSelect={handleRoleSelect} onBack={handleBackFromRole} />
             </motion.div>
           )}
           {screen === "disclaimer" && (
             <motion.div key="disclaimer" {...pageTransition}>
-              <Disclaimer onStart={handleDisclaimerStart} />
+              <Disclaimer onStart={handleDisclaimerStart} onBack={handleBackFromDisclaimer} />
             </motion.div>
           )}
           {screen === "quiz" && (
@@ -263,12 +279,13 @@ const Index = () => {
                 current={currentQuestion + 1}
                 total={quizQuestions.length}
                 onAnswer={handleAnswer}
+                onBack={handleBackFromQuiz}
               />
             </motion.div>
           )}
           {screen === "sprinterCheck" && (
             <motion.div key="sprinterCheck" {...pageTransition}>
-              <SprintCheck onAnswer={handleSprinterAnswer} />
+              <SprintCheck onAnswer={handleSprinterAnswer} onBack={handleBackFromSprintCheck} />
             </motion.div>
           )}
           {screen === "email" && (
