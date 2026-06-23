@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
+import { ChevronLeft } from "lucide-react";
 import { roles } from "@/data/quizQuestions";
 
 interface RoleSelectorProps {
   onSelect: (roleId: string) => void;
+  onBack: () => void;
 }
 
 const fadeUp = {
@@ -14,13 +16,21 @@ const fadeUp = {
   }),
 };
 
-const RoleSelector = ({ onSelect }: RoleSelectorProps) => {
+const RoleSelector = ({ onSelect, onBack }: RoleSelectorProps) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-15%] left-[50%] translate-x-[-50%] w-[120%] h-[50%] rounded-full bg-gradient-to-b from-primary/10 via-accent/5 to-transparent blur-3xl" />
       </div>
+
+      <button
+        onClick={onBack}
+        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-sm"
+        aria-label="Go back"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
 
       <motion.p
         className="relative text-sm text-muted-foreground uppercase tracking-widest mb-3"
