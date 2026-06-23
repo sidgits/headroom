@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft } from "lucide-react";
 import QuizProgressBar from "./QuizProgressBar";
 import type { QuizQuestionData } from "@/data/quizQuestions";
 
@@ -8,6 +9,7 @@ interface QuizQuestionProps {
   current: number;
   total: number;
   onAnswer: (answerId: string) => void;
+  onBack: () => void;
 }
 
 const fadeUp = {
@@ -19,7 +21,7 @@ const fadeUp = {
   }),
 };
 
-const QuizQuestion = ({ question, current, total, onAnswer }: QuizQuestionProps) => {
+const QuizQuestion = ({ question, current, total, onAnswer, onBack }: QuizQuestionProps) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   const handleSelect = (answerId: string) => {
@@ -38,7 +40,15 @@ const QuizQuestion = ({ question, current, total, onAnswer }: QuizQuestionProps)
         <div className="absolute top-[-10%] left-[50%] translate-x-[-50%] w-[100%] h-[40%] rounded-full bg-gradient-to-b from-primary/8 via-accent/5 to-transparent blur-3xl" />
       </div>
 
-      <div className="relative">
+      <button
+        onClick={onBack}
+        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-sm"
+        aria-label="Go back"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      <div className="relative mt-8">
         <QuizProgressBar current={current} total={total} />
       </div>
 
