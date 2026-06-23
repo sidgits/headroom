@@ -141,7 +141,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
         >
           <div className="relative rounded-[2rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 bg-card/30 backdrop-blur-sm">
             <img
-              src={heroImage.url}
+              src="/headroom-hero.jpg"
               alt="Headroom — make room for your best work"
               className="w-full h-auto"
               loading="eager"
