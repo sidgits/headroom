@@ -196,13 +196,28 @@ const Dashboard = () => {
           .select("status, current_period_end")
           .eq("user_id", session.user.id)
           .maybeSingle();
+        let subscribed = false;
         if (
           subRow &&
           ["active", "trialing"].includes(subRow.status as string) &&
           (!subRow.current_period_end || new Date(subRow.current_period_end as string) > new Date())
         ) {
-          setIsSubscribed(true);
+          subscribed = true;
         }
+        // Corporate employees (email domain matches a contracted company) get full access.
+        if (!subscribed) {
+          const userEmail = (session.user.email || "").toLowerCase();
+          const domain = userEmail.split("@")[1];
+          if (domain) {
+            const { data: corp } = await supabase
+              .from("corporate_domains")
+              .select("domain")
+              .ilike("domain", domain)
+              .maybeSingle();
+            if (corp) subscribed = true;
+          }
+        }
+        if (subscribed) setIsSubscribed(true);
       } else if (identityEmail) {
         // Email-only path — fetch via edge function (service role bypasses RLS).
         const { data, error } = await supabase.functions.invoke("get-user-dashboard", {
