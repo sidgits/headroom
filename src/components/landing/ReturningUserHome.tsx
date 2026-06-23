@@ -78,14 +78,14 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
         >
           <div className="text-5xl">{meta.emoji}</div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+            <p className="text-xs uppercase tracking-wider text-white/70 font-medium">
               You are
             </p>
             <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-warm-red mt-1">
               {meta.name}
             </h2>
           </div>
-          <p className="text-sm text-muted-foreground italic leading-relaxed">
+          <p className="text-sm text-white/90 italic leading-relaxed">
             {meta.headline}
           </p>
         </motion.div>
