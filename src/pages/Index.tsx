@@ -123,13 +123,29 @@ const Index = () => {
 
   const handleStart = useCallback(() => setScreen("role"), []);
 
+  const handleBackFromRole = useCallback(() => setScreen("landing"), []);
+
   const handleRoleSelect = useCallback((roleId: string) => {
     setQuizState((prev) => ({ ...prev, role: roleId }));
     setScreen("disclaimer");
   }, []);
 
+  const handleBackFromDisclaimer = useCallback(() => setScreen("role"), []);
+
   const handleDisclaimerStart = useCallback(() => {
     setCurrentQuestion(0);
+    setScreen("quiz");
+  }, []);
+
+  const handleBackFromQuiz = useCallback(() => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion((prev) => prev - 1);
+    } else {
+      setScreen("disclaimer");
+    }
+  }, [currentQuestion]);
+
+  const handleBackFromSprintCheck = useCallback(() => {
     setScreen("quiz");
   }, []);
 
