@@ -80,20 +80,20 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E")' }} />
 
       {/* Hero */}
-      <section className="relative flex-1 flex items-center px-6 lg:px-16 py-12 lg:py-24">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <section className="relative flex-1 flex items-center px-6 lg:px-16 xl:px-24 py-12 lg:py-0">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-24 items-center">
           {/* Left: copy + CTA */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
             <motion.img
               src="/headroom-logo.png"
               alt="Headroom"
-              className="w-36 sm:w-40 md:w-52 mb-6 lg:mb-10"
+              className="w-36 sm:w-40 md:w-48 mb-6 lg:mb-8"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             />
             <motion.h1
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] max-w-3xl tracking-tight"
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-[1.1] max-w-3xl tracking-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -105,7 +105,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
               .
             </motion.h1>
             <motion.p
-              className="mt-5 lg:mt-6 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed"
+              className="mt-5 lg:mt-6 text-base sm:text-lg lg:text-xl text-muted-foreground max-w-xl leading-relaxed"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -124,7 +124,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
             )}
             <motion.button
               onClick={onStart}
-              className="mt-8 lg:mt-10 w-full sm:w-auto sm:self-center lg:self-start h-14 px-8 sm:px-10 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+              className="mt-8 lg:mt-10 w-full sm:w-auto h-14 px-8 sm:px-10 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -138,19 +138,21 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
 
           {/* Right: hero graphic */}
           <motion.div
-            className="w-full max-w-sm sm:max-w-md lg:max-w-none mx-auto"
-            initial={{ opacity: 0, y: 28, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.62, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex items-center justify-center w-full max-w-md sm:max-w-lg lg:max-w-none mx-auto"
+            initial={{ opacity: 0, x: 40, scale: 0.96 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ delay: 0.55, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="relative rounded-2xl lg:rounded-[2rem] overflow-hidden border border-primary/30 shadow-[0_0_50px_-12px_hsl(var(--primary)/0.25)] bg-card/40 backdrop-blur-sm">
+            <div className="relative w-full aspect-square max-w-[520px] xl:max-w-[580px]">
+              <div className="absolute inset-0 rounded-full bg-gradient-radial from-primary/20 via-accent/10 to-transparent blur-3xl" />
               <img
-                src="/headroom-hero.jpg"
-                alt="Headroom — make room for your best work"
-                className="w-full h-auto"
+                src="/headroom-graphic-v2.png"
+                alt="Cognitive capacity gauge illustration"
+                className="relative w-full h-full object-contain drop-shadow-[0_0_40px_hsl(var(--primary)/0.35)]"
                 loading="eager"
+                width={1024}
+                height={1024}
               />
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 via-transparent to-transparent" />
             </div>
           </motion.div>
         </div>
