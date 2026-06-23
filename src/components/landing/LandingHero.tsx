@@ -143,7 +143,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.62, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="relative rounded-2xl lg:rounded-[2rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 bg-card/30 backdrop-blur-sm">
+            <div className="relative rounded-2xl lg:rounded-[2rem] overflow-hidden border border-primary/30 shadow-[0_0_50px_-12px_hsl(var(--primary)/0.25)] bg-card/40 backdrop-blur-sm">
               <img
                 src="/headroom-hero.jpg"
                 alt="Headroom — make room for your best work"
