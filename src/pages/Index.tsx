@@ -12,13 +12,14 @@ import QuizQuestion from "@/components/quiz/QuizQuestion";
 import SprintCheck from "@/components/quiz/SprintCheck";
 import ResultsScreen from "@/components/results/ResultsScreen";
 import EmailCapture from "@/components/quiz/EmailCapture";
+import PreAssessmentCheck from "@/components/quiz/PreAssessmentCheck";
 import HomepageLoginMenu from "@/components/auth/HomepageLoginMenu";
 import { quizQuestions } from "@/data/quizQuestions";
 import { calculateResults, type ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
-type Screen = "landing" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
+type Screen = "landing" | "preAssessment" | "role" | "disclaimer" | "quiz" | "sprinterCheck" | "email" | "results";
 
 interface QuizState {
   role: string;
