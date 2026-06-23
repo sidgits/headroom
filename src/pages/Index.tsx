@@ -264,12 +264,12 @@ const Index = () => {
           )}
           {screen === "role" && (
             <motion.div key="role" {...pageTransition}>
-              <RoleSelector onSelect={handleRoleSelect} />
+              <RoleSelector onSelect={handleRoleSelect} onBack={handleBackFromRole} />
             </motion.div>
           )}
           {screen === "disclaimer" && (
             <motion.div key="disclaimer" {...pageTransition}>
-              <Disclaimer onStart={handleDisclaimerStart} />
+              <Disclaimer onStart={handleDisclaimerStart} onBack={handleBackFromDisclaimer} />
             </motion.div>
           )}
           {screen === "quiz" && (
@@ -279,12 +279,13 @@ const Index = () => {
                 current={currentQuestion + 1}
                 total={quizQuestions.length}
                 onAnswer={handleAnswer}
+                onBack={handleBackFromQuiz}
               />
             </motion.div>
           )}
           {screen === "sprinterCheck" && (
             <motion.div key="sprinterCheck" {...pageTransition}>
-              <SprintCheck onAnswer={handleSprinterAnswer} />
+              <SprintCheck onAnswer={handleSprinterAnswer} onBack={handleBackFromSprintCheck} />
             </motion.div>
           )}
           {screen === "email" && (
