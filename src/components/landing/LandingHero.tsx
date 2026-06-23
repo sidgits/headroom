@@ -131,6 +131,24 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           Take Free Assessment
           <ArrowRight className="w-5 h-5" />
         </motion.button>
+
+        {/* Hero graphic */}
+        <motion.div
+          className="mt-12 w-full max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 28, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.62, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="relative rounded-[2rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 bg-card/30 backdrop-blur-sm">
+            <img
+              src="/headroom-hero.jpg"
+              alt="Headroom — make room for your best work"
+              className="w-full h-auto"
+              loading="eager"
+            />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+          </div>
+        </motion.div>
       </section>
 
       {/* Section 1 — Why do high performers burn out? */}
