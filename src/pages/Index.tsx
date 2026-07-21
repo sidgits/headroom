@@ -172,20 +172,22 @@ const Index = () => {
   }, []);
 
   const finalizeAssessment = useCallback(
-    (result: ScoringResult) => {
+    async (result: ScoringResult) => {
       // Corporate users skip the email capture screen — they already gave name/email
       // on the pre-assessment page and their domain is verified.
       if (isCorporate && userEmail && userName) {
-        supabase.functions.invoke("log-assessment", {
-          body: {
-            role: quizState.role,
-            archetype_id: result.archetype.id,
-            archetype_name: result.archetype.name,
-            email: userEmail,
-            name: userName,
-            result_data: result,
-          },
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke("log-assessment", {
+            body: {
+              role: quizState.role,
+              archetype_id: result.archetype.id,
+              archetype_name: result.archetype.name,
+              email: userEmail,
+              name: userName,
+              result_data: result,
+            },
+          });
+        } catch {}
         navigate("/dashboard");
       } else {
         setScreen("email");
