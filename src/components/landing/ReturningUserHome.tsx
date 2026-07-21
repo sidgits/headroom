@@ -179,6 +179,12 @@ export const useReturningUserProfile = (): ReturningUserState => {
       }
       loadedForUserId.current = user.id;
       const completion = await fetchCompletion(user);
+      // Persist a lightweight "returning user" cookie so future signed-out
+      // visits from this browser can show the sign-in shortcuts.
+      try {
+        document.cookie = `hr_returning=1; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+        if (user.email) localStorage.setItem("headroom_assessment_email", user.email);
+      } catch {}
       if (active) setState({ loading: false, user, completion });
     };
 
