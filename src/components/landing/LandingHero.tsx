@@ -14,6 +14,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react";
+import ReturningSignInMenu from "@/components/auth/ReturningSignInMenu";
 
 interface LandingHeroProps {
   onStart: () => void;
