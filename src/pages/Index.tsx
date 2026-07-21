@@ -229,22 +229,24 @@ const Index = () => {
   );
 
   const handleEmailSubmit = useCallback(
-    ({ name, email }: { name: string; email: string }) => {
+    async ({ name, email }: { name: string; email: string }) => {
       setUserName(name);
       setUserEmail(email);
       try { localStorage.setItem("headroom_assessment_email", email); } catch {}
       // Persist the completion before sending the user to the dashboard.
       if (scoringResult) {
-        supabase.functions.invoke("log-assessment", {
-          body: {
-            role: quizState.role,
-            archetype_id: scoringResult.archetype.id,
-            archetype_name: scoringResult.archetype.name,
-            email,
-            name,
-            result_data: scoringResult,
-          },
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke("log-assessment", {
+            body: {
+              role: quizState.role,
+              archetype_id: scoringResult.archetype.id,
+              archetype_name: scoringResult.archetype.name,
+              email,
+              name,
+              result_data: scoringResult,
+            },
+          });
+        } catch {}
       }
       navigate("/dashboard");
     },
