@@ -128,7 +128,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
-          Take Free Assessment
+          Take Assessment
           <ArrowRight className="w-5 h-5" />
         </motion.button>
       </section>
