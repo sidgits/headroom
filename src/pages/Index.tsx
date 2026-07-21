@@ -286,7 +286,7 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col relative">
-      {screen === "landing" && <HomepageLoginMenu />}
+      
       <Helmet>
         <title>Headroom — Cognitive Load Assessment</title>
         <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
