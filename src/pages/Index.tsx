@@ -104,16 +104,18 @@ const Index = () => {
         setUserEmail(email);
         setUserName(String(name));
         try { localStorage.setItem("headroom_assessment_email", email); } catch {}
-        supabase.functions.invoke("log-assessment", {
-          body: {
-            role: parsed.role,
-            archetype_id: result.archetype.id,
-            archetype_name: result.archetype.name,
-            email,
-            name: String(name),
-            result_data: result,
-          },
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke("log-assessment", {
+            body: {
+              role: parsed.role,
+              archetype_id: result.archetype.id,
+              archetype_name: result.archetype.name,
+              email,
+              name: String(name),
+              result_data: result,
+            },
+          });
+        } catch {}
         navigate("/dashboard", { replace: true });
       } catch {
         sessionStorage.removeItem(PENDING_KEY);
