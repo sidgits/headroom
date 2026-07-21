@@ -54,8 +54,22 @@ const staggerContainer = {
   },
 };
 
+const readCookie = (name: string): string | null => {
+  try {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
+};
+
 const LandingHero = ({ onStart }: LandingHeroProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isReturning, setIsReturning] = useState(false);
+  const [rememberedEmail, setRememberedEmail] = useState("");
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [sendingLink, setSendingLink] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
@@ -65,11 +79,54 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const stored = (() => {
+      try { return localStorage.getItem("headroom_assessment_email"); } catch { return null; }
+    })();
+    const cookie = readCookie("hr_returning");
+    if (stored || cookie) {
+      setIsReturning(true);
+      if (stored) {
+        setRememberedEmail(stored);
+        setEmailInput(stored);
+      }
+    }
+  }, []);
+
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
     (user?.user_metadata?.name as string | undefined) ??
     user?.email ??
     "";
+
+  const handleGoogleSignIn = async () => {
+    const res = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (res.error) toast.error("Sign-in failed. Please try again.");
+  };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = emailInput.trim();
+    if (!email) return;
+    setSendingLink(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setSendingLink(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Check your email for a sign-in link.");
+      setShowEmailForm(false);
+    }
+  };
+
+  // Returning users skip the assessment CTA and see sign-in options instead.
+  const showSignIn = isReturning && !user;
+
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
