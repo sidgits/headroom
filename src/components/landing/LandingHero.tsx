@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import type { User } from "@supabase/supabase-js";
 import {
   Brain,
@@ -13,8 +15,9 @@ import {
   Scale,
   Clock,
   ArrowRight,
+  Mail,
 } from "lucide-react";
-import ReturningSignInMenu from "@/components/auth/ReturningSignInMenu";
+
 
 interface LandingHeroProps {
   onStart: () => void;
