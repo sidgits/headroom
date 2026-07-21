@@ -104,16 +104,18 @@ const Index = () => {
         setUserEmail(email);
         setUserName(String(name));
         try { localStorage.setItem("headroom_assessment_email", email); } catch {}
-        supabase.functions.invoke("log-assessment", {
-          body: {
-            role: parsed.role,
-            archetype_id: result.archetype.id,
-            archetype_name: result.archetype.name,
-            email,
-            name: String(name),
-            result_data: result,
-          },
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke("log-assessment", {
+            body: {
+              role: parsed.role,
+              archetype_id: result.archetype.id,
+              archetype_name: result.archetype.name,
+              email,
+              name: String(name),
+              result_data: result,
+            },
+          });
+        } catch {}
         navigate("/dashboard", { replace: true });
       } catch {
         sessionStorage.removeItem(PENDING_KEY);
@@ -170,20 +172,22 @@ const Index = () => {
   }, []);
 
   const finalizeAssessment = useCallback(
-    (result: ScoringResult) => {
+    async (result: ScoringResult) => {
       // Corporate users skip the email capture screen — they already gave name/email
       // on the pre-assessment page and their domain is verified.
       if (isCorporate && userEmail && userName) {
-        supabase.functions.invoke("log-assessment", {
-          body: {
-            role: quizState.role,
-            archetype_id: result.archetype.id,
-            archetype_name: result.archetype.name,
-            email: userEmail,
-            name: userName,
-            result_data: result,
-          },
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke("log-assessment", {
+            body: {
+              role: quizState.role,
+              archetype_id: result.archetype.id,
+              archetype_name: result.archetype.name,
+              email: userEmail,
+              name: userName,
+              result_data: result,
+            },
+          });
+        } catch {}
         navigate("/dashboard");
       } else {
         setScreen("email");
@@ -225,22 +229,24 @@ const Index = () => {
   );
 
   const handleEmailSubmit = useCallback(
-    ({ name, email }: { name: string; email: string }) => {
+    async ({ name, email }: { name: string; email: string }) => {
       setUserName(name);
       setUserEmail(email);
       try { localStorage.setItem("headroom_assessment_email", email); } catch {}
       // Persist the completion before sending the user to the dashboard.
       if (scoringResult) {
-        supabase.functions.invoke("log-assessment", {
-          body: {
-            role: quizState.role,
-            archetype_id: scoringResult.archetype.id,
-            archetype_name: scoringResult.archetype.name,
-            email,
-            name,
-            result_data: scoringResult,
-          },
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke("log-assessment", {
+            body: {
+              role: quizState.role,
+              archetype_id: scoringResult.archetype.id,
+              archetype_name: scoringResult.archetype.name,
+              email,
+              name,
+              result_data: scoringResult,
+            },
+          });
+        } catch {}
       }
       navigate("/dashboard");
     },
