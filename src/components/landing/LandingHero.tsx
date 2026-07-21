@@ -140,8 +140,6 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
       {/* Subtle grain texture overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E")' }} />
 
-      <ReturningSignInMenu />
-
       {/* Hero */}
       <section className="relative flex flex-col items-center justify-center px-6 pt-20 pb-20 text-center">
         <motion.img
@@ -182,19 +180,86 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
             Welcome{displayName ? `, ${displayName.split(" ")[0]}` : ""} 👋
           </motion.p>
         )}
-        <motion.button
-          onClick={onStart}
-          className="mt-10 w-full max-w-sm h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Take Free Assessment
-          <ArrowRight className="w-5 h-5" />
-        </motion.button>
+
+        {showSignIn ? (
+          <motion.div
+            className="mt-10 w-full max-w-sm flex flex-col items-center gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="text-sm text-muted-foreground mb-1">
+              Welcome back{rememberedEmail ? `, ${rememberedEmail.split("@")[0]}` : ""} — sign in to continue.
+            </p>
+            <button
+              onClick={handleGoogleSignIn}
+              className="w-full h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-base shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#fff" d="M21.35 11.1H12v3.8h5.35c-.23 1.5-1.72 4.4-5.35 4.4-3.22 0-5.85-2.66-5.85-5.95s2.63-5.95 5.85-5.95c1.83 0 3.06.78 3.76 1.45l2.57-2.48C16.66 4.9 14.53 4 12 4 6.98 4 3 7.98 3 13s3.98 9 9 9c5.19 0 8.62-3.65 8.62-8.79 0-.59-.06-1.04-.15-1.51z"/>
+              </svg>
+              Sign in with Google
+            </button>
+            {!showEmailForm ? (
+              <button
+                onClick={() => setShowEmailForm(true)}
+                className="w-full h-12 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground font-medium text-sm hover:bg-card/80 transition-all flex items-center justify-center gap-2"
+              >
+                <Mail className="w-4 h-4" />
+                Sign in with Email
+              </button>
+            ) : (
+              <form
+                onSubmit={handleEmailSignIn}
+                className="w-full flex flex-col gap-2"
+              >
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  autoFocus
+                  className="w-full h-12 px-4 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-primary/60"
+                />
+                <button
+                  type="submit"
+                  disabled={sendingLink}
+                  className="w-full h-12 rounded-xl bg-foreground/90 text-background font-semibold text-sm disabled:opacity-50 transition-all hover:bg-foreground"
+                >
+                  {sendingLink ? "Sending…" : "Send magic link"}
+                </button>
+              </form>
+            )}
+            <button
+              onClick={() => {
+                try {
+                  localStorage.removeItem("headroom_assessment_email");
+                  document.cookie = "hr_returning=; path=/; max-age=0; SameSite=Lax";
+                } catch {}
+                setIsReturning(false);
+              }}
+              className="mt-1 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+            >
+              Not you? Take the assessment instead
+            </button>
+          </motion.div>
+        ) : (
+          <motion.button
+            onClick={onStart}
+            className="mt-10 w-full max-w-sm h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Take Free Assessment
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
+        )}
       </section>
+
 
       {/* Section 1 — Why do high performers burn out? */}
       <section className="relative px-6 py-20">
