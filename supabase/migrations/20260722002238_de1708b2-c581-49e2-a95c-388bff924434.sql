@@ -1,0 +1,2 @@
+DELETE FROM auth.sessions WHERE user_id IN (SELECT id FROM auth.users WHERE email ILIKE '%pedersen%' OR email ILIKE '%pederson%');
+DELETE FROM auth.refresh_tokens WHERE user_id IN (SELECT id::text FROM auth.users WHERE email ILIKE '%pedersen%' OR email ILIKE '%pederson%');
