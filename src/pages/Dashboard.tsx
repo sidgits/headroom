@@ -495,6 +495,7 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
+      <Footer />
 
       <AnimatePresence>
         {showCheckoutSuccess && (
