@@ -53,7 +53,6 @@ export const SignupEmail = ({
         <Text style={footer}>
           If you didn't create an account, you can safely ignore this email.
         </Text>
-        <Text style={companyFooter}>Headroom is a Digital Lexicon Corp Production.</Text>
       </Container>
     </Body>
   </Html>
