@@ -1,6 +1,5 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import Footer from "@/components/Footer";
 
 const Privacy = () => {
   return (

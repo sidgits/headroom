@@ -150,7 +150,7 @@ const PreAssessmentCheck = ({ onIndividual, onCorporateVerified, onBack }: PreAs
               Verify your employer
             </h2>
             <p className="text-sm text-muted-foreground">
-              Enter your work email. We only accept domains of companies contracted with Digital Lexicon.
+              Enter your work email. We only accept domains of companies contracted with Headroom.
             </p>
           </div>
 
