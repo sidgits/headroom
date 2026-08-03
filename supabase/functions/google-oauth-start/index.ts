@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
     const sb = serviceClient();
     if (!(await isActiveSubscriber(sb, e))) return json({ error: "Subscription required" }, 402);
 
-    const clientId = Deno.env.get("GOOGLE_CLIENT_ID");
+    const clientId = Deno.env.get("GOOGLE_CLIENT_ID")?.trim();
     if (!clientId) return json({ error: "Google OAuth not configured" }, 500);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
