@@ -1,17 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, Calendar, CheckCircle2, Copy, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-const OutlookIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M2.5 5h9a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 .5-.5Z" fill="#0078D4"/>
-    <path d="M13 7.5h8.5a.5.5 0 0 1 .5.5v7.25a.5.5 0 0 1-.5.5H13V7.5Z" fill="#0078D4"/>
-    <path d="M15.25 10.75h4.5v1h-4.5v-1Zm0 2h3v1h-3v-1Z" fill="#fff"/>
-    <circle cx="7" cy="12" r="3" fill="#fff"/>
-  </svg>
-);
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
@@ -32,7 +23,6 @@ export default function CalendarSection({ email }: { email: string }) {
   const [clt, setClt] = useState<CltDay[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
-  const [redirectUri, setRedirectUri] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -97,36 +87,6 @@ export default function CalendarSection({ email }: { email: string }) {
     finally { setBusy(null); }
   };
 
-
-  const connectGoogle = async () => {
-    setBusy("google");
-    try {
-      const { data, error } = await supabase.functions.invoke("google-oauth-start", {
-        body: { email, redirectOrigin: window.location.origin },
-      });
-      if (error) throw error;
-      if (data?.redirectUri) setRedirectUri(data.redirectUri);
-      if (data?.url) window.location.href = data.url;
-    } catch {
-      toast.error("Could not start Google connection.");
-      setBusy(null);
-    }
-  };
-
-  const connectOutlook = async () => {
-    setBusy("outlook");
-    try {
-      const { data, error } = await supabase.functions.invoke("outlook-oauth-start", {
-        body: { email, redirectOrigin: window.location.origin },
-      });
-      if (error) throw error;
-      if (data?.redirectUri) setRedirectUri(data.redirectUri);
-      if (data?.url) window.location.href = data.url;
-    } catch {
-      toast.error("Could not start Outlook connection.");
-      setBusy(null);
-    }
-  };
 
   const submitIcs = async () => {
     if (!icsUrl) { toast.error("Paste an .ics URL or upload a file."); return; }
