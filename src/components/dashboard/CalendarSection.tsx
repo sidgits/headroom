@@ -33,6 +33,7 @@ export default function CalendarSection({ email }: { email: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
   const [redirectUri, setRedirectUri] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
