@@ -23,9 +23,10 @@ Deno.serve(async (req) => {
     for (const conn of conns) {
       // Clear existing future events
       await sb.from("calendar_events").delete().eq("connection_id", conn.id);
-      const events = conn.provider === "google"
-        ? await syncGoogle(sb, conn)
-        : await syncIcs(sb, conn);
+      let events = 0;
+      if (conn.provider === "google") events = await syncGoogle(sb, conn);
+      else if (conn.provider === "outlook") events = await syncOutlook(sb, conn);
+      else events = await syncIcs(sb, conn);
       totalEvents += events;
       await sb.from("calendar_connections").update({ last_synced_at: new Date().toISOString() }).eq("id", conn.id);
     }
@@ -102,6 +103,78 @@ async function refreshAccess(sb: ReturnType<typeof serviceClient>, conn: Record<
   await sb.from("calendar_connections").update({
     google_access_token: tok.access_token,
     google_token_expires_at: expiresAt,
+  }).eq("id", conn.id);
+  return tok.access_token;
+}
+
+async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<number> {
+  let access = conn.outlook_access_token as string | null;
+  const expires = conn.outlook_token_expires_at ? new Date(conn.outlook_token_expires_at as string) : null;
+  if (!access || !expires || expires < new Date()) {
+    access = await refreshOutlookAccess(sb, conn);
+  }
+  if (!access) return 0;
+
+  const now = new Date();
+  const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
+  const url = new URL("https://graph.microsoft.com/v1.0/me/calendarview");
+  url.searchParams.set("startDateTime", now.toISOString());
+  url.searchParams.set("endDateTime", max.toISOString());
+  url.searchParams.set("$select", "id,subject,start,end,attendees,location,recurrence");
+  url.searchParams.set("$top", "250");
+
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${access}` } });
+  if (!r.ok) {
+    console.error("outlook calendar fetch failed", await r.text());
+    return 0;
+  }
+  const j = await r.json();
+  const items = j.value || [];
+  const rows = items
+    .filter((it: { start?: { dateTime?: string } }) => it.start?.dateTime)
+    .map((it: {
+      id: string; subject?: string; bodyPreview?: string;
+      start: { dateTime: string; timeZone: string };
+      end: { dateTime: string; timeZone: string };
+      attendees?: unknown[]; location?: { displayName?: string }; recurrence?: unknown;
+    }) => ({
+      connection_id: conn.id,
+      email: conn.email,
+      external_id: it.id,
+      title: it.subject ?? "(no title)",
+      description: it.bodyPreview ?? null,
+      starts_at: new Date(it.start.dateTime).toISOString(),
+      ends_at: new Date(it.end.dateTime).toISOString(),
+      attendee_count: Array.isArray(it.attendees) ? it.attendees.length : 0,
+      is_recurring: !!it.recurrence,
+      location: it.location?.displayName ?? null,
+      source: "outlook",
+    }));
+  if (rows.length) await sb.from("calendar_events").insert(rows);
+  return rows.length;
+}
+
+async function refreshOutlookAccess(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<string | null> {
+  const refresh = conn.outlook_refresh_token as string | null;
+  if (!refresh) return null;
+  const r = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: Deno.env.get("OUTLOOK_CLIENT_ID")!,
+      client_secret: Deno.env.get("OUTLOOK_CLIENT_SECRET")!,
+      refresh_token: refresh,
+      grant_type: "refresh_token",
+      scope: ["openid", "profile", "email", "offline_access", "Calendars.Read"].join(" "),
+    }),
+  });
+  const tok = await r.json();
+  if (!r.ok) { console.error("outlook refresh failed", tok); return null; }
+  const expiresAt = new Date(Date.now() + (tok.expires_in ?? 3600) * 1000).toISOString();
+  await sb.from("calendar_connections").update({
+    outlook_access_token: tok.access_token,
+    outlook_token_expires_at: expiresAt,
+    ...(tok.refresh_token ? { outlook_refresh_token: tok.refresh_token } : {}),
   }).eq("id", conn.id);
   return tok.access_token;
 }

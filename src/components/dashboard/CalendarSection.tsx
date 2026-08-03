@@ -4,6 +4,15 @@ import { Calendar, CheckCircle2, Copy, Loader2, RefreshCw, Upload } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const OutlookIcon = () => (
+  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2.5 5h9a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 .5-.5Z" fill="#0078D4"/>
+    <path d="M13 7.5h8.5a.5.5 0 0 1 .5.5v7.25a.5.5 0 0 1-.5.5H13V7.5Z" fill="#0078D4"/>
+    <path d="M15.25 10.75h4.5v1h-4.5v-1Zm0 2h3v1h-3v-1Z" fill="#fff"/>
+    <circle cx="7" cy="12" r="3" fill="#fff"/>
+  </svg>
+);
+
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
   attendee_count: number; is_recurring: boolean; location: string | null; source: string;
@@ -31,11 +40,15 @@ export default function CalendarSection({ email }: { email: string }) {
       await refresh();
       const p = new URLSearchParams(window.location.search);
       const g = p.get("google");
+      const o = p.get("outlook");
       if (g === "connected") { toast.success("Google Calendar connected!"); await runSync(); }
       if (g === "error") toast.error("Google connection failed. Try again.");
-      if (g) {
+      if (o === "connected") { toast.success("Outlook Calendar connected!"); await runSync(); }
+      if (o === "error") toast.error("Outlook connection failed. Try again.");
+      if (g || o) {
         const url = new URL(window.location.href);
         url.searchParams.delete("google");
+        url.searchParams.delete("outlook");
         window.history.replaceState({}, "", url.toString());
       }
       setLoading(false);
@@ -75,6 +88,21 @@ export default function CalendarSection({ email }: { email: string }) {
       if (data?.url) window.location.href = data.url;
     } catch {
       toast.error("Could not start Google connection.");
+      setBusy(null);
+    }
+  };
+
+  const connectOutlook = async () => {
+    setBusy("outlook");
+    try {
+      const { data, error } = await supabase.functions.invoke("outlook-oauth-start", {
+        body: { email, redirectOrigin: window.location.origin },
+      });
+      if (error) throw error;
+      if (data?.redirectUri) setRedirectUri(data.redirectUri);
+      if (data?.url) window.location.href = data.url;
+    } catch {
+      toast.error("Could not start Outlook connection.");
       setBusy(null);
     }
   };
@@ -139,12 +167,18 @@ export default function CalendarSection({ email }: { email: string }) {
               <p className="text-xs text-muted-foreground">Pick one — change anytime.</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-3 gap-3">
             <button onClick={connectGoogle} disabled={!!busy}
               className="rounded-xl border border-border bg-background hover:border-primary/50 p-3 text-left transition-colors">
               <div className="font-semibold text-sm">Google Calendar</div>
               <p className="text-xs text-muted-foreground mt-1">Read-only access to your primary calendar.</p>
               {busy === "google" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
+            </button>
+            <button onClick={connectOutlook} disabled={!!busy}
+              className="rounded-xl border border-border bg-background hover:border-primary/50 p-3 text-left transition-colors">
+              <div className="flex items-center gap-2 font-semibold text-sm"><OutlookIcon /> Outlook Calendar</div>
+              <p className="text-xs text-muted-foreground mt-1">Read-only access to your Outlook calendar.</p>
+              {busy === "outlook" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
             </button>
             <div className="rounded-xl border border-border bg-background p-3 space-y-2">
               <div className="font-semibold text-sm">ICS file or URL</div>
@@ -163,8 +197,8 @@ export default function CalendarSection({ email }: { email: string }) {
           </div>
           {redirectUri && (
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs space-y-2">
-              <p className="font-semibold text-foreground">Google setup tip</p>
-              <p className="text-muted-foreground">Add this as an Authorized redirect URI in Google Cloud Console:</p>
+              <p className="font-semibold text-foreground">OAuth setup tip</p>
+              <p className="text-muted-foreground">Add this as an Authorized redirect URI in your provider's console (Google Cloud / Microsoft Entra):</p>
               <div className="flex items-center gap-2 bg-background border border-border rounded p-2 font-mono text-[11px] break-all">
                 <span className="flex-1">{redirectUri}</span>
                 <button onClick={() => { navigator.clipboard.writeText(redirectUri); toast.success("Copied"); }}>
@@ -178,7 +212,7 @@ export default function CalendarSection({ email }: { email: string }) {
         <>
           <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-            Connected via {connections[0].provider === "google" ? "Google Calendar" : "ICS"}.
+            Connected via {connections[0].provider === "google" ? "Google Calendar" : connections[0].provider === "outlook" ? "Outlook Calendar" : "ICS"}.
             {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
           </div>
 
