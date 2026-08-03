@@ -124,8 +124,8 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
     }
   };
 
-  // Returning users skip the assessment CTA and see sign-in options instead.
-  const showSignIn = isReturning && !user;
+  // Every signed-out visitor gets sign-in options; returning users lose the assessment CTA.
+  const showSignIn = !user;
 
 
   return (
