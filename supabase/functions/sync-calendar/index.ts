@@ -20,22 +20,31 @@ Deno.serve(async (req) => {
     if (!conns || conns.length === 0) return j({ events: 0, connections: 0 });
 
     let totalEvents = 0;
+    const errors: string[] = [];
     for (const conn of conns) {
       // Clear existing future events
       await sb.from("calendar_events").delete().eq("connection_id", conn.id);
       let events = 0;
-      if (conn.provider === "google") events = await syncGoogle(sb, conn);
-      else if (conn.provider === "outlook") events = await syncOutlook(sb, conn);
-      else events = await syncIcs(sb, conn);
+      if (conn.provider === "google") events = await syncGoogle(sb, conn, errors);
+      else if (conn.provider === "outlook") events = await syncOutlook(sb, conn, errors);
+      else events = await syncIcs(sb, conn, errors);
       totalEvents += events;
       await sb.from("calendar_connections").update({ last_synced_at: new Date().toISOString() }).eq("id", conn.id);
     }
-    return j({ events: totalEvents, connections: conns.length });
+    return j({ events: totalEvents, connections: conns.length, errors });
   } catch (err) {
     console.error("sync-calendar", err);
     return j({ error: (err as Error).message }, 500);
   }
 });
+
+function providerMessage(status: number, body: string): string {
+  if (body.includes("has not been used in project") || body.includes("SERVICE_DISABLED")) {
+    return "Calendar API is not enabled for this app yet. We've been notified — no action needed on your side.";
+  }
+  if (status === 401 || status === 403) return "Calendar access was denied or expired. Please disconnect and reconnect.";
+  return `Calendar provider error (${status}).`;
+}
 
 async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<number> {
   let access = conn.google_access_token as string | null;
