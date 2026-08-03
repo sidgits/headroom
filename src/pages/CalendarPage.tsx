@@ -38,17 +38,8 @@ export default function CalendarPage() {
       if (!e) { navigate("/"); return; }
       setEmail(e);
       await refresh(e);
-      // Handle return from Google
-      const p = new URLSearchParams(window.location.search);
-      const g = p.get("google");
-      if (g === "connected") { toast.success("Google Calendar connected!"); await runSync(e); }
-      if (g === "error") toast.error("Google connection failed. Try again.");
-      if (g) {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("google");
-        window.history.replaceState({}, "", url.toString());
-      }
       setLoading(false);
+
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -175,7 +166,7 @@ export default function CalendarPage() {
         ) : (
           <div className="rounded-xl border border-border bg-card/40 p-3 text-xs text-muted-foreground flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-primary" />
-            Connected via {connections[0].provider === "google" ? "Google Calendar" : "ICS"}.
+            Connected via ICS.
             {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
           </div>
         )}

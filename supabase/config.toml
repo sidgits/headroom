@@ -15,9 +15,3 @@ project_id = "awyxbcmjwkuvsibimpuy"
     verify_jwt = false
   [functions.stripe-webhook]
     verify_jwt = false
-  [functions.google-oauth-callback]
-    verify_jwt = false
-  [functions.outlook-oauth-start]
-    verify_jwt = true
-  [functions.outlook-oauth-callback]
-    verify_jwt = false

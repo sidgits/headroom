@@ -12,7 +12,7 @@ const features = [
   { icon: User, title: "Full Archetype Profile", desc: "Complete work pattern analysis with burnout markers." },
   { icon: TrendingUp, title: "Pattern Shifts Over Time", desc: "Longitudinal trend tracking across retakes." },
   { icon: CheckSquare, title: "Check-In Tracker", desc: "Daily headroom status logging." },
-  { icon: Calendar, title: "Calendar Integration", desc: "Google Calendar or .ics upload for load scoring." },
+  { icon: Calendar, title: "Calendar Integration", desc: ".ics calendar upload for load scoring." },
   { icon: Activity, title: "Daily Cognitive Load Analysis", desc: "CLT-based burnout risk classification." },
   { icon: MessageCircle, title: "Burnout Mitigation Chat", desc: "CLT-grounded chat agent." },
 ];

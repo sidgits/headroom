@@ -1,0 +1,2 @@
+DELETE FROM public.calendar_events WHERE connection_id IN (SELECT id FROM public.calendar_connections WHERE provider IN ('google','outlook'));
+DELETE FROM public.calendar_connections WHERE provider IN ('google','outlook');

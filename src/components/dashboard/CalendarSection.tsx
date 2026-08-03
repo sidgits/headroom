@@ -29,23 +29,11 @@ export default function CalendarSection({ email }: { email: string }) {
   useEffect(() => {
     (async () => {
       await refresh();
-      const p = new URLSearchParams(window.location.search);
-      const g = p.get("google");
-      const o = p.get("outlook");
-      if (g === "connected") { toast.success("Google Calendar connected!"); await runSync(); }
-      if (g === "error") toast.error("Google connection failed. Try again.");
-      if (o === "connected") { toast.success("Outlook Calendar connected!"); await runSync(); }
-      if (o === "error") toast.error("Outlook connection failed. Try again.");
-      if (g || o) {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("google");
-        url.searchParams.delete("outlook");
-        window.history.replaceState({}, "", url.toString());
-      }
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const refresh = async () => {
     const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email } });
@@ -180,7 +168,7 @@ export default function CalendarSection({ email }: { email: string }) {
           <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
             <span className="flex-1 min-w-[180px]">
-              Connected via {connections[0].provider === "google" ? "Google Calendar" : connections[0].provider === "outlook" ? "Outlook Calendar" : "ICS"}.
+              Connected via ICS.
               {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
             </span>
             <button onClick={disconnect} disabled={!!busy}
