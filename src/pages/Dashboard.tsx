@@ -558,6 +558,7 @@ function NoAssessmentGate() {
           </Link>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -365,6 +365,7 @@ const Index = () => {
           )}
         </AnimatePresence>
       </div>
+      <Footer />
     </div>
   );
 };
