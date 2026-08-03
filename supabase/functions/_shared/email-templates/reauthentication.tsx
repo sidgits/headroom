@@ -58,4 +58,3 @@ const codeStyle = {
   margin: '0 0 30px',
 }
 const footer = { fontSize: '12px', color: '#999999', margin: '32px 0 0' }
-const companyFooter = { fontSize: '11px', color: '#bbbbbb', margin: '16px 0 0' }
