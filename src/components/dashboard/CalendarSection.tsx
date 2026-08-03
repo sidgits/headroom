@@ -40,11 +40,15 @@ export default function CalendarSection({ email }: { email: string }) {
       await refresh();
       const p = new URLSearchParams(window.location.search);
       const g = p.get("google");
+      const o = p.get("outlook");
       if (g === "connected") { toast.success("Google Calendar connected!"); await runSync(); }
       if (g === "error") toast.error("Google connection failed. Try again.");
-      if (g) {
+      if (o === "connected") { toast.success("Outlook Calendar connected!"); await runSync(); }
+      if (o === "error") toast.error("Outlook connection failed. Try again.");
+      if (g || o) {
         const url = new URL(window.location.href);
         url.searchParams.delete("google");
+        url.searchParams.delete("outlook");
         window.history.replaceState({}, "", url.toString());
       }
       setLoading(false);
@@ -84,6 +88,21 @@ export default function CalendarSection({ email }: { email: string }) {
       if (data?.url) window.location.href = data.url;
     } catch {
       toast.error("Could not start Google connection.");
+      setBusy(null);
+    }
+  };
+
+  const connectOutlook = async () => {
+    setBusy("outlook");
+    try {
+      const { data, error } = await supabase.functions.invoke("outlook-oauth-start", {
+        body: { email, redirectOrigin: window.location.origin },
+      });
+      if (error) throw error;
+      if (data?.redirectUri) setRedirectUri(data.redirectUri);
+      if (data?.url) window.location.href = data.url;
+    } catch {
+      toast.error("Could not start Outlook connection.");
       setBusy(null);
     }
   };
@@ -148,12 +167,18 @@ export default function CalendarSection({ email }: { email: string }) {
               <p className="text-xs text-muted-foreground">Pick one — change anytime.</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-3 gap-3">
             <button onClick={connectGoogle} disabled={!!busy}
               className="rounded-xl border border-border bg-background hover:border-primary/50 p-3 text-left transition-colors">
               <div className="font-semibold text-sm">Google Calendar</div>
               <p className="text-xs text-muted-foreground mt-1">Read-only access to your primary calendar.</p>
               {busy === "google" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
+            </button>
+            <button onClick={connectOutlook} disabled={!!busy}
+              className="rounded-xl border border-border bg-background hover:border-primary/50 p-3 text-left transition-colors">
+              <div className="flex items-center gap-2 font-semibold text-sm"><OutlookIcon /> Outlook Calendar</div>
+              <p className="text-xs text-muted-foreground mt-1">Read-only access to your Outlook calendar.</p>
+              {busy === "outlook" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
             </button>
             <div className="rounded-xl border border-border bg-background p-3 space-y-2">
               <div className="font-semibold text-sm">ICS file or URL</div>
@@ -187,7 +212,7 @@ export default function CalendarSection({ email }: { email: string }) {
         <>
           <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-            Connected via {connections[0].provider === "google" ? "Google Calendar" : "ICS"}.
+            Connected via {connections[0].provider === "google" ? "Google Calendar" : connections[0].provider === "outlook" ? "Outlook Calendar" : "ICS"}.
             {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
           </div>
 
