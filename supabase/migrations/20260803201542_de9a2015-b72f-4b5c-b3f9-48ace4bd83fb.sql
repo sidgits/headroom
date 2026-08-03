@@ -1,0 +1,1 @@
+update public.calendar_events set starts_at = starts_at + interval '1 day', ends_at = ends_at + interval '1 day' where email='sid1612@gmail.com';
