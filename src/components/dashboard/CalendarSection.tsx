@@ -168,7 +168,7 @@ export default function CalendarSection({ email }: { email: string }) {
           <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
             <span className="flex-1 min-w-[180px]">
-              Connected via {connections[0].provider === "google" ? "Google Calendar" : connections[0].provider === "outlook" ? "Outlook Calendar" : "ICS"}.
+              Connected via ICS.
               {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
             </span>
             <button onClick={disconnect} disabled={!!busy}
