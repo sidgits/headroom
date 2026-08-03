@@ -197,8 +197,8 @@ export default function CalendarSection({ email }: { email: string }) {
           </div>
           {redirectUri && (
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs space-y-2">
-              <p className="font-semibold text-foreground">Google setup tip</p>
-              <p className="text-muted-foreground">Add this as an Authorized redirect URI in Google Cloud Console:</p>
+              <p className="font-semibold text-foreground">OAuth setup tip</p>
+              <p className="text-muted-foreground">Add this as an Authorized redirect URI in your provider's console (Google Cloud / Microsoft Entra):</p>
               <div className="flex items-center gap-2 bg-background border border-border rounded p-2 font-mono text-[11px] break-all">
                 <span className="flex-1">{redirectUri}</span>
                 <button onClick={() => { navigator.clipboard.writeText(redirectUri); toast.success("Copied"); }}>
