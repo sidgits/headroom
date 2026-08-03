@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, CheckCircle2, Copy, Loader2, RefreshCw, Upload } from "lucide-react";
+import { ArrowLeft, Calendar, CheckCircle2, Loader2, RefreshCw, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
@@ -28,7 +28,6 @@ export default function CalendarPage() {
   const [clt, setClt] = useState<CltDay[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
-  const [redirectUri, setRedirectUri] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -80,22 +79,6 @@ export default function CalendarPage() {
     } catch (err) {
       console.error(err); toast.error("Sync failed.");
     } finally { setBusy(null); }
-  };
-
-  const connectGoogle = async () => {
-    if (!email) return;
-    setBusy("google");
-    try {
-      const { data, error } = await supabase.functions.invoke("google-oauth-start", {
-        body: { email, redirectOrigin: window.location.origin },
-      });
-      if (error) throw error;
-      if (data?.redirectUri) setRedirectUri(data.redirectUri);
-      if (data?.url) window.location.href = data.url;
-    } catch {
-      toast.error("Could not start Google connection. Make sure Google credentials are configured.");
-      setBusy(null);
-    }
   };
 
   const submitIcs = async () => {
@@ -165,16 +148,10 @@ export default function CalendarPage() {
               <Calendar className="w-5 h-5 text-primary mt-1" />
               <div>
                 <h2 className="text-lg font-semibold">Connect your calendar</h2>
-                <p className="text-sm text-muted-foreground">Pick one — change anytime.</p>
+                <p className="text-sm text-muted-foreground">Upload an .ics file or paste a calendar URL.</p>
               </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <button onClick={connectGoogle} disabled={!!busy}
-                className="rounded-xl border border-border bg-background hover:border-primary/50 p-4 text-left transition-colors">
-                <div className="font-semibold">Google Calendar</div>
-                <p className="text-xs text-muted-foreground mt-1">Read-only access to your primary calendar.</p>
-                {busy === "google" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
-              </button>
               <div className="rounded-xl border border-border bg-background p-4 space-y-3">
                 <div className="font-semibold">ICS file or URL</div>
                 <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
@@ -189,19 +166,11 @@ export default function CalendarPage() {
                     onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
                 </div>
               </div>
-            </div>
-            {redirectUri && (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs space-y-2">
-                <p className="font-semibold text-foreground">Google setup tip</p>
-                <p className="text-muted-foreground">In Google Cloud Console → OAuth client, add this as an Authorized redirect URI:</p>
-                <div className="flex items-center gap-2 bg-background border border-border rounded p-2 font-mono text-[11px] break-all">
-                  <span className="flex-1">{redirectUri}</span>
-                  <button onClick={() => { navigator.clipboard.writeText(redirectUri); toast.success("Copied"); }}>
-                    <Copy className="w-3 h-3" />
-                  </button>
-                </div>
+              <div className="rounded-xl border border-dashed border-border bg-background/40 p-4 flex flex-col justify-center">
+                <div className="font-semibold text-muted-foreground">Google / Outlook Calendar</div>
+                <p className="text-xs text-muted-foreground mt-1">Direct integration coming soon!</p>
               </div>
-            )}
+            </div>
           </div>
         ) : (
           <div className="rounded-xl border border-border bg-card/40 p-3 text-xs text-muted-foreground flex items-center gap-2">
