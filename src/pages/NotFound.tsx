@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import Footer from "@/components/Footer";
 
 const NotFound = () => {
   const location = useLocation();
@@ -25,6 +26,7 @@ const NotFound = () => {
           </a>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
