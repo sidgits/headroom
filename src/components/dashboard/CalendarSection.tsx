@@ -148,7 +148,7 @@ export default function CalendarSection({ email }: { email: string }) {
               <p className="text-xs text-muted-foreground">Upload an .ics file or paste a calendar URL.</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-3">
             <div className="rounded-xl border border-border bg-background p-3 space-y-2">
               <div className="font-semibold text-sm">ICS file or URL</div>
               <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
@@ -163,9 +163,14 @@ export default function CalendarSection({ email }: { email: string }) {
                   onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
               </div>
             </div>
-            <div className="rounded-xl border border-dashed border-border bg-background/40 p-3 flex flex-col justify-center">
-              <div className="text-sm font-semibold text-muted-foreground">Google / Outlook Calendar</div>
-              <p className="text-xs text-muted-foreground mt-1">Direct integration coming soon!</p>
+            <div className="rounded-xl border border-dashed border-border bg-background/40 p-3 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-muted-foreground">Google/Outlook Calendar Integration coming soon!</div>
+                <p className="text-xs text-muted-foreground mt-0.5">We're building direct, secure connections for Google Calendar and Outlook.</p>
+              </div>
             </div>
           </div>
 
