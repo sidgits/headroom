@@ -46,13 +46,13 @@ function providerMessage(status: number, body: string): string {
   return `Calendar provider error (${status}).`;
 }
 
-async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<number> {
+async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
   let access = conn.google_access_token as string | null;
   const expires = conn.google_token_expires_at ? new Date(conn.google_token_expires_at as string) : null;
   if (!access || !expires || expires < new Date()) {
     access = await refreshAccess(sb, conn);
   }
-  if (!access) return 0;
+  if (!access) { errors.push("Google access expired. Please disconnect and reconnect your calendar."); return 0; }
 
   const now = new Date();
   const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
@@ -65,7 +65,9 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
 
   const r = await fetch(url, { headers: { Authorization: `Bearer ${access}` } });
   if (!r.ok) {
-    console.error("google calendar fetch failed", await r.text());
+    const body = await r.text();
+    console.error("google calendar fetch failed", body);
+    errors.push(providerMessage(r.status, body));
     return 0;
   }
   const j = await r.json();
@@ -116,13 +118,13 @@ async function refreshAccess(sb: ReturnType<typeof serviceClient>, conn: Record<
   return tok.access_token;
 }
 
-async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<number> {
+async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
   let access = conn.outlook_access_token as string | null;
   const expires = conn.outlook_token_expires_at ? new Date(conn.outlook_token_expires_at as string) : null;
   if (!access || !expires || expires < new Date()) {
     access = await refreshOutlookAccess(sb, conn);
   }
-  if (!access) return 0;
+  if (!access) { errors.push("Outlook access expired. Please disconnect and reconnect your calendar."); return 0; }
 
   const now = new Date();
   const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
@@ -134,7 +136,9 @@ async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<st
 
   const r = await fetch(url, { headers: { Authorization: `Bearer ${access}` } });
   if (!r.ok) {
-    console.error("outlook calendar fetch failed", await r.text());
+    const body = await r.text();
+    console.error("outlook calendar fetch failed", body);
+    errors.push(providerMessage(r.status, body));
     return 0;
   }
   const j = await r.json();
@@ -188,11 +192,11 @@ async function refreshOutlookAccess(sb: ReturnType<typeof serviceClient>, conn: 
   return tok.access_token;
 }
 
-async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<number> {
+async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
   let text = conn.ics_content as string | null;
   if (!text && conn.ics_url) {
     const r = await fetch(conn.ics_url as string);
-    if (!r.ok) return 0;
+    if (!r.ok) { errors.push(`Could not download the ICS URL (${r.status}). Check that the link is public.`); return 0; }
     text = await r.text();
   }
   if (!text) return 0;
