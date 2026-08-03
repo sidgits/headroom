@@ -73,6 +73,9 @@ export type Database = {
           ics_url: string | null
           id: string
           last_synced_at: string | null
+          outlook_access_token: string | null
+          outlook_refresh_token: string | null
+          outlook_token_expires_at: string | null
           provider: string
           updated_at: string
         }
@@ -86,6 +89,9 @@ export type Database = {
           ics_url?: string | null
           id?: string
           last_synced_at?: string | null
+          outlook_access_token?: string | null
+          outlook_refresh_token?: string | null
+          outlook_token_expires_at?: string | null
           provider: string
           updated_at?: string
         }
@@ -99,6 +105,9 @@ export type Database = {
           ics_url?: string | null
           id?: string
           last_synced_at?: string | null
+          outlook_access_token?: string | null
+          outlook_refresh_token?: string | null
+          outlook_token_expires_at?: string | null
           provider?: string
           updated_at?: string
         }
