@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, CheckCircle2, Copy, Loader2, RefreshCw, Upload } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, Copy, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -33,6 +33,7 @@ export default function CalendarSection({ email }: { email: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
   const [redirectUri, setRedirectUri] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -66,16 +67,36 @@ export default function CalendarSection({ email }: { email: string }) {
 
   const runSync = async () => {
     setBusy("sync");
+    setSyncError(null);
     try {
-      const { error } = await supabase.functions.invoke("sync-calendar", { body: { email } });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: { email } });
       if (error) throw error;
+      const errs: string[] = data?.errors ?? [];
+      if (errs.length) setSyncError(errs[0]);
       await supabase.functions.invoke("analyze-clt", { body: { email } });
       await refresh();
-      toast.success("Calendar synced.");
+      if (errs.length) toast.error(errs[0]);
+      else toast.success(`Calendar synced — ${data?.events ?? 0} events.`);
     } catch (err) {
-      console.error(err); toast.error("Sync failed.");
+      console.error(err);
+      setSyncError("Sync failed. Please try disconnecting and reconnecting.");
+      toast.error("Sync failed.");
     } finally { setBusy(null); }
   };
+
+  const disconnect = async () => {
+    setBusy("disconnect");
+    try {
+      const { error } = await supabase.functions.invoke("disconnect-calendar", { body: { email } });
+      if (error) throw error;
+      setSyncError(null);
+      setConnections([]); setEvents([]); setClt([]);
+      await refresh();
+      toast.success("Calendar disconnected.");
+    } catch { toast.error("Could not disconnect."); }
+    finally { setBusy(null); }
+  };
+
 
   const connectGoogle = async () => {
     setBusy("google");
@@ -210,11 +231,28 @@ export default function CalendarSection({ email }: { email: string }) {
         </div>
       ) : (
         <>
-          <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex items-center gap-2">
+          <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-            Connected via {connections[0].provider === "google" ? "Google Calendar" : connections[0].provider === "outlook" ? "Outlook Calendar" : "ICS"}.
-            {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
+            <span className="flex-1 min-w-[180px]">
+              Connected via {connections[0].provider === "google" ? "Google Calendar" : connections[0].provider === "outlook" ? "Outlook Calendar" : "ICS"}.
+              {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
+            </span>
+            <button onClick={disconnect} disabled={!!busy}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border hover:bg-secondary text-foreground">
+              {busy === "disconnect" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Unplug className="w-3 h-3" />} Disconnect
+            </button>
           </div>
+
+          {syncError && (
+            <div className="rounded-xl border border-[hsl(var(--warm-red)/0.4)] bg-[hsl(var(--warm-red)/0.08)] p-3 text-xs flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-[hsl(var(--warm-red))] shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">We couldn't pull your events</p>
+                <p className="text-muted-foreground">{syncError}</p>
+                <p className="text-muted-foreground">You can disconnect above and switch to an ICS link instead.</p>
+              </div>
+            </div>
+          )}
 
           {clt.length > 0 && (
             <div className="grid grid-cols-7 gap-2">
@@ -222,9 +260,26 @@ export default function CalendarSection({ email }: { email: string }) {
             </div>
           )}
 
-          {groupedByDay.length === 0 && (
-            <div className="text-sm text-muted-foreground italic">No upcoming events found in the next 14 days.</div>
+          {groupedByDay.length === 0 && !syncError && (
+            <div className="rounded-xl border border-border bg-background/40 p-4 space-y-3">
+              <p className="text-sm text-muted-foreground italic">No upcoming events found in the next 14 days.</p>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">Wrong calendar? Switch to an ICS link:</p>
+                <div className="flex flex-wrap gap-2">
+                  <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
+                    className="flex-1 min-w-[200px] text-xs px-2 py-1.5 rounded-lg border border-border bg-background" />
+                  <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
+                  <button onClick={() => fileRef.current?.click()} disabled={!!busy}
+                    className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border">
+                    <Upload className="w-3 h-3" /> Upload .ics
+                  </button>
+                  <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
+                    onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
+                </div>
+              </div>
+            </div>
           )}
+
 
           <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
             {groupedByDay.map(([date, evs]) => {
