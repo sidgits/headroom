@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import Admin from "./pages/Admin.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Privacy from "./pages/Privacy.tsx";
+import Login from "./pages/Login.tsx";
 import CalendarPage from "./pages/CalendarPage.tsx";
 import CoachPage from "./pages/CoachPage.tsx";
 
