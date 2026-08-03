@@ -29,23 +29,11 @@ export default function CalendarSection({ email }: { email: string }) {
   useEffect(() => {
     (async () => {
       await refresh();
-      const p = new URLSearchParams(window.location.search);
-      const g = p.get("google");
-      const o = p.get("outlook");
-      if (g === "connected") { toast.success("Google Calendar connected!"); await runSync(); }
-      if (g === "error") toast.error("Google connection failed. Try again.");
-      if (o === "connected") { toast.success("Outlook Calendar connected!"); await runSync(); }
-      if (o === "error") toast.error("Outlook connection failed. Try again.");
-      if (g || o) {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("google");
-        url.searchParams.delete("outlook");
-        window.history.replaceState({}, "", url.toString());
-      }
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const refresh = async () => {
     const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email } });
