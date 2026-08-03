@@ -124,8 +124,8 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
     }
   };
 
-  // Returning users skip the assessment CTA and see sign-in options instead.
-  const showSignIn = isReturning && !user;
+  // Every signed-out visitor gets sign-in options; returning users lose the assessment CTA.
+  const showSignIn = !user;
 
 
   return (
@@ -181,22 +181,43 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
           </motion.p>
         )}
 
-        {showSignIn ? (
-          <motion.div
-            className="mt-10 w-full max-w-sm flex flex-col items-center gap-3"
+        {!isReturning && (
+          <motion.button
+            onClick={onStart}
+            className="mt-10 w-full max-w-sm h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Take Free Assessment
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
+        )}
+
+        {showSignIn && (
+          <motion.div
+            className={`${isReturning ? "mt-10" : "mt-6"} w-full max-w-sm flex flex-col items-center gap-3`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             <p className="text-sm text-muted-foreground mb-1">
-              Welcome back{rememberedEmail ? `, ${rememberedEmail.split("@")[0]}` : ""} — sign in to continue.
+              {isReturning
+                ? `Welcome back${rememberedEmail ? `, ${rememberedEmail.split("@")[0]}` : ""} — sign in to continue.`
+                : "Already took the assessment? Sign in to your dashboard."}
             </p>
             <button
               onClick={handleGoogleSignIn}
-              className="w-full h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-base shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+              className={
+                isReturning
+                  ? "w-full h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-base shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  : "w-full h-12 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground font-medium text-sm hover:bg-card/80 transition-all flex items-center justify-center gap-2"
+              }
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#fff" d="M21.35 11.1H12v3.8h5.35c-.23 1.5-1.72 4.4-5.35 4.4-3.22 0-5.85-2.66-5.85-5.95s2.63-5.95 5.85-5.95c1.83 0 3.06.78 3.76 1.45l2.57-2.48C16.66 4.9 14.53 4 12 4 6.98 4 3 7.98 3 13s3.98 9 9 9c5.19 0 8.62-3.65 8.62-8.79 0-.59-.06-1.04-.15-1.51z"/>
+                <path fill="currentColor" d="M21.35 11.1H12v3.8h5.35c-.23 1.5-1.72 4.4-5.35 4.4-3.22 0-5.85-2.66-5.85-5.95s2.63-5.95 5.85-5.95c1.83 0 3.06.78 3.76 1.45l2.57-2.48C16.66 4.9 14.53 4 12 4 6.98 4 3 7.98 3 13s3.98 9 9 9c5.19 0 8.62-3.65 8.62-8.79 0-.59-.06-1.04-.15-1.51z"/>
               </svg>
               Sign in with Google
             </button>
@@ -231,46 +252,21 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
                 </button>
               </form>
             )}
-            <button
-              onClick={() => {
-                try {
-                  localStorage.removeItem("headroom_assessment_email");
-                  document.cookie = "hr_returning=; path=/; max-age=0; SameSite=Lax";
-                } catch {}
-                setIsReturning(false);
-              }}
-              className="mt-1 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
-            >
-              Not you? Take the assessment instead
-            </button>
+            {isReturning && (
+              <button
+                onClick={() => {
+                  try {
+                    localStorage.removeItem("headroom_assessment_email");
+                    document.cookie = "hr_returning=; path=/; max-age=0; SameSite=Lax";
+                  } catch {}
+                  setIsReturning(false);
+                }}
+                className="mt-1 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+              >
+                Not you? Take the assessment instead
+              </button>
+            )}
           </motion.div>
-        ) : (
-          <motion.button
-            onClick={onStart}
-            className="mt-10 w-full max-w-sm h-14 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Take Free Assessment
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
-        )}
-
-        {!user && (
-          <motion.p
-            className="mt-4 text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            Already took the assessment?{" "}
-            <a href="/login" className="text-foreground underline underline-offset-4 hover:text-primary transition-colors">
-              Sign in
-            </a>
-          </motion.p>
         )}
       </section>
 
