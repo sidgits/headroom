@@ -185,22 +185,10 @@ export default function CalendarSection({ email }: { email: string }) {
             <Calendar className="w-5 h-5 text-primary mt-0.5" />
             <div>
               <h3 className="font-semibold">Connect your calendar</h3>
-              <p className="text-xs text-muted-foreground">Pick one — change anytime.</p>
+              <p className="text-xs text-muted-foreground">Upload an .ics file or paste a calendar URL.</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-3 gap-3">
-            <button onClick={connectGoogle} disabled={!!busy}
-              className="rounded-xl border border-border bg-background hover:border-primary/50 p-3 text-left transition-colors">
-              <div className="font-semibold text-sm">Google Calendar</div>
-              <p className="text-xs text-muted-foreground mt-1">Read-only access to your primary calendar.</p>
-              {busy === "google" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
-            </button>
-            <button onClick={connectOutlook} disabled={!!busy}
-              className="rounded-xl border border-border bg-background hover:border-primary/50 p-3 text-left transition-colors">
-              <div className="flex items-center gap-2 font-semibold text-sm"><OutlookIcon /> Outlook Calendar</div>
-              <p className="text-xs text-muted-foreground mt-1">Read-only access to your Outlook calendar.</p>
-              {busy === "outlook" && <Loader2 className="w-4 h-4 animate-spin mt-2" />}
-            </button>
+          <div className="grid sm:grid-cols-2 gap-3">
             <div className="rounded-xl border border-border bg-background p-3 space-y-2">
               <div className="font-semibold text-sm">ICS file or URL</div>
               <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
@@ -215,19 +203,12 @@ export default function CalendarSection({ email }: { email: string }) {
                   onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
               </div>
             </div>
-          </div>
-          {redirectUri && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs space-y-2">
-              <p className="font-semibold text-foreground">OAuth setup tip</p>
-              <p className="text-muted-foreground">Add this as an Authorized redirect URI in your provider's console (Google Cloud / Microsoft Entra):</p>
-              <div className="flex items-center gap-2 bg-background border border-border rounded p-2 font-mono text-[11px] break-all">
-                <span className="flex-1">{redirectUri}</span>
-                <button onClick={() => { navigator.clipboard.writeText(redirectUri); toast.success("Copied"); }}>
-                  <Copy className="w-3 h-3" />
-                </button>
-              </div>
+            <div className="rounded-xl border border-dashed border-border bg-background/40 p-3 flex flex-col justify-center">
+              <div className="text-sm font-semibold text-muted-foreground">Google / Outlook Calendar</div>
+              <p className="text-xs text-muted-foreground mt-1">Direct integration coming soon!</p>
             </div>
-          )}
+          </div>
+
         </div>
       ) : (
         <>
