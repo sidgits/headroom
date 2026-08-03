@@ -26,8 +26,6 @@ export async function isActiveSubscriber(
   supabase: SupabaseClient,
   email: string,
 ): Promise<boolean> {
-  // Corporate employees of contracted companies get full access automatically.
-  if (await isCorporateEmail(supabase, email)) return true;
 
   const { data } = await supabase
     .from("subscribers")
