@@ -66,16 +66,36 @@ export default function CalendarSection({ email }: { email: string }) {
 
   const runSync = async () => {
     setBusy("sync");
+    setSyncError(null);
     try {
-      const { error } = await supabase.functions.invoke("sync-calendar", { body: { email } });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: { email } });
       if (error) throw error;
+      const errs: string[] = data?.errors ?? [];
+      if (errs.length) setSyncError(errs[0]);
       await supabase.functions.invoke("analyze-clt", { body: { email } });
       await refresh();
-      toast.success("Calendar synced.");
+      if (errs.length) toast.error(errs[0]);
+      else toast.success(`Calendar synced — ${data?.events ?? 0} events.`);
     } catch (err) {
-      console.error(err); toast.error("Sync failed.");
+      console.error(err);
+      setSyncError("Sync failed. Please try disconnecting and reconnecting.");
+      toast.error("Sync failed.");
     } finally { setBusy(null); }
   };
+
+  const disconnect = async () => {
+    setBusy("disconnect");
+    try {
+      const { error } = await supabase.functions.invoke("disconnect-calendar", { body: { email } });
+      if (error) throw error;
+      setSyncError(null);
+      setConnections([]); setEvents([]); setClt([]);
+      await refresh();
+      toast.success("Calendar disconnected.");
+    } catch { toast.error("Could not disconnect."); }
+    finally { setBusy(null); }
+  };
+
 
   const connectGoogle = async () => {
     setBusy("google");
