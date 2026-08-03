@@ -23,9 +23,10 @@ Deno.serve(async (req) => {
     for (const conn of conns) {
       // Clear existing future events
       await sb.from("calendar_events").delete().eq("connection_id", conn.id);
-      const events = conn.provider === "google"
-        ? await syncGoogle(sb, conn)
-        : await syncIcs(sb, conn);
+      let events = 0;
+      if (conn.provider === "google") events = await syncGoogle(sb, conn);
+      else if (conn.provider === "outlook") events = await syncOutlook(sb, conn);
+      else events = await syncIcs(sb, conn);
       totalEvents += events;
       await sb.from("calendar_connections").update({ last_synced_at: new Date().toISOString() }).eq("id", conn.id);
     }
