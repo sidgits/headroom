@@ -56,44 +56,77 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
 
   const now = new Date();
   const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
-  const url = new URL("https://www.googleapis.com/calendar/v3/calendars/primary/events");
-  url.searchParams.set("timeMin", now.toISOString());
-  url.searchParams.set("timeMax", max.toISOString());
-  url.searchParams.set("singleEvents", "true");
-  url.searchParams.set("orderBy", "startTime");
-  url.searchParams.set("maxResults", "250");
 
-  const r = await fetch(url, { headers: { Authorization: `Bearer ${access}` } });
-  if (!r.ok) {
-    const body = await r.text();
-    console.error("google calendar fetch failed", body);
-    errors.push(providerMessage(r.status, body));
+  // Collect the calendars the user actually looks at (primary + any selected ones).
+  let calendarIds: string[] = ["primary"];
+  const listRes = await fetch(
+    "https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=reader&maxResults=250",
+    { headers: { Authorization: `Bearer ${access}` } },
+  );
+  if (listRes.ok) {
+    const list = await listRes.json();
+    const ids = (list.items ?? [])
+      .filter((c: { selected?: boolean; primary?: boolean }) => c.selected !== false || c.primary)
+      .map((c: { id: string }) => c.id)
+      .filter(Boolean);
+    if (ids.length) calendarIds = Array.from(new Set(ids));
+  } else {
+    const body = await listRes.text();
+    console.error("google calendarList failed", listRes.status, body);
+    errors.push(providerMessage(listRes.status, body));
     return 0;
   }
-  const j = await r.json();
-  const items = j.items || [];
-  const rows = items
-    .filter((it: { start?: { dateTime?: string } }) => it.start?.dateTime)
-    .map((it: {
-      id: string; summary?: string; description?: string;
-      start: { dateTime: string }; end: { dateTime: string };
+
+  const rows: Record<string, unknown>[] = [];
+  const seen = new Set<string>();
+  for (const calId of calendarIds) {
+    const url = new URL(
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`,
+    );
+    url.searchParams.set("timeMin", now.toISOString());
+    url.searchParams.set("timeMax", max.toISOString());
+    url.searchParams.set("singleEvents", "true");
+    url.searchParams.set("orderBy", "startTime");
+    url.searchParams.set("maxResults", "250");
+
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${access}` } });
+    if (!r.ok) {
+      const body = await r.text();
+      console.error("google calendar fetch failed", calId, r.status, body);
+      // A single inaccessible calendar shouldn't fail the whole sync.
+      if (calendarIds.length === 1) errors.push(providerMessage(r.status, body));
+      continue;
+    }
+    const j = await r.json();
+    for (const it of (j.items ?? []) as Array<{
+      id: string; iCalUID?: string; status?: string; summary?: string; description?: string;
+      start: { dateTime?: string }; end: { dateTime?: string };
       attendees?: unknown[]; recurringEventId?: string; location?: string;
-    }) => ({
-      connection_id: conn.id,
-      email: conn.email,
-      external_id: it.id,
-      title: it.summary ?? "(no title)",
-      description: it.description ?? null,
-      starts_at: it.start.dateTime,
-      ends_at: it.end.dateTime,
-      attendee_count: Array.isArray(it.attendees) ? it.attendees.length : 0,
-      is_recurring: !!it.recurringEventId,
-      location: it.location ?? null,
-      source: "google",
-    }));
+    }>) {
+      if (it.status === "cancelled") continue;
+      if (!it.start?.dateTime || !it.end?.dateTime) continue;
+      const key = `${it.iCalUID ?? it.id}|${it.start.dateTime}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      rows.push({
+        connection_id: conn.id,
+        email: conn.email,
+        external_id: it.id,
+        title: it.summary ?? "(no title)",
+        description: it.description ?? null,
+        starts_at: it.start.dateTime,
+        ends_at: it.end.dateTime,
+        attendee_count: Array.isArray(it.attendees) ? it.attendees.length : 0,
+        is_recurring: !!it.recurringEventId,
+        location: it.location ?? null,
+        source: "google",
+      });
+    }
+  }
   if (rows.length) await sb.from("calendar_events").insert(rows);
   return rows.length;
 }
+
 
 async function refreshAccess(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<string | null> {
   const refresh = conn.google_refresh_token as string | null;
