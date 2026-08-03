@@ -1,6 +1,5 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import Footer from "@/components/Footer";
 
 const Privacy = () => {
   return (
@@ -28,25 +27,25 @@ const Privacy = () => {
           </header>
 
           <section className="space-y-3 text-sm leading-relaxed">
-            <p>
-              This Privacy Policy explains how Digital Lexicon Corp ("Headroom", "we", "us", or "our") collects,
-              uses, and protects your personal information when you use the Headroom cognitive load assessment
-              platform (the "Service"), available at headroomapp.co. We are committed to processing your data in
-              compliance with the EU General Data Protection Regulation (GDPR), the UK GDPR, and the California
-              Consumer Privacy Act as amended by the CPRA (collectively, "CCPA").
+          <p>
+              This Privacy Policy explains how Headroom ("we", "us", or "our") collects, uses, and protects your
+              personal information when you use the Headroom cognitive load assessment platform (the "Service"),
+              available at headroomapp.co. We are committed to processing your data in compliance with the EU General
+              Data Protection Regulation (GDPR), the UK GDPR, and the California Consumer Privacy Act as amended by
+              the CPRA (collectively, "CCPA").
             </p>
             <p>
-              This page is maintained by Digital Lexicon Corp to answer common security and privacy questions about
-              Headroom. It describes our data practices and the controls available to you. Our hosting and service
-              providers process data only on our behalf and under contractual data-protection terms.
+              This page is maintained by Headroom to answer common security and privacy questions. It describes our
+              data practices and the controls available to you. Our hosting and service providers process data only on
+              our behalf and under contractual data-protection terms.
             </p>
           </section>
 
           <section className="space-y-2">
             <h2 className="text-xl font-semibold">1. Data Controller</h2>
             <p className="text-sm leading-relaxed">
-              Digital Lexicon Corp, registered in Delaware, USA, is the data controller responsible for your
-              personal data. For any privacy-related inquiries, contact us at{" "}
+              Headroom, based in the United States, is the data controller responsible for your personal data. For any
+              privacy-related inquiries, contact us at{" "}
               <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
                 sid@headroomapp.co
               </a>
@@ -68,7 +67,7 @@ const Privacy = () => {
               </li>
               <li>
                 <strong>Service</strong> — the Headroom website, quiz, dashboard, and any related features,
-                content, or applications offered by Digital Lexicon Corp.
+                content, or applications offered by Headroom.
               </li>
               <li>
                 <strong>You / User</strong> — any individual who accesses or uses the Service.
@@ -173,9 +172,8 @@ const Privacy = () => {
           <section className="space-y-2">
             <h2 className="text-xl font-semibold">7. International Data Transfers</h2>
             <p className="text-sm leading-relaxed">
-              Digital Lexicon Corp is based in the United States. Personal Data collected through the Service may
-              be transferred to, stored, or processed in the United States or other jurisdictions where our
-              subprocessors operate.
+              Headroom is based in the United States. Personal Data collected through the Service may be transferred
+              to, stored, or processed in the United States or other jurisdictions where our subprocessors operate.
             </p>
             <p className="text-sm leading-relaxed">
               Where Personal Data is transferred outside the European Economic Area (EEA), the UK, or Switzerland,
@@ -305,7 +303,7 @@ const Privacy = () => {
           <section className="space-y-2">
             <h2 className="text-xl font-semibold">14. Contact</h2>
             <p className="text-sm leading-relaxed">
-              Digital Lexicon Corp · Delaware, USA · {" "}
+              Headroom · USA · {" "}
               <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
                 sid@headroomapp.co
               </a>
@@ -313,8 +311,6 @@ const Privacy = () => {
           </section>
         </article>
       </main>
-
-      <Footer />
     </div>
   );
 };

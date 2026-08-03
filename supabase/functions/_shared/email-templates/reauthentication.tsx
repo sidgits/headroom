@@ -29,7 +29,6 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
           This code will expire shortly. If you didn't request this, you can
           safely ignore this email.
         </Text>
-        <Text style={companyFooter}>Headroom is a Digital Lexicon Corp Production.</Text>
       </Container>
     </Body>
   </Html>
@@ -59,4 +58,3 @@ const codeStyle = {
   margin: '0 0 30px',
 }
 const footer = { fontSize: '12px', color: '#999999', margin: '32px 0 0' }
-const companyFooter = { fontSize: '11px', color: '#bbbbbb', margin: '16px 0 0' }

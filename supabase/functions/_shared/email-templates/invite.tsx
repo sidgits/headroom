@@ -46,7 +46,6 @@ export const InviteEmail = ({
           If you weren't expecting this invitation, you can safely ignore this
           email.
         </Text>
-        <Text style={companyFooter}>Headroom is a Digital Lexicon Corp Production.</Text>
       </Container>
     </Body>
   </Html>
@@ -79,4 +78,3 @@ const button = {
   fontWeight: 'bold' as const,
 }
 const footer = { fontSize: '12px', color: '#999999', margin: '32px 0 0' }
-const companyFooter = { fontSize: '11px', color: '#bbbbbb', margin: '16px 0 0' }

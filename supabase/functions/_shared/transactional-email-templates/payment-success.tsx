@@ -39,7 +39,6 @@ const PaymentSuccessEmail = ({ name, amount, dashboardUrl }: Props) => (
           A Stripe receipt will arrive separately with your invoice details.
         </Text>
         <Text style={contactFooter}>Contact — sid@headroomapp.co</Text>
-        <Text style={companyFooter}>Headroom is a Digital Lexicon Corp Production.</Text>
       </Container>
     </Body>
   </Html>
@@ -98,15 +97,6 @@ const footer: React.CSSProperties = {
   lineHeight: 1.5,
   color: '#666666',
   margin: '24px 0 8px',
-}
-
-const companyFooter: React.CSSProperties = {
-  fontSize: '12px',
-  color: '#999999',
-  margin: '8px 0 0',
-  borderTop: '1px solid #eeeeee',
-  paddingTop: '16px',
-  textAlign: 'center',
 }
 
 const contactFooter: React.CSSProperties = {

@@ -9,7 +9,6 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import Footer from "@/components/Footer";
 
 interface AssessmentCompletion {
   id: string;
@@ -255,7 +254,6 @@ const Admin = () => {
           )}
         </div>
       </div>
-      <Footer />
     </>
   );
 };
