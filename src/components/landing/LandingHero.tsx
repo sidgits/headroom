@@ -258,6 +258,20 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
             <ArrowRight className="w-5 h-5" />
           </motion.button>
         )}
+
+        {!user && (
+          <motion.p
+            className="mt-4 text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            Already took the assessment?{" "}
+            <a href="/login" className="text-foreground underline underline-offset-4 hover:text-primary transition-colors">
+              Sign in
+            </a>
+          </motion.p>
+        )}
       </section>
 
 
