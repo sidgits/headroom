@@ -20,7 +20,10 @@ Deno.serve(async (req) => {
   const back = (status: string) =>
     Response.redirect(`${origin}/dashboard/calendar?google=${status}`, 302);
 
-  if (err || !code || !email) return back("error");
+  if (err || !code || !email) {
+    console.error("oauth callback bad request", { err, hasCode: !!code, hasEmail: !!email });
+    return back("error");
+  }
 
   try {
     const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
