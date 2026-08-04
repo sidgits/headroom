@@ -381,29 +381,7 @@ const Evolution = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "Behavioral OS — How Headroom Evolves | Headroom";
     document.body.classList.add("evolution-page");
-    const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
-      let el = document.querySelector(`meta[${attr}="${name}"]`);
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-    };
-    setMeta(
-      "description",
-      "Headroom evolves into a Behavioral OS: the Behavioral Equation of Profit turns cognitive load and delivery-risk signals into enterprise margin.",
-    );
-    setMeta("og:title", "Behavioral OS — How Headroom Evolves", "property");
-    setMeta(
-      "og:description",
-      "How human endeavour translates into enterprise profitability in a large services organisation.",
-      "property",
-    );
-    setMeta("og:type", "website", "property");
-    setMeta("twitter:card", "summary_large_image");
     return () => {
       document.body.classList.remove("evolution-page");
     };
@@ -411,6 +389,29 @@ const Evolution = () => {
 
   return (
     <div className="light min-h-screen bg-background">
+      <Helmet>
+        <title>Behavioral OS — How Headroom Evolves | Headroom</title>
+        <meta
+          name="description"
+          content="Headroom evolves into a Behavioral OS: the Behavioral Equation of Profit turns cognitive load and delivery-risk signals into enterprise margin."
+        />
+        <link rel="canonical" href="https://headroomapp.co/evolution" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://headroomapp.co/evolution" />
+        <meta property="og:title" content="Behavioral OS — How Headroom Evolves" />
+        <meta
+          property="og:description"
+          content="How human endeavour translates into enterprise profitability in a large services organisation."
+        />
+        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Behavioral OS — How Headroom Evolves" />
+        <meta
+          name="twitter:description"
+          content="How human endeavour translates into enterprise profitability in a large services organisation."
+        />
+        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
+      </Helmet>
       {/* Hero */}
       <header className="relative overflow-hidden">
         <div
