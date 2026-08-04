@@ -1,5 +1,6 @@
 import * as React from 'npm:react@18.3.1'
 import { template as paymentSuccess } from './payment-success.tsx'
+import { template as earlyInterestNotification } from './early-interest-notification.tsx'
 
 export interface TemplateEntry {
   component: React.ComponentType<any>
@@ -11,4 +12,5 @@ export interface TemplateEntry {
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'payment-success': paymentSuccess,
+  'early-interest-notification': earlyInterestNotification,
 }
