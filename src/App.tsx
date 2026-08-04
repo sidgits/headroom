@@ -60,7 +60,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Helmet>
-        <title>Headroom — Cognitive Load Assessment</title>
         <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Headroom - Take Control of your Burnout & Cognitive Load" />
