@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -58,6 +59,17 @@ const AuthLogger = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <Helmet>
+        <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Headroom - Take Control of your Burnout & Cognitive Load" />
+        <meta property="og:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
+        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Headroom - Take Control of your Burnout & Cognitive Load" />
+        <meta name="twitter:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
+        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
+      </Helmet>
       <Toaster />
       <Sonner />
       <AuthLogger />
