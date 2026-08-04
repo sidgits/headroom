@@ -189,11 +189,13 @@ const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
     if (!validate()) return;
 
     setIsSubmitting(true);
-    const { error } = await supabase.from("early_interest_registrations").insert({
-      name: formData.name.trim(),
-      email: formData.email.trim().toLowerCase(),
-      company: formData.company.trim(),
-    });
+    const { error } = await supabase
+      .from("early_interest_registrations" as any)
+      .insert({
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        company: formData.company.trim(),
+      } as any);
 
     setIsSubmitting(false);
     if (error) {
