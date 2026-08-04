@@ -51,7 +51,7 @@ export const template = {
   subject: (data: Record<string, any>) =>
     `New early interest — ${data?.company || data?.name || 'Behavioral OS'}`,
   displayName: 'Early interest notification',
-  to: 'hello@headroomapp.co',
+  to: 'sid@headroomapp.co',
   previewData: {
     name: 'Jane Cooper',
     email: 'jane@acme.com',
