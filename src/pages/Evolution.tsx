@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
   Activity,
@@ -14,7 +14,13 @@ import {
   Users,
   ShieldAlert,
   LineChart,
+  X,
+  CheckCircle2,
+  Building2,
+  Mail,
+  User,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
