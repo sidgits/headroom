@@ -20,6 +20,8 @@ import {
   Building2,
   Mail,
   User,
+  Crosshair,
+  Sigma,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -453,10 +455,10 @@ const Evolution = () => {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed"
           >
-            An operating system for how human endeavour translates into enterprise
-            profitability. It reads behaviour at the level of the individual, aggregates it
-            across delivery, and prices it in the language the business already speaks:
-            margin.
+            Traditional corporate accounting treats human capital as a static, linear
+            expense. Knowledge work does not behave that way — it runs on finite mental
+            energy. Profitability is a lagging indicator of aligned human behaviour, and
+            the Behavioral OS is the system that measures it.
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
@@ -465,22 +467,93 @@ const Evolution = () => {
             className="mt-10 rounded-2xl border border-primary/30 bg-card/60 backdrop-blur p-6 md:p-8"
           >
             <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
-              The engine
+              The engine — the refined formula
             </p>
             <p className="font-heading text-xl md:text-3xl text-foreground leading-snug">
               Π = (M<sub className="text-sm text-muted-foreground">discipline</sub> × R
-              <sub className="text-sm text-muted-foreground">ideal</sub>) − (C
+              <sub className="text-sm text-muted-foreground">ideal</sub>) − [C
               <sub className="text-sm text-muted-foreground">baseline</sub> + L
-              <sub className="text-sm text-muted-foreground">shadow</sub> + H
-              <sub className="text-sm text-muted-foreground">drag</sub>)
+              <sub className="text-sm text-muted-foreground">shadow</sub> + (H
+              <sub className="text-sm text-muted-foreground">drag</sub> × W
+              <sub className="text-sm text-muted-foreground">scope</sub>)]
             </p>
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-              The Behavioral Equation of Profit. Profit is a lagging indicator of aligned
-              human behaviour — every term on the right is something the OS can measure.
+              The Behavioral Equation of Profit, refined edition. Every term on the right
+              is something the OS can measure — and the scope weight factor keeps
+              behavioural cost matched to the revenue stream being evaluated.
             </p>
           </motion.div>
         </div>
       </header>
+
+      {/* Variable definitions */}
+      <Section
+        eyebrow="The vocabulary"
+        title="Seven variables that turn behaviour into a ledger"
+      >
+        <div className="overflow-hidden rounded-2xl border border-border">
+          {[
+            {
+              symbol: "Π",
+              name: "Behavioral Profit",
+              icon: Sigma,
+              def: "The true financial surplus remaining after accounting for real-world human behaviour across the project lifecycle. Currency/time.",
+            },
+            {
+              symbol: "M_discipline",
+              name: "Management Discipline",
+              icon: Scale,
+              def: "A dimensionless multiplier (geometric mean of three sub-scores ≤ 1.0) for how effectively leadership holds pricing integrity, accurate scoping and operational boundaries.",
+            },
+            {
+              symbol: "R_ideal",
+              name: "Ideal Revenue",
+              icon: TrendingUp,
+              def: "The maximum value-based card-rate revenue a project should command under disciplined scoping, before client compromises or discounts.",
+            },
+            {
+              symbol: "C_baseline",
+              name: "Baseline Cost",
+              icon: Users,
+              def: "Visible, fixed accounting costs already on the balance sheet: direct salaries, hardware, licences and basic overhead.",
+            },
+            {
+              symbol: "L_shadow",
+              name: "Shadow Labor",
+              icon: Layers,
+              def: "Unbilled, untracked hours spent resolving operational friction, vague briefs, miscommunication and out-of-scope adjustments at execution.",
+            },
+            {
+              symbol: "H_drag",
+              name: "Cognitive Drag",
+              icon: Gauge,
+              def: "The financial penalty of an exhausted workforce: velocity degradation from context-switching inside deep work, plus amortised replacement cost of burnout-driven churn.",
+            },
+            {
+              symbol: "W_scope",
+              name: "Scope Weight Factor",
+              icon: Crosshair,
+              def: "A dimensionless scaling factor (≤ 1.0) matching behavioural cost to the revenue stream measured: localized statutory revenue ÷ total ecosystem portfolio value.",
+            },
+          ].map((row, i) => (
+            <div
+              key={row.symbol}
+              className={`grid md:grid-cols-[220px_1fr] gap-2 md:gap-6 p-5 bg-card/50 ${
+                i > 0 ? "border-t border-border" : ""
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <row.icon className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-heading text-sm text-foreground">{row.symbol}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{row.name}</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{row.def}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
 
       {/* Where we are today */}
       <Section eyebrow="Layer one — today" title="Headroom measures the individual mind at work">
@@ -551,76 +624,215 @@ const Evolution = () => {
         <div className="mt-6 flex flex-col items-center gap-3 text-muted-foreground">
           <ArrowDown className="w-5 h-5 text-primary" />
           <p className="text-sm text-center max-w-xl">
-            Individual cognitive signal is aggregated to team, team to engagement,
-            engagement to portfolio — each level converted at a blended cost rate into
-            currency.
+            Workflow telemetry is continuously cross-referenced with the organisation's
+            fully loaded blended cost rate per hour — individual to team, team to
+            engagement, engagement to portfolio.
           </p>
         </div>
       </Section>
 
-      {/* The engine mapping */}
+      {/* Algorithmic conversions */}
       <Section
-        eyebrow="Layer three — the engine"
-        title="Every behavioural signal maps to a term in the equation"
+        eyebrow="Layer three — the conversions"
+        title="How abstract behaviour lands on a standard P&L"
       >
-        <div className="overflow-hidden rounded-2xl border border-border">
+        <div className="grid md:grid-cols-2 gap-4">
           {[
             {
-              term: "M_discipline",
-              label: "Management discipline multiplier",
+              n: "01",
               icon: Scale,
-              source:
-                "MarginMix commercial + coordination risk, Headroom leadership archetype mix",
+              title: "Management Discipline",
+              formula:
+                "M_discipline = ∛(Scope Adherence × Pricing Integrity × Boundary Holding)",
+              body: "Three sub-scores bounded 0–1.0: delivered vs. contracted scope, invoiced vs. rate-card rate, on-scope vs. total hours logged. A geometric mean, so a collapse in any single dimension pulls the whole multiplier down instead of being averaged away.",
             },
             {
-              term: "R_ideal",
-              label: "Value-based revenue ceiling",
+              n: "02",
               icon: TrendingUp,
-              source: "Engagement pricing model and scope definition",
+              title: "Ideal Revenue",
+              formula: "R_ideal = Contracted Capacity Hours × Value-Based Card Rate",
+              body: "The undamaged revenue ceiling, calculated purely from market and contract data before human friction or procurement discounts are subtracted.",
             },
             {
-              term: "C_baseline",
-              label: "Visible fixed cost",
-              icon: Users,
-              source: "Salaries, tooling, overhead — already in the ledger",
-            },
-            {
-              term: "L_shadow",
-              label: "Shadow labour",
+              n: "03",
               icon: Layers,
-              source:
-                "Headroom extraneous load × blended rate — unbilled hours from scope creep and friction",
+              title: "Shadow Labor",
+              formula:
+                "L_shadow = [Σ(Unscoped Deliverables × Baseline Production Hours) + Excess Meeting Hours] × Blended Hourly Cost Rate",
+              body: "Monitors the unbilled effort required to fix systemic workflow friction. Hours logged as shadow labour are strictly mutually exclusive from deep focus blocks, so nothing is double-counted.",
             },
             {
-              term: "H_drag",
-              label: "Cognitive drag",
+              n: "04",
               icon: Gauge,
-              source:
-                "Burnout risk markers, focus-recovery tax and churn probability, priced",
+              title: "Cognitive Drag",
+              formula:
+                "H_drag = (Focus Disruptions in T_deep × 0.38 h × Blended Rate) + [(90-Day Churn Count × Replacement Cost) ÷ 520 h] × Blended Rate",
+              body: "Captures attention fragmentation and chronic burnout that predicts churn. Switching penalties apply only inside deep work blocks; the churn penalty is amortised over a 90-day onboarding stabilisation window of 520 working hours.",
             },
-          ].map((row, i) => (
+          ].map((c) => (
             <div
-              key={row.term}
-              className={`grid md:grid-cols-[200px_1fr] gap-2 md:gap-6 p-5 bg-card/50 ${
-                i > 0 ? "border-t border-border" : ""
-              }`}
+              key={c.n}
+              className="rounded-2xl border border-border bg-card/60 backdrop-blur p-6"
             >
-              <div className="flex items-center gap-3">
-                <row.icon className="w-4 h-4 text-accent shrink-0" />
-                <span className="font-heading text-sm text-foreground">{row.term}</span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
+                  <c.icon className="w-5 h-5 text-accent" />
+                </div>
+                <span className="text-xs tracking-[0.2em] text-muted-foreground">
+                  {c.n}
+                </span>
+                <h3 className="font-heading text-lg font-semibold text-foreground">
+                  {c.title}
+                </h3>
               </div>
-              <div>
-                <p className="text-sm text-foreground">{row.label}</p>
-                <p className="text-sm text-muted-foreground mt-1">{row.source}</p>
-              </div>
+              <p className="rounded-xl bg-background/70 border border-border/70 px-4 py-3 font-mono text-xs leading-relaxed text-foreground/90 break-words">
+                {c.formula}
+              </p>
+              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                {c.body}
+              </p>
             </div>
           ))}
         </div>
-        <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
-          The result is behavioural profit — the surplus that survives after discipline
-          erosion, shadow labour and cognitive drag are subtracted. In a worked example,
-          a naive $21,000 profit resolves to $10,395 once behaviour is priced.
+      </Section>
+
+      {/* Worked example */}
+      <Section
+        eyebrow="Worked example — enterprise ecosystem"
+        title="A $20M localized revenue line inside a $1.7B portfolio"
+      >
+        <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-3xl">
+          A localized $20,000,000 statutory revenue line, managed by a 37,000-person
+          ecosystem that handles $1.7 billion in total cross-border contract portfolio
+          value. The scope weight factor isolates the behavioural cost that actually
+          belongs to this segment.
         </p>
+
+        <div className="rounded-2xl border border-primary/30 bg-card/60 backdrop-blur p-6 mb-6 text-center">
+          <p className="font-heading text-lg md:text-xl text-foreground">
+            W<sub className="text-sm text-muted-foreground">scope</sub> = $20,000,000 ÷
+            $1,700,000,000 = 0.0117 (1.17%)
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-border">
+          {[
+            ["R_ideal", "$25,000,000", "Portfolio capacity at full un-discounted value-based rate card"],
+            ["M_discipline", "0.823", "Geometric mean of Scope (0.85), Pricing (0.80), Boundaries (0.82)"],
+            ["M_discipline × R_ideal", "$20,575,000", "Realized revenue inflow hitting the local entity"],
+            ["C_baseline", "$16,000,000", "Visible balance sheet payroll, tools and overhead for this segment"],
+            ["L_shadow", "$78,300", "De-duplicated unbilled hours spent troubleshooting for local clients"],
+            ["H_drag (total system)", "$21,608,000", "Ecosystem switching tax ($7.73M) plus talent churn ($13.87M)"],
+            ["H_drag × W_scope", "$252,813", "The isolated cognitive damage affecting just this revenue segment"],
+          ].map(([term, value, basis], i) => (
+            <div
+              key={term}
+              className={`grid md:grid-cols-[220px_160px_1fr] gap-1 md:gap-6 p-5 bg-card/50 ${
+                i > 0 ? "border-t border-border" : ""
+              }`}
+            >
+              <p className="font-heading text-sm text-foreground">{term}</p>
+              <p className="text-sm text-accent font-medium">{value}</p>
+              <p className="text-sm text-muted-foreground">{basis}</p>
+            </div>
+          ))}
+          <div className="grid md:grid-cols-[220px_160px_1fr] gap-1 md:gap-6 p-5 border-t border-primary/30 bg-primary/10">
+            <p className="font-heading text-sm font-semibold text-foreground">
+              Π — Behavioral Profit
+            </p>
+            <p className="text-sm font-semibold text-foreground">$4,243,887</p>
+            <p className="text-sm text-muted-foreground">
+              $20,575,000 − [$16,000,000 + $78,300 + $252,813]
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* Reconciliation */}
+      <Section
+        eyebrow="Reconciliation"
+        title="What the traditional ledger cannot see"
+      >
+        <div className="overflow-hidden rounded-2xl border border-border">
+          <div className="grid grid-cols-[1fr_120px_120px] md:grid-cols-[1fr_200px_200px] gap-3 md:gap-6 p-5 bg-secondary/60 border-b border-border">
+            <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground">
+              Ledger item
+            </p>
+            <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground text-right">
+              Traditional
+            </p>
+            <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground text-right">
+              Behavioral
+            </p>
+          </div>
+          {[
+            ["Discipline-adjusted inflow", "$20,575,000", "$20,575,000", true],
+            ["Visible balance sheet costs (C_baseline)", "−$16,000,000", "−$16,000,000", false],
+            ["Traditional net profit baseline", "+$4,575,000", "—", true],
+            ["Invisible shadow labour (L_shadow)", "Hidden in salaries", "−$78,300", false],
+            ["Systemic cognitive drag (H_drag × W_scope)", "Hidden in HR/salaries", "−$252,813", false],
+          ].map(([label, trad, beh, bold], i) => (
+            <div
+              key={label as string}
+              className={`grid grid-cols-[1fr_120px_120px] md:grid-cols-[1fr_200px_200px] gap-3 md:gap-6 p-5 bg-card/50 ${
+                i > 0 ? "border-t border-border" : ""
+              }`}
+            >
+              <p
+                className={`text-sm ${bold ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+              >
+                {label}
+              </p>
+              <p
+                className={`text-sm text-right ${bold ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+              >
+                {trad}
+              </p>
+              <p
+                className={`text-sm text-right ${bold ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+              >
+                {beh}
+              </p>
+            </div>
+          ))}
+          <div className="grid grid-cols-[1fr_120px_120px] md:grid-cols-[1fr_200px_200px] gap-3 md:gap-6 p-5 border-t border-primary/30 bg-primary/10">
+            <p className="text-sm font-semibold text-foreground">
+              Π — true behavioural profit
+            </p>
+            <p className="text-sm text-right text-muted-foreground">—</p>
+            <p className="text-sm text-right font-semibold text-foreground">
+              +$4,243,887
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid md:grid-cols-2 gap-4">
+          <div className="rounded-2xl border border-border bg-card/60 backdrop-blur p-6">
+            <p className="text-xs tracking-[0.2em] uppercase text-accent mb-3">
+              Mathematical proof
+            </p>
+            <p className="font-mono text-xs leading-relaxed text-muted-foreground">
+              $4,575,000 − $4,243,887 = $331,113 total leakage
+              <br />
+              $78,300 + $252,813 = $331,113 total leakage
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card/60 backdrop-blur p-6">
+            <p className="text-xs tracking-[0.2em] uppercase text-accent mb-3">
+              The ledger narrative
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Below the surface of the ledger, $331,113 is destroyed by human friction —
+              $78,300 in unbilled reactive shadow labour and $252,813 in cognitive fatigue
+              from focus disruption and turnover. Scaled across the full $1.7 billion
+              managed contract value, the same friction accounts for{" "}
+              <span className="text-foreground font-medium">
+                $28.2 million of annual enterprise value destruction
+              </span>
+              .
+            </p>
+          </div>
+        </div>
       </Section>
 
       {/* Enterprise view */}
@@ -637,9 +849,9 @@ const Evolution = () => {
             Same inputs, same verdict, every time. Auditable rule cascades — the standard
             both Headroom and MarginMix already hold themselves to.
           </Card>
-          <Card icon={Scale} title="Pricing that reflects reality">
-            Delivery complexity and cognitive drag are priced into the bid, instead of
-            being discovered in month four.
+          <Card icon={Crosshair} title="Scoped, not double-counted">
+            The scope weight factor and mutually exclusive hour accounting keep every
+            behavioural cost attributed once, to the revenue line it actually damages.
           </Card>
           <Card icon={ShieldAlert} title="Intervention before attrition">
             Burnout markers become an operating metric with a currency value attached —
@@ -667,6 +879,7 @@ const Evolution = () => {
           </button>
         </div>
       </section>
+
 
       <EarlyInterestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
