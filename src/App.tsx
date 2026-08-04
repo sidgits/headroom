@@ -59,6 +59,18 @@ const AuthLogger = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <Helmet>
+        <title>Headroom — Cognitive Load Assessment</title>
+        <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Headroom - Take Control of your Burnout & Cognitive Load" />
+        <meta property="og:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
+        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Headroom - Take Control of your Burnout & Cognitive Load" />
+        <meta name="twitter:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
+        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
+      </Helmet>
       <Toaster />
       <Sonner />
       <AuthLogger />
