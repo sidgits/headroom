@@ -105,7 +105,7 @@ const Evolution = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="light min-h-screen bg-background">
       {/* Hero */}
       <header className="relative overflow-hidden">
         <div

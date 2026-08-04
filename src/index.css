@@ -95,6 +95,40 @@
     --deep-orange: 22 100% 56%;
     --golden: 36 85% 55%;
   }
+
+  /* Light theme — warm paper palette for landing pages */
+  .light {
+    --background: 36 33% 97%;
+    --foreground: 24 14% 12%;
+    --card: 36 30% 94%;
+    --card-foreground: 24 14% 12%;
+    --popover: 36 30% 94%;
+    --popover-foreground: 24 14% 12%;
+    --primary: 28 56% 46%;
+    --primary-foreground: 30 20% 96%;
+    --secondary: 32 25% 90%;
+    --secondary-foreground: 24 14% 12%;
+    --muted: 32 20% 88%;
+    --muted-foreground: 24 10% 42%;
+    --accent: 22 100% 56%;
+    --accent-foreground: 24 14% 12%;
+    --destructive: 4 70% 50%;
+    --destructive-foreground: 30 20% 96%;
+    --border: 28 25% 82%;
+    --input: 28 25% 82%;
+    --ring: 28 56% 46%;
+    --sidebar-background: 36 30% 94%;
+    --sidebar-foreground: 24 14% 12%;
+    --sidebar-primary: 28 56% 46%;
+    --sidebar-primary-foreground: 30 20% 96%;
+    --sidebar-accent: 32 25% 90%;
+    --sidebar-accent-foreground: 24 14% 12%;
+    --sidebar-border: 28 25% 82%;
+    --sidebar-ring: 28 56% 46%;
+    --warm-red: 16 78% 52%;
+    --deep-orange: 22 100% 56%;
+    --golden: 36 85% 55%;
+  }
 }
 
 @layer base {
