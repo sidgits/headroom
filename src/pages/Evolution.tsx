@@ -638,8 +638,8 @@ const Evolution = () => {
             Be the first to see the Behavioral OS
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            We are opening early access to enterprise teams. Register your interest and we
-            will reach out when the first portfolio pilots go live.
+            We are building the system for enterprise teams. Register your interest and we
+            will reach out when the beta version goes live.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
