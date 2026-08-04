@@ -20,6 +20,8 @@ import {
   Building2,
   Mail,
   User,
+  Crosshair,
+  Sigma,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
