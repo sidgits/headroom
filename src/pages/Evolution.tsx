@@ -639,15 +639,17 @@ const Evolution = () => {
             We are opening early access to enterprise teams. Register your interest and we
             will reach out when the first portfolio pilots go live.
           </p>
-          <a
-            href="mailto:hello@headroomapp.co?subject=Register%20Early%20Interest%20%E2%80%94%20Behavioral%20OS"
+          <button
+            onClick={() => setIsModalOpen(true)}
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
           >
             Register Early Interest
             <ArrowRight className="w-4 h-4" />
-          </a>
+          </button>
         </div>
       </section>
+
+      <EarlyInterestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };
