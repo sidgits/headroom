@@ -229,11 +229,9 @@ const Dashboard = () => {
 
   if (loading || recoveringIdentity) {
     return (
-      <div className="h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground text-sm">
-          {recoveringIdentity ? "Finalizing your subscription…" : "Loading…"}
-        </div>
-      </div>
+      <DashboardLoading
+        message={recoveringIdentity ? "Finalizing your subscription…" : undefined}
+      />
     );
   }
 
