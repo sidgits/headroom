@@ -84,7 +84,284 @@ const Card = ({
   </div>
 );
 
+const GENERIC_EMAIL_DOMAINS = new Set([
+  "gmail.com",
+  "googlemail.com",
+  "yahoo.com",
+  "yahoo.co.uk",
+  "yahoo.in",
+  "hotmail.com",
+  "outlook.com",
+  "live.com",
+  "live.co.uk",
+  "msn.com",
+  "aol.com",
+  "icloud.com",
+  "me.com",
+  "mac.com",
+  "qq.com",
+  "163.com",
+  "126.com",
+  "protonmail.com",
+  "proton.me",
+  "pm.me",
+  "mail.com",
+  "yandex.com",
+  "yandex.ru",
+  "zoho.com",
+  "gmx.com",
+  "gmx.net",
+  "hey.com",
+  "fastmail.com",
+  "fastmail.fm",
+  "tutanota.com",
+  "tutanota.de",
+  "runbox.com",
+  "hushmail.com",
+  "lycos.com",
+  "rediffmail.com",
+  "sify.com",
+]);
+
+const isCompanyEmail = (email: string) => {
+  const match = email.toLowerCase().trim().match(/@([^@]+)$/);
+  if (!match) return false;
+  const domain = match[1];
+  if (GENERIC_EMAIL_DOMAINS.has(domain)) return false;
+  // Also block subdomains of generic providers, e.g. mail.google.com
+  const parts = domain.split(".");
+  for (let i = 0; i < parts.length - 1; i++) {
+    const sub = parts.slice(i).join(".");
+    if (GENERIC_EMAIL_DOMAINS.has(sub)) return false;
+  }
+  return true;
+};
+
+interface EarlyInterestModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
+  const [formData, setFormData] = useState({ name: "", email: "", company: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({ name: "", email: "", company: "" });
+      setErrors({});
+      setIsSubmitting(false);
+      setIsSuccess(false);
+    }
+  }, [isOpen]);
+
+  const validate = () => {
+    const nextErrors: Record<string, string> = {};
+    if (!formData.name.trim()) {
+      nextErrors.name = "Name is required";
+    } else if (formData.name.trim().length < 2) {
+      nextErrors.name = "Name must be at least 2 characters";
+    }
+
+    const email = formData.email.trim().toLowerCase();
+    if (!email) {
+      nextErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextErrors.email = "Please enter a valid email address";
+    } else if (!isCompanyEmail(email)) {
+      nextErrors.email = "Please use your company email address";
+    }
+
+    if (!formData.company.trim()) {
+      nextErrors.company = "Company name is required";
+    } else if (formData.company.trim().length < 2) {
+      nextErrors.company = "Company name must be at least 2 characters";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+    const { error } = await supabase.from("early_interest_registrations").insert({
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      company: formData.company.trim(),
+    });
+
+    setIsSubmitting(false);
+    if (error) {
+      if (error.message?.includes("duplicate")) {
+        setErrors({ email: "This email has already registered" });
+      } else {
+        setErrors({ submit: "Something went wrong. Please try again." });
+      }
+    } else {
+      setIsSuccess(true);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-3xl border border-border bg-card/95 backdrop-blur-xl p-8 shadow-2xl"
+          >
+            <button
+              onClick={onClose}
+              className="absolute right-4 top-4 p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {isSuccess ? (
+              <div className="text-center py-6">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-5">
+                  <CheckCircle2 className="w-7 h-7 text-emerald-600" />
+                </div>
+                <h3 className="font-heading text-2xl font-semibold text-foreground mb-3">
+                  You&apos;re on the list
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Thank you for registering early interest. We&apos;ll reach out when the
+                  first Behavioral OS portfolio pilots go live.
+                </p>
+                <button
+                  onClick={onClose}
+                  className="mt-8 inline-flex items-center rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3 className="font-heading text-2xl font-semibold text-foreground mb-2">
+                  Register early interest
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Be the first to pilot the Behavioral OS with your enterprise team.
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="ei-name"
+                      className="block text-xs font-medium text-foreground mb-1.5"
+                    >
+                      Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        id="ei-name"
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, name: e.target.value }))
+                        }
+                        placeholder="Your full name"
+                        className="w-full rounded-xl border border-border bg-background/80 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                      />
+                    </div>
+                    {errors.name && (
+                      <p className="mt-1.5 text-xs text-red-500">{errors.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="ei-email"
+                      className="block text-xs font-medium text-foreground mb-1.5"
+                    >
+                      Company email
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        id="ei-email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, email: e.target.value }))
+                        }
+                        placeholder="you@company.com"
+                        className="w-full rounded-xl border border-border bg-background/80 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="mt-1.5 text-xs text-red-500">{errors.email}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="ei-company"
+                      className="block text-xs font-medium text-foreground mb-1.5"
+                    >
+                      Company
+                    </label>
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        id="ei-company"
+                        type="text"
+                        value={formData.company}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, company: e.target.value }))
+                        }
+                        placeholder="Company name"
+                        className="w-full rounded-xl border border-border bg-background/80 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                      />
+                    </div>
+                    {errors.company && (
+                      <p className="mt-1.5 text-xs text-red-500">{errors.company}</p>
+                    )}
+                  </div>
+
+                  {errors.submit && (
+                    <p className="text-xs text-red-500 text-center">{errors.submit}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                    {!isSubmitting && <ArrowRight className="w-4 h-4" />}
+                  </button>
+                </form>
+              </>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const Evolution = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     document.title = "Behavioral OS — How Headroom Evolves | Headroom";
     document.body.classList.add("evolution-page");
