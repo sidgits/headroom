@@ -206,8 +206,23 @@ const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
       }
     } else {
       setIsSuccess(true);
+      supabase.functions
+        .invoke("send-transactional-email", {
+          body: {
+            templateName: "early-interest-notification",
+            idempotencyKey: `early-interest-${formData.email.trim().toLowerCase()}`,
+            templateData: {
+              name: formData.name.trim(),
+              email: formData.email.trim().toLowerCase(),
+              company: formData.company.trim(),
+              submittedAt: new Date().toUTCString(),
+            },
+          },
+        })
+        .catch(() => {});
     }
   };
+
 
   return (
     <AnimatePresence>
