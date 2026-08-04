@@ -676,7 +676,7 @@ const Evolution = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
-                  <c.icon className="w-4.5 h-4.5 text-accent" />
+                  <c.icon className="w-5 h-5 text-accent" />
                 </div>
                 <span className="text-xs tracking-[0.2em] text-muted-foreground">
                   {c.n}
