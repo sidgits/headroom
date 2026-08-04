@@ -1,0 +1,1 @@
+DELETE FROM public.early_interest_registrations WHERE email LIKE 'test@%' OR email LIKE 'test+%';

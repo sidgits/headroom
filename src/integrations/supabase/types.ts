@@ -283,6 +283,30 @@ export type Database = {
         }
         Relationships: []
       }
+      early_interest_registrations: {
+        Row: {
+          company: string
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          company: string
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+        }
+        Update: {
+          company?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
