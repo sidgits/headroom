@@ -81,6 +81,7 @@ const Card = ({
 const Evolution = () => {
   useEffect(() => {
     document.title = "Behavioral OS — How Headroom Evolves | Headroom";
+    document.body.classList.add("evolution-page");
     const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) {
@@ -102,10 +103,13 @@ const Evolution = () => {
     );
     setMeta("og:type", "website", "property");
     setMeta("twitter:card", "summary_large_image");
+    return () => {
+      document.body.classList.remove("evolution-page");
+    };
   }, []);
 
   return (
-    <div className="light min-h-[calc(100vh+3rem)] bg-background">
+    <div className="light min-h-screen bg-background">
       {/* Hero */}
       <header className="relative overflow-hidden">
         <div
