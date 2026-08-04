@@ -1,0 +1,1 @@
+DELETE FROM public.assessment_completions WHERE email = 'debugtest+qa@example.com'; DELETE FROM public.dashboard_checkins WHERE email = 'debugtest+qa@example.com';
