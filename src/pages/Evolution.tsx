@@ -346,19 +346,19 @@ const Evolution = () => {
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="rounded-3xl border border-primary/30 bg-card/60 backdrop-blur p-8 md:p-12 text-center">
           <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground">
-            It starts with one honest measurement
+            Be the first to see the Behavioral OS
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            The Behavioral OS is built upward from the individual. Begin where the signal
-            begins.
+            We are opening early access to enterprise teams. Register your interest and we
+            will reach out when the first portfolio pilots go live.
           </p>
-          <Link
-            to="/"
+          <a
+            href="mailto:hello@headroomapp.co?subject=Register%20Early%20Interest%20%E2%80%94%20Behavioral%20OS"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
           >
-            Take the assessment
+            Register Early Interest
             <ArrowRight className="w-4 h-4" />
-          </Link>
+          </a>
         </div>
       </section>
     </div>
