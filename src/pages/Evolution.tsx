@@ -635,7 +635,7 @@ const Evolution = () => {
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="rounded-3xl border border-primary/30 bg-card/60 backdrop-blur p-8 md:p-12 text-center">
           <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground">
-            Be the first to see the Behavioral OS
+            Be the first to experience the Behavioral OS
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
             We are building the system for enterprise teams. Register your interest and we
