@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -424,12 +423,6 @@ const Evolution = () => {
           }}
         />
         <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-12 md:pt-28 md:pb-20">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors mb-10"
-          >
-            ← Headroom
-          </Link>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
