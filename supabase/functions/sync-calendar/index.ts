@@ -55,8 +55,8 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
   }
   if (!access) { errors.push("Google access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = new Date();
-  const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
 
   // Collect the calendars the user actually looks at (primary + any selected ones).
   let calendarIds: string[] = ["primary"];
@@ -163,8 +163,8 @@ async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<st
   }
   if (!access) { errors.push("Outlook access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = new Date();
-  const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
   const url = new URL("https://graph.microsoft.com/v1.0/me/calendarview");
   url.searchParams.set("startDateTime", now.toISOString());
   url.searchParams.set("endDateTime", max.toISOString());
@@ -253,10 +253,12 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
     return 0;
   }
 
+  // Start at midnight today so the present day is fully covered, not just the hours left.
   const now = new Date();
+  const from = new Date(now); from.setHours(0, 0, 0, 0);
   const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
   const parsed = parseIcs(text);
-  const occurrences = expandOccurrences(parsed, now, max);
+  const occurrences = expandOccurrences(parsed, from, max);
 
   const seen = new Set<string>();
   const rows: Record<string, unknown>[] = [];

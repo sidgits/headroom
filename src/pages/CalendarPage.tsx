@@ -220,7 +220,7 @@ export default function CalendarPage() {
 
         {/* Per-day timelines */}
         {groupedByDay.length === 0 && connections.length > 0 && (
-          <div className="text-sm text-muted-foreground italic">No upcoming events found in the next 14 days.</div>
+          <div className="text-sm text-muted-foreground italic">No events found for today or the week ahead.</div>
         )}
         {groupedByDay.map(([date, evs]) => {
           const day = cltByDay.get(date);
@@ -229,7 +229,7 @@ export default function CalendarPage() {
               className="rounded-2xl border border-border bg-card/40 p-4 sm:p-5 space-y-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3 className="font-semibold">
-                  {new Date(date).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" })}
+                  {dayLabel(date)}
                 </h3>
                 {day && <LoadBadge score={day.daily_load_score} label={day.summary} />}
               </div>
@@ -333,4 +333,12 @@ function BlockRisk({ load, risk }: { load: number; risk: "low" | "moderate" | "h
       {label} · {load}
     </span>
   );
+}
+
+function dayLabel(date: string) {
+  const d = new Date(date + "T00:00:00");
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
+  const base = d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
+  return diff === 0 ? `Today · ${base}` : diff === 1 ? `Tomorrow · ${base}` : base;
 }

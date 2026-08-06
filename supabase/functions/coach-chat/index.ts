@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const [profileRes, todayClt, eventsRes, histRes] = await Promise.all([
       sb.from("assessment_completions").select("name, archetype_name, result_data").ilike("email", e).order("created_at", { ascending: false }).limit(1).maybeSingle(),
       sb.from("clt_analyses").select("*").ilike("email", e).order("analysis_date", { ascending: true }).limit(7),
-      sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count").ilike("email", e).gte("starts_at", new Date().toISOString()).order("starts_at").limit(40),
+      sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count").ilike("email", e).gte("starts_at", (() => { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString(); })()).order("starts_at").limit(40),
       sb.from("coach_messages").select("role, content").ilike("email", e).order("created_at", { ascending: false }).limit(20),
     ]);
 

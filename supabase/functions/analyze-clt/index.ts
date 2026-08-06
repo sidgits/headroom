@@ -39,14 +39,16 @@ Deno.serve(async (req) => {
     const sb = serviceClient();
     if (!(await isActiveSubscriber(sb, e))) return j({ error: "Subscription required" }, 402);
 
+    // Today (from midnight) plus the week ahead.
     const now = new Date();
-    const end = new Date(now.getTime() + 7 * 24 * 3600 * 1000);
+    const from = new Date(now); from.setHours(0, 0, 0, 0);
+    const end = new Date(from.getTime() + 8 * 24 * 3600 * 1000);
 
     const { data: events } = await sb
       .from("calendar_events")
       .select("id, title, starts_at, ends_at, attendee_count, is_recurring, description")
       .ilike("email", e)
-      .gte("starts_at", now.toISOString())
+      .gte("starts_at", from.toISOString())
       .lte("starts_at", end.toISOString())
       .order("starts_at");
 
