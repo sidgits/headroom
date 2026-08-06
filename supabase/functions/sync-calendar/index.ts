@@ -228,16 +228,36 @@ async function refreshOutlookAccess(sb: ReturnType<typeof serviceClient>, conn: 
 async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
   let text = conn.ics_content as string | null;
   if (!text && conn.ics_url) {
-    const r = await fetch(conn.ics_url as string);
+    // Some providers only serve ICS over webcal:// — normalise to https.
+    const raw = (conn.ics_url as string).trim().replace(/^webcal:\/\//i, "https://");
+    let r: Response;
+    try {
+      r = await fetch(raw, { headers: { "User-Agent": "HeadroomCalendar/1.0", Accept: "text/calendar,*/*" } });
+    } catch {
+      errors.push("Could not reach the ICS URL. Check that the link is public.");
+      return 0;
+    }
     if (!r.ok) { errors.push(`Could not download the ICS URL (${r.status}). Check that the link is public.`); return 0; }
     text = await r.text();
   }
   if (!text) return 0;
-  const events = parseIcs(text);
-  const now = new Date(); const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
-  const rows = events
-    .filter((ev) => ev.start >= now && ev.start <= max)
-    .map((ev) => ({
+  if (!/BEGIN:VEVENT/i.test(text)) {
+    errors.push("That file/link didn't contain any calendar events. Export your calendar as .ics and try again.");
+    return 0;
+  }
+
+  const now = new Date();
+  const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
+  const parsed = parseIcs(text);
+  const occurrences = expandOccurrences(parsed, now, max);
+
+  const seen = new Set<string>();
+  const rows: Record<string, unknown>[] = [];
+  for (const ev of occurrences) {
+    const key = `${ev.uid}|${ev.start.toISOString()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    rows.push({
       connection_id: conn.id,
       email: conn.email,
       external_id: ev.uid,
@@ -249,14 +269,20 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
       is_recurring: ev.recurring,
       location: ev.location,
       source: "ics",
-    }));
+    });
+  }
   if (rows.length) await sb.from("calendar_events").insert(rows);
+  if (!rows.length) {
+    errors.push("We parsed your calendar but found no events in the next 14 days.");
+  }
   return rows.length;
 }
 
 interface IcsEvent {
   uid: string; summary: string; description: string | null; location: string | null;
   start: Date; end: Date; attendees: number; recurring: boolean;
+  rrule: string | null; exdates: number[]; allDay: boolean;
+  recurrenceId: number | null;
 }
 
 function parseIcs(text: string): IcsEvent[] {
@@ -264,51 +290,230 @@ function parseIcs(text: string): IcsEvent[] {
   const unfolded = text.replace(/\r?\n[ \t]/g, "");
   const lines = unfolded.split(/\r?\n/);
   const events: IcsEvent[] = [];
-  let cur: Partial<IcsEvent> & { _attendees?: number } | null = null;
-  for (const ln of lines) {
-    if (ln === "BEGIN:VEVENT") cur = { _attendees: 0 };
-    else if (ln === "END:VEVENT" && cur && cur.start && cur.end) {
-      events.push({
-        uid: cur.uid ?? crypto.randomUUID(),
-        summary: cur.summary ?? "(no title)",
-        description: cur.description ?? null,
-        location: cur.location ?? null,
-        start: cur.start, end: cur.end,
-        attendees: cur._attendees ?? 0,
-        recurring: cur.recurring ?? false,
-      });
-      cur = null;
-    } else if (cur) {
-      const [keyRaw, ...rest] = ln.split(":");
-      const value = rest.join(":");
-      const key = keyRaw.split(";")[0];
+  let cur: (Partial<IcsEvent> & { _attendees?: number; _exdates?: number[] }) | null = null;
+  let inEvent = false;
+  for (const lnRaw of lines) {
+    const ln = lnRaw.trim();
+    if (/^BEGIN:VEVENT$/i.test(ln)) { cur = { _attendees: 0, _exdates: [] }; inEvent = true; }
+    else if (/^END:VEVENT$/i.test(ln)) {
+      if (cur && cur.start) {
+        const start = cur.start;
+        const end = cur.end ?? new Date(start.getTime() + (cur.allDay ? 24 * 3600 * 1000 : 30 * 60 * 1000));
+        events.push({
+          uid: cur.uid ?? crypto.randomUUID(),
+          summary: cur.summary ?? "(no title)",
+          description: cur.description ?? null,
+          location: cur.location ?? null,
+          start, end,
+          attendees: cur._attendees ?? 0,
+          recurring: !!cur.rrule,
+          rrule: cur.rrule ?? null,
+          exdates: cur._exdates ?? [],
+          allDay: !!cur.allDay,
+          recurrenceId: cur.recurrenceId ?? null,
+        });
+      }
+      cur = null; inEvent = false;
+    } else if (inEvent && cur) {
+      const idx = ln.indexOf(":");
+      if (idx === -1) continue;
+      const keyRaw = ln.slice(0, idx);
+      const value = ln.slice(idx + 1);
+      const key = keyRaw.split(";")[0].toUpperCase();
       if (key === "UID") cur.uid = value;
       else if (key === "SUMMARY") cur.summary = unescapeIcs(value);
       else if (key === "DESCRIPTION") cur.description = unescapeIcs(value);
       else if (key === "LOCATION") cur.location = unescapeIcs(value);
-      else if (key === "DTSTART") cur.start = parseIcsDate(value, keyRaw);
-      else if (key === "DTEND") cur.end = parseIcsDate(value, keyRaw);
+      else if (key === "DTSTART") {
+        cur.start = parseIcsDate(value.split(",")[0], keyRaw);
+        cur.allDay = /VALUE=DATE(?!-TIME)/i.test(keyRaw) || /^\d{8}$/.test(value);
+      }
+      else if (key === "DTEND") cur.end = parseIcsDate(value.split(",")[0], keyRaw);
+      else if (key === "DURATION" && !cur.end && cur.start) {
+        cur.end = new Date(cur.start.getTime() + parseIcsDuration(value));
+      }
       else if (key === "ATTENDEE") cur._attendees = (cur._attendees ?? 0) + 1;
-      else if (key === "RRULE") cur.recurring = true;
+      else if (key === "RRULE") cur.rrule = value;
+      else if (key === "EXDATE") {
+        for (const part of value.split(",")) {
+          const d = parseIcsDate(part.trim(), keyRaw);
+          if (!isNaN(d.getTime())) cur._exdates!.push(d.getTime());
+        }
+      }
+      else if (key === "RECURRENCE-ID") {
+        const d = parseIcsDate(value, keyRaw);
+        if (!isNaN(d.getTime())) cur.recurrenceId = d.getTime();
+      }
+      else if (key === "STATUS" && /CANCELLED/i.test(value)) cur.start = undefined;
     }
   }
   return events;
 }
 
-function unescapeIcs(v: string) { return v.replace(/\\n/g, "\n").replace(/\\,/g, ",").replace(/\\;/g, ";").replace(/\\\\/g, "\\"); }
+const DAY_MS = 24 * 3600 * 1000;
+const WEEKDAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
+/** Expand single + recurring events into concrete occurrences inside [from, to]. */
+function expandOccurrences(events: IcsEvent[], from: Date, to: Date): IcsEvent[] {
+  const out: IcsEvent[] = [];
+  // Overrides (RECURRENCE-ID) replace a specific instance of the master event.
+  const overrides = new Map<string, IcsEvent>();
+  for (const ev of events) {
+    if (ev.recurrenceId != null) overrides.set(`${ev.uid}|${ev.recurrenceId}`, ev);
+  }
+
+  for (const ev of events) {
+    if (ev.recurrenceId != null) {
+      if (overlaps(ev.start, ev.end, from, to)) out.push(ev);
+      continue;
+    }
+    if (!ev.rrule) {
+      if (overlaps(ev.start, ev.end, from, to)) out.push(ev);
+      continue;
+    }
+    const duration = Math.max(ev.end.getTime() - ev.start.getTime(), 5 * 60 * 1000);
+    for (const startMs of recurrenceStarts(ev, from, to)) {
+      if (ev.exdates.includes(startMs)) continue;
+      const override = overrides.get(`${ev.uid}|${startMs}`);
+      if (override) continue; // already added above
+      const start = new Date(startMs);
+      const end = new Date(startMs + duration);
+      if (!overlaps(start, end, from, to)) continue;
+      out.push({ ...ev, start, end, recurring: true });
+    }
+  }
+  return out.sort((a, b) => a.start.getTime() - b.start.getTime());
+}
+
+function overlaps(start: Date, end: Date, from: Date, to: Date): boolean {
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return false;
+  return end.getTime() >= from.getTime() && start.getTime() <= to.getTime();
+}
+
+/** Minimal but practical RRULE expansion: FREQ DAILY/WEEKLY/MONTHLY/YEARLY + INTERVAL, COUNT, UNTIL, BYDAY. */
+function recurrenceStarts(ev: IcsEvent, from: Date, to: Date): number[] {
+  const rule: Record<string, string> = {};
+  for (const part of ev.rrule!.split(";")) {
+    const [k, v] = part.split("=");
+    if (k && v) rule[k.toUpperCase()] = v;
+  }
+  const freq = (rule.FREQ ?? "").toUpperCase();
+  const interval = Math.max(parseInt(rule.INTERVAL ?? "1", 10) || 1, 1);
+  const count = rule.COUNT ? parseInt(rule.COUNT, 10) : null;
+  const until = rule.UNTIL ? parseIcsDate(rule.UNTIL, "UNTIL").getTime() : null;
+  const byDay = rule.BYDAY ? rule.BYDAY.split(",").map((d) => d.replace(/^[-+]?\d+/, "").toUpperCase()) : [];
+
+  const starts: number[] = [];
+  const base = ev.start.getTime();
+  if (isNaN(base)) return starts;
+  const limit = to.getTime();
+  const windowStart = from.getTime() - DAY_MS; // keep events already in progress
+  let emitted = 0;
+  const MAX_ITER = 5000;
+
+  if (freq === "DAILY" || freq === "WEEKLY") {
+    const stepMs = (freq === "DAILY" ? DAY_MS : 7 * DAY_MS) * interval;
+    // Weekly with BYDAY: iterate day by day within each active week.
+    if (freq === "WEEKLY" && byDay.length) {
+      const weekStepMs = 7 * DAY_MS * interval;
+      for (let i = 0; i < MAX_ITER; i++) {
+        const weekBase = base + i * weekStepMs;
+        if (weekBase > limit) break;
+        for (let d = 0; d < 7; d++) {
+          const t = weekBase + d * DAY_MS;
+          if (t < base) continue;
+          const dow = WEEKDAYS[new Date(t).getUTCDay()];
+          if (!byDay.includes(dow)) continue;
+          if (until != null && t > until) return starts;
+          emitted++;
+          if (count != null && emitted > count) return starts;
+          if (t >= windowStart && t <= limit) starts.push(t);
+        }
+      }
+      return starts;
+    }
+    for (let i = 0; i < MAX_ITER; i++) {
+      const t = base + i * stepMs;
+      if (t > limit) break;
+      if (until != null && t > until) break;
+      if (count != null && i + 1 > count) break;
+      if (t >= windowStart) starts.push(t);
+    }
+    return starts;
+  }
+
+  if (freq === "MONTHLY" || freq === "YEARLY") {
+    const d0 = new Date(base);
+    for (let i = 0; i < 400; i++) {
+      const t = new Date(d0.getTime());
+      if (freq === "MONTHLY") t.setUTCMonth(d0.getUTCMonth() + i * interval);
+      else t.setUTCFullYear(d0.getUTCFullYear() + i * interval);
+      const ms = t.getTime();
+      if (ms > limit) break;
+      if (until != null && ms > until) break;
+      if (count != null && i + 1 > count) break;
+      if (ms >= windowStart) starts.push(ms);
+    }
+    return starts;
+  }
+
+  // Unknown FREQ — treat as a single event.
+  if (base >= windowStart && base <= limit) starts.push(base);
+  return starts;
+}
+
+function unescapeIcs(v: string) { return v.replace(/\\n/gi, "\n").replace(/\\,/g, ",").replace(/\\;/g, ";").replace(/\\\\/g, "\\"); }
+
+function parseIcsDuration(v: string): number {
+  const m = v.match(/^P?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/i);
+  if (!m) return 30 * 60 * 1000;
+  const [, w, d, h, mi, s] = m;
+  return ((+(w ?? 0) * 7 + +(d ?? 0)) * 86400 + +(h ?? 0) * 3600 + +(mi ?? 0) * 60 + +(s ?? 0)) * 1000;
+}
+
+/** Offset (ms) to add to a "wall clock as UTC" timestamp to get the real UTC instant. */
+function tzOffsetMs(tz: string, utcGuess: Date): number {
+  try {
+    const dtf = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz, hour12: false,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    });
+    const parts = Object.fromEntries(dtf.formatToParts(utcGuess).map((p) => [p.type, p.value]));
+    const asUTC = Date.UTC(
+      +parts.year, +parts.month - 1, +parts.day,
+      +parts.hour % 24, +parts.minute, +parts.second,
+    );
+    return utcGuess.getTime() - asUTC;
+  } catch {
+    return 0;
+  }
+}
 
 function parseIcsDate(v: string, key: string): Date {
+  const val = v.trim();
   // Examples: 20251217T093000Z, 20251217T093000, 20251217 (all-day)
-  if (/^\d{8}$/.test(v)) {
-    return new Date(`${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}T00:00:00Z`);
+  if (/^\d{8}$/.test(val)) {
+    return new Date(`${val.slice(0, 4)}-${val.slice(4, 6)}-${val.slice(6, 8)}T00:00:00Z`);
   }
-  const m = v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/);
+  const m = val.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/);
   if (m) {
-    const iso = `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? "Z" : ""}`;
-    return new Date(iso);
+    const wall = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+    if (m[7]) return new Date(wall);
+    // Floating or TZID-qualified local time — convert using the named zone.
+    const tzid = key.match(/TZID=([^;:]+)/i)?.[1];
+    if (tzid) {
+      const guess = new Date(wall);
+      const offset = tzOffsetMs(tzid.replace(/^"|"$/g, ""), guess);
+      // Refine once for DST boundaries.
+      const refined = new Date(wall + offset);
+      return new Date(wall + tzOffsetMs(tzid.replace(/^"|"$/g, ""), refined));
+    }
+    return new Date(wall);
   }
-  return new Date(v);
+  return new Date(val);
 }
+
 
 function j(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
