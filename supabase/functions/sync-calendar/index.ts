@@ -23,7 +23,8 @@ Deno.serve(async (req) => {
     const errors: string[] = [];
     for (const conn of conns) {
       // Clear existing future events
-      await sb.from("calendar_events").delete().eq("connection_id", conn.id);
+      const { error: deleteError } = await sb.from("calendar_events").delete().eq("connection_id", conn.id);
+      if (deleteError) throw deleteError;
       let events = 0;
       if (conn.provider === "google") events = await syncGoogle(sb, conn, errors);
       else if (conn.provider === "outlook") events = await syncOutlook(sb, conn, errors);
@@ -123,7 +124,10 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
       });
     }
   }
-  if (rows.length) await sb.from("calendar_events").insert(rows);
+  if (rows.length) {
+    const { error } = await sb.from("calendar_events").insert(rows);
+    if (error) throw error;
+  }
   return rows.length;
 }
 
@@ -196,7 +200,10 @@ async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<st
       location: it.location?.displayName ?? null,
       source: "outlook",
     }));
-  if (rows.length) await sb.from("calendar_events").insert(rows);
+  if (rows.length) {
+    const { error } = await sb.from("calendar_events").insert(rows);
+    if (error) throw error;
+  }
   return rows.length;
 }
 
@@ -271,7 +278,10 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
       source: "ics",
     });
   }
-  if (rows.length) await sb.from("calendar_events").insert(rows);
+  if (rows.length) {
+    const { error } = await sb.from("calendar_events").insert(rows);
+    if (error) throw error;
+  }
   if (!rows.length) {
     errors.push("We parsed your calendar but found no events in the next 14 days.");
   }
