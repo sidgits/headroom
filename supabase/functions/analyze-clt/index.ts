@@ -10,9 +10,13 @@ interface EventRow {
 interface BlockTip {
   event_id: string;
   category: "intrinsic" | "extraneous" | "germane";
-  action: "add_buffer" | "batch" | "chunk" | "switch_modality" | "defer" | "preserve";
+  action: "add_buffer" | "batch" | "chunk" | "switch_modality" | "defer" | "preserve" | "monitor";
   tip: string;
+  /** 0-100 burnout/cognitive-load marker for this specific time slot */
+  load: number;
+  risk: "low" | "moderate" | "high";
 }
+
 
 interface DayAnalysis {
   date: string;
