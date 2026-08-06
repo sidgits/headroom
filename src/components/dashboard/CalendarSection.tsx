@@ -11,7 +11,7 @@ interface EventRow {
 interface CltDay {
   analysis_date: string; daily_load_score: number;
   intrinsic_load: number; extraneous_load: number; germane_load: number;
-  per_block_tips: { event_id: string; category: string; action: string; tip: string }[];
+  per_block_tips: { event_id: string; category: string; action: string; tip: string; load?: number; risk?: "low" | "moderate" | "high" }[];
   recommendations: string[]; summary: string;
 }
 interface Connection { id: string; provider: string; last_synced_at: string | null }
@@ -284,7 +284,10 @@ export default function CalendarSection({ email }: { email: string }) {
                             <span className="text-muted-foreground/60"> · {mins}m</span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate">{ev.title}</div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-medium truncate">{ev.title}</span>
+                              {tip && typeof tip.load === "number" && tip.risk && <BlockRisk load={tip.load} risk={tip.risk} />}
+                            </div>
                             {ev.attendee_count > 0 && <div className="text-[11px] text-muted-foreground">{ev.attendee_count} attendees</div>}
                             {tip && (
                               <div className="mt-1 text-[11px] px-2 py-1 rounded-md bg-primary/10 border border-primary/20 text-foreground inline-block max-w-full">
@@ -346,5 +349,18 @@ function DayChip({ day }: { day: CltDay }) {
       <div className="text-sm font-bold">{d.getDate()}</div>
       <div className="text-[11px] font-semibold mt-0.5">{day.daily_load_score}</div>
     </div>
+  );
+}
+
+function BlockRisk({ load, risk }: { load: number; risk: "low" | "moderate" | "high" }) {
+  const style =
+    risk === "high" ? "bg-[hsl(var(--warm-red)/0.15)] text-[hsl(var(--warm-red))] border-[hsl(var(--warm-red)/0.4)]"
+    : risk === "moderate" ? "bg-[hsl(var(--deep-orange)/0.15)] text-[hsl(var(--deep-orange))] border-[hsl(var(--deep-orange)/0.4)]"
+    : "bg-[hsl(var(--golden)/0.12)] text-[hsl(var(--golden))] border-[hsl(var(--golden)/0.35)]";
+  const label = risk === "high" ? "High burnout risk" : risk === "moderate" ? "Moderate load" : "Low load";
+  return (
+    <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${style}`}>
+      {label} · {load}
+    </span>
   );
 }

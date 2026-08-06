@@ -10,9 +10,13 @@ interface EventRow {
 interface BlockTip {
   event_id: string;
   category: "intrinsic" | "extraneous" | "germane";
-  action: "add_buffer" | "batch" | "chunk" | "switch_modality" | "defer" | "preserve";
+  action: "add_buffer" | "batch" | "chunk" | "switch_modality" | "defer" | "preserve" | "monitor";
   tip: string;
+  /** 0-100 burnout/cognitive-load marker for this specific time slot */
+  load: number;
+  risk: "low" | "moderate" | "high";
 }
+
 
 interface DayAnalysis {
   date: string;
@@ -106,6 +110,11 @@ function analyzeDay(date: string, events: EventRow[]): DayAnalysis {
     const big = ev.attendee_count >= 6;
     const isFocus = ev.attendee_count <= 1 && dur >= 90;
 
+    // Per-block accumulators so every time slot gets its own marker.
+    let evExtraneous = 0;
+    let evGermane = 0;
+    const evTips: { category: BlockTip["category"]; action: BlockTip["action"]; tip: string }[] = [];
+
     // Intrinsic load: complexity × duration weight
     let evIntrinsic = (complex ? 6 : routine ? 2 : 4) * Math.min(2, dur / 60);
     if (big) evIntrinsic += 2;
@@ -115,36 +124,70 @@ function analyzeDay(date: string, events: EventRow[]): DayAnalysis {
     if (i > 0) {
       const gap = (new Date(ev.starts_at).getTime() - new Date(events[i-1].ends_at).getTime()) / 60000;
       if (gap >= 0 && gap < 10) {
-        extraneous += 5;
-        tips.push({ event_id: ev.id, category: "extraneous", action: "add_buffer",
+        evExtraneous += 5;
+        evTips.push({ category: "extraneous", action: "add_buffer",
           tip: "Back-to-back with previous block — add a 10-min buffer to reset working memory." });
       }
     }
     if (h < 8 || h >= 19) {
-      extraneous += 4;
-      tips.push({ event_id: ev.id, category: "extraneous", action: "defer",
+      evExtraneous += 4;
+      evTips.push({ category: "extraneous", action: "defer",
         tip: "Outside core hours — defer to tomorrow if not urgent; off-hour load compounds fatigue." });
     }
     if (big && complex) {
-      extraneous += 3;
-      tips.push({ event_id: ev.id, category: "extraneous", action: "chunk",
+      evExtraneous += 3;
+      evTips.push({ category: "extraneous", action: "chunk",
         tip: "Large complex meeting — split into a pre-read + decision call to lower extraneous load." });
     }
     if (routine && dur > 30) {
-      extraneous += 2;
-      tips.push({ event_id: ev.id, category: "extraneous", action: "batch",
+      evExtraneous += 2;
+      evTips.push({ category: "extraneous", action: "batch",
         tip: "Routine sync running long — cap at 25 min and batch with other status meetings." });
+    }
+    if (dur >= 120 && ev.attendee_count >= 2) {
+      evExtraneous += 3;
+      evTips.push({ category: "extraneous", action: "chunk",
+        tip: "Over two hours with others — attention decays after ~50 min; split it or add a break." });
     }
 
     // Germane: protected long focus blocks
     if (isFocus) {
-      germane += 6;
-      tips.push({ event_id: ev.id, category: "germane", action: "preserve",
+      evGermane += 6;
+      evTips.push({ category: "germane", action: "preserve",
         tip: "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
     } else if (complex && dur >= 45 && ev.attendee_count <= 3) {
-      germane += 3;
+      evGermane += 3;
     }
+
+    extraneous += evExtraneous;
+    germane += evGermane;
+
+    // Burnout marker for this slot (0-100): intrinsic + extraneous, offset by germane.
+    const blockLoad = Math.max(0, Math.min(100, Math.round(
+      (evIntrinsic * 4.5) + (evExtraneous * 6) - (evGermane * 3),
+    )));
+    const risk: BlockTip["risk"] = blockLoad >= 60 ? "high" : blockLoad >= 35 ? "moderate" : "low";
+
+    const primary = evTips[0] ?? {
+      category: (complex ? "intrinsic" : "extraneous") as BlockTip["category"],
+      action: "monitor" as BlockTip["action"],
+      tip: risk === "low"
+        ? "Low-load block — good place to absorb overflow or protect recovery."
+        : complex
+          ? "Complex block — prep 10 min beforehand so working memory isn't loaded cold."
+          : "Moderate load — keep it to its slot and avoid stacking another meeting after it.",
+    };
+
+    tips.push({
+      event_id: ev.id,
+      category: primary.category,
+      action: primary.action,
+      tip: evTips.length > 1 ? evTips.map((t) => t.tip).join(" ") : primary.tip,
+      load: blockLoad,
+      risk,
+    });
   }
+
 
   // Fragmentation penalty
   if (events.length >= 6) extraneous += (events.length - 5) * 2;
