@@ -37,11 +37,16 @@ export default function CalendarSection({ email }: { email: string }) {
 
   const refresh = async () => {
     const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email } });
-    if (error) return;
+    if (error) {
+      console.error("get-coach-data failed", error);
+      setSyncError("We couldn't load your calendar data just now. Please refresh the page.");
+      return;
+    }
     setConnections(data?.connections ?? []);
     setEvents(data?.events ?? []);
     setClt(data?.clt ?? []);
   };
+
 
   const runSync = async () => {
     setBusy("sync");
