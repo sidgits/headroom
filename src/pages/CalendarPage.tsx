@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, CheckCircle2, Loader2, RefreshCw, Upload } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, Loader2, RefreshCw, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
@@ -28,6 +28,8 @@ export default function CalendarPage() {
   const [clt, setClt] = useState<CltDay[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -62,13 +64,17 @@ export default function CalendarPage() {
     const em = e ?? email; if (!em) return;
     setBusy("sync");
     try {
-      const { error } = await supabase.functions.invoke("sync-calendar", { body: { email: em } });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: { email: em } });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const errors: string[] = data?.errors ?? [];
+      if (errors.length) throw new Error(errors[0]);
       await supabase.functions.invoke("analyze-clt", { body: { email: em } });
       await refresh(em);
       toast.success("Calendar synced.");
     } catch (err) {
-      console.error(err); toast.error("Sync failed.");
+      const message = err instanceof Error ? err.message : "Sync failed.";
+      console.error(err); setSyncError(message); toast.error(message);
     } finally { setBusy(null); }
   };
 
@@ -76,27 +82,46 @@ export default function CalendarPage() {
     if (!email) return;
     if (!icsUrl) { toast.error("Paste an .ics URL or upload a file."); return; }
     setBusy("ics");
+    setSyncError(null);
+    setImportMessage("Importing calendar…");
     try {
-      const { error } = await supabase.functions.invoke("ingest-ics", {
+      const { data, error } = await supabase.functions.invoke("ingest-ics", {
         body: { email, icsUrl },
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       setIcsUrl("");
       await runSync();
-    } catch { toast.error("ICS import failed."); }
+      setImportMessage("Calendar imported.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "ICS import failed.";
+      setImportMessage(null); setSyncError(message); toast.error(message);
+    }
     finally { setBusy(null); }
   };
 
   const uploadIcsFile = async (file: File) => {
     if (!email) return;
     setBusy("ics");
+    setSyncError(null);
+    setImportMessage(`Importing ${file.name}…`);
     try {
       const text = await file.text();
-      const { error } = await supabase.functions.invoke("ingest-ics", { body: { email, icsContent: text } });
+      if (!text.trim()) throw new Error("The selected file is empty.");
+      if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error("Please select a valid .ics calendar file.");
+      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: { email, icsContent: text } });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       await runSync();
-    } catch { toast.error("Upload failed."); }
-    finally { setBusy(null); }
+      setImportMessage(`${file.name} imported.`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Upload failed.";
+      setImportMessage(null); setSyncError(message); toast.error(message);
+    }
+    finally {
+      setBusy(null);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
 
   const groupedByDay = (() => {
@@ -151,7 +176,7 @@ export default function CalendarPage() {
                   <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
                   <button onClick={() => fileRef.current?.click()} disabled={!!busy}
                     className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border">
-                    <Upload className="w-3 h-3" /> Upload .ics
+                    {busy === "ics" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />} Upload .ics
                   </button>
                   <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
                     onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
@@ -168,6 +193,19 @@ export default function CalendarPage() {
             <CheckCircle2 className="w-4 h-4 text-primary" />
             Connected via ICS.
             {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
+          </div>
+        )}
+
+        {importMessage && (
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm flex items-center gap-2">
+            {busy ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <CheckCircle2 className="w-4 h-4 text-primary" />}
+            {importMessage}
+          </div>
+        )}
+        {syncError && (
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-destructive mt-0.5" />
+            <span>{syncError}</span>
           </div>
         )}
 

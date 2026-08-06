@@ -8,12 +8,22 @@ Deno.serve(async (req) => {
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     if (!icsUrl && !icsContent) return j({ error: "Provide icsUrl or icsContent" }, 400);
+    if (icsUrl && typeof icsUrl !== "string") return j({ error: "Invalid ICS URL" }, 400);
+    if (icsContent && typeof icsContent !== "string") return j({ error: "Invalid ICS file" }, 400);
+    if (typeof icsContent === "string") {
+      if (!icsContent.trim()) return j({ error: "The selected ICS file is empty" }, 400);
+      if (!/BEGIN:VCALENDAR/i.test(icsContent) || !/BEGIN:VEVENT/i.test(icsContent)) {
+        return j({ error: "The selected file does not contain calendar events" }, 400);
+      }
+    }
 
     const sb = serviceClient();
     if (!(await isActiveSubscriber(sb, e))) return j({ error: "Subscription required" }, 402);
 
-    // Replace any prior ICS connection for this email.
-    await sb.from("calendar_connections").delete().ilike("email", e).eq("provider", "ics");
+    // Validate first, then replace any prior ICS connection so a bad upload
+    // cannot erase a previously working calendar.
+    const { error: deleteError } = await sb.from("calendar_connections").delete().ilike("email", e).eq("provider", "ics");
+    if (deleteError) throw deleteError;
     const { data, error } = await sb.from("calendar_connections").insert({
       email: e,
       provider: "ics",
