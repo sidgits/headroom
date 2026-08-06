@@ -233,7 +233,7 @@ export default function CalendarSection({ email }: { email: string }) {
 
           {groupedByDay.length === 0 && !syncError && (
             <div className="rounded-xl border border-border bg-background/40 p-4 space-y-3">
-              <p className="text-sm text-muted-foreground italic">No upcoming events found in the next 14 days.</p>
+              <p className="text-sm text-muted-foreground italic">No events found for today or the week ahead.</p>
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground">Wrong calendar? Switch to an ICS link:</p>
                 <div className="flex flex-wrap gap-2">
@@ -260,7 +260,7 @@ export default function CalendarSection({ email }: { email: string }) {
                   className="rounded-xl border border-border bg-background/40 p-3 sm:p-4 space-y-3">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h4 className="font-semibold text-sm">
-                      {new Date(date).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" })}
+                      {dayLabel(date)}
                     </h4>
                     {day && <LoadBadge score={day.daily_load_score} label={day.summary} />}
                   </div>
@@ -363,4 +363,12 @@ function BlockRisk({ load, risk }: { load: number; risk: "low" | "moderate" | "h
       {label} · {load}
     </span>
   );
+}
+
+function dayLabel(date: string) {
+  const d = new Date(date + "T00:00:00");
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
+  const base = d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
+  return diff === 0 ? `Today · ${base}` : diff === 1 ? `Tomorrow · ${base}` : base;
 }
