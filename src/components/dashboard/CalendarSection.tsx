@@ -70,6 +70,23 @@ export default function CalendarSection({ email }: { email: string }) {
     } finally { setBusy(null); }
   };
 
+  const connectGoogle = async () => {
+    setBusy("google");
+    try {
+      const { data, error } = await supabase.functions.invoke("google-oauth-start", {
+        body: withReview({ email, redirectTo: `${window.location.origin}/dashboard` }),
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.url) { window.location.href = data.url; return; }
+      throw new Error("Could not start Google authorisation.");
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Google connection failed.");
+      setBusy(null);
+    }
+  };
+
   const disconnect = async () => {
     setBusy("disconnect");
     try {
@@ -182,15 +199,29 @@ export default function CalendarSection({ email }: { email: string }) {
                   onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
               </div>
             </div>
-            <div className="rounded-xl border border-dashed border-border bg-background/40 p-3 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Calendar className="w-4 h-4 text-primary" />
+            {isReviewMode() ? (
+              <div className="rounded-xl border border-primary/30 bg-background p-3 space-y-2">
+                <div className="font-semibold text-sm">Google Calendar</div>
+                <p className="text-xs text-muted-foreground">
+                  Connect your Google Calendar (read-only) to score your real schedule.
+                </p>
+                <button onClick={connectGoogle} disabled={!!busy}
+                  className="text-xs inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
+                  {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
+                  Connect Google Calendar
+                </button>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-muted-foreground">Google/Outlook Calendar Integration coming soon!</div>
-                <p className="text-xs text-muted-foreground mt-0.5">We're building direct, secure connections for Google Calendar and Outlook.</p>
+            ) : (
+              <div className="rounded-xl border border-dashed border-border bg-background/40 p-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Calendar className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-muted-foreground">Google/Outlook Calendar Integration coming soon!</div>
+                  <p className="text-xs text-muted-foreground mt-0.5">We're building direct, secure connections for Google Calendar and Outlook.</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {importMessage && (
