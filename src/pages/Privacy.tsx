@@ -171,7 +171,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">7. International Data Transfers</h2>
+            <h2 className="text-xl font-semibold">8. International Data Transfers</h2>
             <p className="text-sm leading-relaxed">
               Headroom is based in the United States. Personal Data collected through the Service may be transferred
               to, stored, or processed in the United States or other jurisdictions where our subprocessors operate.
@@ -186,7 +186,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">8. Data Retention</h2>
+            <h2 className="text-xl font-semibold">9. Data Retention</h2>
             <p className="text-sm leading-relaxed">
               We retain your account data for as long as your account is active. If you request deletion, we
               will erase your personal data within 30 days, except where retention is required for legal,
@@ -195,7 +195,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">9. Your Rights</h2>
+            <h2 className="text-xl font-semibold">10. Your Rights</h2>
             <p className="text-sm leading-relaxed">
               Depending on your location, you have the right to:
             </p>
@@ -259,7 +259,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">10. Security & Incident Response</h2>
+            <h2 className="text-xl font-semibold">11. Security & Incident Response</h2>
             <p className="text-sm leading-relaxed">
               We use industry-standard safeguards including TLS encryption in transit, encryption at rest,
               row-level security on our database, and least-privilege access controls. No system is 100% secure,
@@ -273,7 +273,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">11. Cookies & Tracking Technologies</h2>
+            <h2 className="text-xl font-semibold">12. Cookies & Tracking Technologies</h2>
             <p className="text-sm leading-relaxed">
               We use a minimal set of strictly necessary cookies and local storage to keep you signed in and to
               remember your assessment progress. We do not use third-party advertising or tracking cookies. We do not
@@ -282,7 +282,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">12. Children's Privacy</h2>
+            <h2 className="text-xl font-semibold">13. Children's Privacy</h2>
             <p className="text-sm leading-relaxed">
               The Service is not directed to children under 16, and we do not knowingly collect Personal Data from
               children under 16. If you believe we have collected data from a child under 16, please contact us at{" "}
@@ -294,7 +294,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">13. Changes to This Policy</h2>
+            <h2 className="text-xl font-semibold">14. Changes to This Policy</h2>
             <p className="text-sm leading-relaxed">
               We may update this Privacy Policy from time to time. Material changes will be communicated via
               email or a notice on the Service.
@@ -302,7 +302,7 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xl font-semibold">14. Contact</h2>
+            <h2 className="text-xl font-semibold">15. Contact</h2>
             <p className="text-sm leading-relaxed">
               Headroom · USA · {" "}
               <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
