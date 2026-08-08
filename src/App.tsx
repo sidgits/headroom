@@ -56,6 +56,12 @@ const AuthLogger = () => {
   return null;
 };
 
+// behavos.headroomapp.co serves the Behavioral OS (Evolution) page at its root,
+// while headroomapp.co/evolution keeps working as before.
+const isBehavOsHost =
+  typeof window !== "undefined" &&
+  window.location.hostname.split(".")[0].toLowerCase() === "behavos";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -77,7 +83,7 @@ const App = () => (
         <main>
           <Suspense fallback={<RouteFallback />}>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={isBehavOsHost ? <Evolution /> : <Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard/calendar" element={<CalendarPage />} />
