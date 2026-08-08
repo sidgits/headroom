@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
+import { isReviewMode } from "@/lib/reviewAccess";
 
 import type { ScoringResult } from "@/lib/scoring";
 
@@ -59,7 +60,7 @@ const Dashboard = () => {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
   const [recoveringIdentity, setRecoveringIdentity] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(isReviewMode());
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const isIndia = (() => {
     try {
