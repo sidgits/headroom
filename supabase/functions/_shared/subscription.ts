@@ -40,6 +40,22 @@ export async function isActiveSubscriber(
   return true;
 }
 
+/** Shared review access code (app-review / OAuth verification), validated server-side. */
+export function isReviewAccess(code: unknown): boolean {
+  const expected = (Deno.env.get("REVIEW_ACCESS_CODE") ?? "").trim();
+  return !!expected && typeof code === "string" && code.trim() === expected;
+}
+
+/** True when the email is an active subscriber OR a valid review code was supplied. */
+export async function hasPaidAccess(
+  supabase: SupabaseClient,
+  email: string,
+  reviewCode?: unknown,
+): Promise<boolean> {
+  if (isReviewAccess(reviewCode)) return true;
+  return await isActiveSubscriber(supabase, email);
+}
+
 export function normalizeEmail(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   const t = raw.trim().toLowerCase();
