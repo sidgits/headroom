@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Send, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { withReview, isReviewMode } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import coachAvatar from "@/assets/coach-avatar.jpg";
 
@@ -23,7 +24,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email } });
+      const { data, error } = await supabase.functions.invoke("get-coach-data", { body: withReview({ email }) });
       if (!error) setMessages(data?.messages ?? []);
       setLoading(false);
     })();
@@ -39,7 +40,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
     setMessages((m) => [...m, optimistic]);
     setInput("");
     try {
-      const { data, error } = await supabase.functions.invoke("coach-chat", { body: { email, message: text } });
+      const { data, error } = await supabase.functions.invoke("coach-chat", { body: withReview({ email, message: text }) });
       if (error) throw error;
       const reply: Msg = {
         id: `a-${Date.now()}`, role: "assistant",

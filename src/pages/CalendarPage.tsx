@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, Loader2, RefreshCw, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { withReview, isReviewMode } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 
@@ -47,7 +48,7 @@ export default function CalendarPage() {
   }, []);
 
   const refresh = async (e: string) => {
-    const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email: e } });
+    const { data, error } = await supabase.functions.invoke("get-coach-data", { body: withReview({ email: e }) });
     if (error) {
       if ((error as { context?: { status?: number } }).context?.status === 402) {
         toast.error("Subscription required.");
@@ -64,12 +65,12 @@ export default function CalendarPage() {
     const em = e ?? email; if (!em) return;
     setBusy("sync");
     try {
-      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: { email: em } });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: withReview({ email: em }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const errors: string[] = data?.errors ?? [];
       if (errors.length) throw new Error(errors[0]);
-      await supabase.functions.invoke("analyze-clt", { body: { email: em } });
+      await supabase.functions.invoke("analyze-clt", { body: withReview({ email: em }) });
       await refresh(em);
       toast.success("Calendar synced.");
     } catch (err) {
@@ -86,7 +87,7 @@ export default function CalendarPage() {
     setImportMessage("Importing calendar…");
     try {
       const { data, error } = await supabase.functions.invoke("ingest-ics", {
-        body: { email, icsUrl },
+        body: withReview({ email, icsUrl }),
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -109,7 +110,7 @@ export default function CalendarPage() {
       const text = await file.text();
       if (!text.trim()) throw new Error("The selected file is empty.");
       if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error("Please select a valid .ics calendar file.");
-      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: { email, icsContent: text } });
+      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: withReview({ email, icsContent: text }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       await runSync();
