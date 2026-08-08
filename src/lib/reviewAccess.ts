@@ -4,6 +4,9 @@
 
 const KEY = "headroom_review_code";
 
+/** Identity used when a reviewer opens the app with ?review=CODE and is not signed in. */
+export const REVIEW_EMAIL = "appreview@headroomapp.co";
+
 (function capture() {
   if (typeof window === "undefined") return;
   try {

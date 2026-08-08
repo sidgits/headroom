@@ -13,7 +13,7 @@ import Footer from "@/components/Footer";
 import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
-import { isReviewMode } from "@/lib/reviewAccess";
+import { isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 
 import type { ScoringResult } from "@/lib/scoring";
 
@@ -147,6 +147,8 @@ const Dashboard = () => {
       if (!identityEmail) {
         try { identityEmail = localStorage.getItem("headroom_assessment_email"); } catch {}
       }
+      // App-review mode: work with a dedicated reviewer identity, no sign-in or payment needed.
+      if (!identityEmail && isReviewMode()) identityEmail = REVIEW_EMAIL;
 
       if (session?.user) {
         setUser({ id: session.user.id, email: session.user.email });
