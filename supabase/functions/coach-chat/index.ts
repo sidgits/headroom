@@ -1,19 +1,19 @@
 // Personalized AI Productivity Coach — OpenAI Chat Completions with calendar/CLT context.
 // Supports a `propose_schedule_edit` tool call that the UI renders as an action card.
-import { corsHeaders, normalizeEmail, serviceClient, isActiveSubscriber } from "../_shared/subscription.ts";
+import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 
 interface ChatMessage { role: "user" | "assistant" | "system" | "tool"; content: string; tool_calls?: unknown; tool_call_id?: string }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email, message } = await req.json();
+    const { email, message, reviewCode } = await req.json();
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     if (!message || typeof message !== "string") return j({ error: "Missing message" }, 400);
 
     const sb = serviceClient();
-    if (!(await isActiveSubscriber(sb, e))) return j({ error: "Subscription required" }, 402);
+    if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
 
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return j({ error: "OpenAI not configured" }, 500);

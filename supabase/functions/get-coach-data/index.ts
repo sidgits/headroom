@@ -1,14 +1,14 @@
 // Fetch coach + calendar data for the dashboard (subscribers only).
-import { corsHeaders, normalizeEmail, serviceClient, isActiveSubscriber } from "../_shared/subscription.ts";
+import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email } = await req.json();
+    const { email, reviewCode } = await req.json();
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     const sb = serviceClient();
-    if (!(await isActiveSubscriber(sb, e))) return j({ error: "Subscription required" }, 402);
+    if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
 
     const from = new Date(); from.setHours(0, 0, 0, 0);
     const until = new Date(from.getTime() + 8 * 24 * 3600 * 1000);
