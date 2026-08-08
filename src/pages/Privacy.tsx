@@ -171,6 +171,150 @@ const Privacy = () => {
           </section>
 
           <section className="space-y-2">
+            <h2 className="text-xl font-semibold">7. Google User Data & Limited Use Disclosure</h2>
+            <p className="text-sm leading-relaxed">
+              This section describes, specifically and exhaustively, how Headroom accesses, uses, stores, shares, and
+              deletes Google user data obtained through Google APIs. It applies whenever you choose to sign in with
+              Google or to connect your Google Calendar to Headroom. Connecting a Google account is always optional:
+              Headroom is fully usable without it, and calendars can instead be added by uploading or linking an
+              .ics file.
+            </p>
+
+            <h3 className="text-base font-semibold pt-2">7.1 Data we access (Data Access)</h3>
+            <p className="text-sm leading-relaxed">
+              We request the narrowest scopes required for our user-facing features, and we access nothing beyond them:
+            </p>
+            <ul className="list-disc pl-6 text-sm space-y-1">
+              <li>
+                <strong>openid, .../auth/userinfo.email, .../auth/userinfo.profile</strong> — used solely to
+                authenticate you and create your Headroom account. Raw data accessed: your Google account email
+                address, name, and profile picture URL.
+              </li>
+              <li>
+                <strong>.../auth/calendar.readonly</strong> — read-only access to your Google Calendar events, used
+                solely to compute your cognitive load and burnout-risk analysis. Raw data accessed: event title,
+                start and end times, time zone, recurrence flag, location, attendee count, and busy/free status
+                for events in a rolling window of today plus the next 8 days. We never request write, update, or
+                delete access, and we never modify or create events in your calendar.
+              </li>
+            </ul>
+            <p className="text-sm leading-relaxed">
+              We do not access Gmail, Drive, Contacts, Photos, Chat, Meet, Health, YouTube, or Data Portability APIs,
+              and we do not read attachments, meeting notes, or event descriptions beyond the fields listed above.
+            </p>
+
+            <h3 className="text-base font-semibold pt-2">7.2 How we use it (Data Use)</h3>
+            <ul className="list-disc pl-6 text-sm space-y-1">
+              <li>
+                <strong>Raw Google user data</strong> is used only to provide the user-facing features you
+                requested: signing you in, displaying your own schedule back to you in the Headroom dashboard,
+                and generating your per-day and per-block cognitive load scores, burnout-risk markers, and
+                scheduling recommendations, and to power your personal AI productivity coach's answers about
+                your own schedule.
+              </li>
+              <li>
+                <strong>Aggregated / anonymized Google user data</strong> (for example, meeting counts, meeting
+                durations, and context-switch counts stripped of identifiers) is used only to compute your own
+                scores and to monitor the reliability of those calculations. We do not build cross-user profiles
+                or commercial datasets from it.
+              </li>
+              <li>
+                We never use raw or aggregated/anonymized Google user data for advertising, ad targeting,
+                retargeting, credit or lending decisions, resale, market research, or any purpose other than
+                providing and improving these user-facing features.
+              </li>
+            </ul>
+
+            <h3 className="text-base font-semibold pt-2">7.3 Who we share it with (Data Transfer)</h3>
+            <ul className="list-disc pl-6 text-sm space-y-1">
+              <li>
+                <strong>Supabase</strong> (database, authentication, and serverless function hosting) — stores your
+                events and analyses on our behalf as a processor under contractual data-protection terms.
+              </li>
+              <li>
+                <strong>Our AI model provider</strong> — when you use the AI productivity coach, the minimum
+                necessary derived schedule context (event titles, times, durations, and computed load scores) is
+                sent to the model provider solely to generate your response. The provider is contractually bound
+                not to use this data to train or improve its models, and no data is retained by it for training.
+              </li>
+            </ul>
+            <p className="text-sm leading-relaxed">
+              We never transfer or sell raw or aggregated/anonymized Google user data to data brokers,
+              advertisers, information resellers, or any third party for purposes other than providing or
+              improving these user-facing features, and never for AI/ML model training by third parties.
+            </p>
+
+            <h3 className="text-base font-semibold pt-2">7.4 AI/ML restrictions</h3>
+            <p className="text-sm leading-relaxed">
+              Raw or aggregated/anonymized Google Workspace API user data is <strong>not</strong> used to develop,
+              improve, or train generalized AI or ML models, and is not transferred to any third-party service that
+              uses it for such training. AI processing is limited to generating personalized output for the
+              individual user the data belongs to, in real time, and is not retained for model development.
+            </p>
+
+            <h3 className="text-base font-semibold pt-2">7.5 Limited Use compliance statement</h3>
+            <p className="text-sm leading-relaxed italic">
+              "Headroom's use and transfer of information received from Google APIs to any other app will adhere to
+              the{" "}
+              <a
+                href="https://developers.google.com/terms/api-services-user-data-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-2 not-italic"
+              >
+                Google API Services User Data Policy
+              </a>
+              , including the Limited Use requirements."
+            </p>
+
+            <h3 className="text-base font-semibold pt-2">7.6 How we protect it (Data Protection)</h3>
+            <ul className="list-disc pl-6 text-sm space-y-1">
+              <li>All data is encrypted in transit (TLS 1.2+) and at rest (AES-256) by our infrastructure provider.</li>
+              <li>
+                OAuth access and refresh tokens are stored server-side only, in restricted tables that are never
+                readable from the browser, and are accessible only to our server-side functions.
+              </li>
+              <li>
+                Database access is enforced with row-level security so that each user can only ever read their own
+                calendar data; privileged keys are never exposed to client code.
+              </li>
+              <li>Access to production systems is limited to authorized personnel, protected by MFA and audit logging.</li>
+            </ul>
+
+            <h3 className="text-base font-semibold pt-2">7.7 Retention & deletion of Google user data</h3>
+            <ul className="list-disc pl-6 text-sm space-y-1">
+              <li>
+                Calendar events are retained only for the rolling analysis window (today plus the next 8 days) and
+                are overwritten on each sync; superseded events are deleted automatically.
+              </li>
+              <li>
+                Disconnecting your calendar in the Headroom dashboard immediately deletes the stored OAuth tokens,
+                all synced calendar events, and the derived analyses for that connection.
+              </li>
+              <li>
+                You may also revoke Headroom's access at any time at{" "}
+                <a
+                  href="https://myaccount.google.com/permissions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  myaccount.google.com/permissions
+                </a>
+                .
+              </li>
+              <li>
+                Deleting your Headroom account, or emailing{" "}
+                <a href="mailto:sid@headroomapp.co" className="text-primary underline underline-offset-2">
+                  sid@headroomapp.co
+                </a>
+                , erases all Google user data (profile, tokens, events, and analyses) within 30 days, including from
+                encrypted backups on their normal rotation cycle.
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-2">
             <h2 className="text-xl font-semibold">8. International Data Transfers</h2>
             <p className="text-sm leading-relaxed">
               Headroom is based in the United States. Personal Data collected through the Service may be transferred
