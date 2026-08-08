@@ -1,14 +1,14 @@
 // Disconnect a calendar connection (and its events) for the user.
-import { corsHeaders, normalizeEmail, serviceClient, isActiveSubscriber } from "../_shared/subscription.ts";
+import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email, connectionId } = await req.json();
+    const { email, connectionId, reviewCode } = await req.json();
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     const sb = serviceClient();
-    if (!(await isActiveSubscriber(sb, e))) return j({ error: "Subscription required" }, 402);
+    if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
 
     // Only allow deleting connections that belong to this email.
     const q = sb.from("calendar_connections").select("id").ilike("email", e);

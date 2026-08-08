@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, Loader2, RefreshCw, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { withReview, isReviewMode } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 
@@ -47,7 +48,7 @@ export default function CalendarPage() {
   }, []);
 
   const refresh = async (e: string) => {
-    const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email: e } });
+    const { data, error } = await supabase.functions.invoke("get-coach-data", { body: withReview({ email: e }) });
     if (error) {
       if ((error as { context?: { status?: number } }).context?.status === 402) {
         toast.error("Subscription required.");
@@ -64,18 +65,35 @@ export default function CalendarPage() {
     const em = e ?? email; if (!em) return;
     setBusy("sync");
     try {
-      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: { email: em } });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: withReview({ email: em }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const errors: string[] = data?.errors ?? [];
       if (errors.length) throw new Error(errors[0]);
-      await supabase.functions.invoke("analyze-clt", { body: { email: em } });
+      await supabase.functions.invoke("analyze-clt", { body: withReview({ email: em }) });
       await refresh(em);
       toast.success("Calendar synced.");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Sync failed.";
       console.error(err); setSyncError(message); toast.error(message);
     } finally { setBusy(null); }
+  };
+
+  const connectGoogle = async () => {
+    if (!email) return;
+    setBusy("google");
+    try {
+      const { data, error } = await supabase.functions.invoke("google-oauth-start", {
+        body: withReview({ email, redirectTo: `${window.location.origin}/dashboard/calendar` }),
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.url) { window.location.href = data.url; return; }
+      throw new Error("Could not start Google authorisation.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google connection failed.");
+      setBusy(null);
+    }
   };
 
   const submitIcs = async () => {
@@ -86,7 +104,7 @@ export default function CalendarPage() {
     setImportMessage("Importing calendar…");
     try {
       const { data, error } = await supabase.functions.invoke("ingest-ics", {
-        body: { email, icsUrl },
+        body: withReview({ email, icsUrl }),
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -109,7 +127,7 @@ export default function CalendarPage() {
       const text = await file.text();
       if (!text.trim()) throw new Error("The selected file is empty.");
       if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error("Please select a valid .ics calendar file.");
-      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: { email, icsContent: text } });
+      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: withReview({ email, icsContent: text }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       await runSync();
@@ -182,10 +200,22 @@ export default function CalendarPage() {
                     onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
                 </div>
               </div>
-              <div className="rounded-xl border border-dashed border-border bg-background/40 p-4 flex flex-col justify-center">
-                <div className="font-semibold text-muted-foreground">Google / Outlook Calendar</div>
-                <p className="text-xs text-muted-foreground mt-1">Direct integration coming soon!</p>
-              </div>
+              {isReviewMode() ? (
+                <div className="rounded-xl border border-primary/30 bg-background p-4 space-y-2">
+                  <div className="font-semibold">Google Calendar</div>
+                  <p className="text-xs text-muted-foreground">Connect your Google Calendar (read-only) to score your real schedule.</p>
+                  <button onClick={connectGoogle} disabled={!!busy}
+                    className="text-xs inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
+                    {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
+                    Connect Google Calendar
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-border bg-background/40 p-4 flex flex-col justify-center">
+                  <div className="font-semibold text-muted-foreground">Google / Outlook Calendar</div>
+                  <p className="text-xs text-muted-foreground mt-1">Direct integration coming soon!</p>
+                </div>
+              )}
             </div>
           </div>
         ) : (

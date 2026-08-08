@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, Send, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { withReview, isReviewMode } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 import coachAvatar from "@/assets/coach-avatar.jpg";
@@ -34,7 +35,7 @@ export default function CoachPage() {
       if (!e) { try { e = localStorage.getItem("headroom_assessment_email"); } catch { /**/ } }
       if (!e) { navigate("/login", { replace: true }); return; }
       setEmail(e);
-      const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email: e } });
+      const { data, error } = await supabase.functions.invoke("get-coach-data", { body: withReview({ email: e }) });
       if (error) {
         if ((error as { context?: { status?: number } }).context?.status === 402) {
           toast.error("Subscription required.");
@@ -60,7 +61,7 @@ export default function CoachPage() {
     setMessages((m) => [...m, optimistic]);
     setInput("");
     try {
-      const { data, error } = await supabase.functions.invoke("coach-chat", { body: { email, message: text } });
+      const { data, error } = await supabase.functions.invoke("coach-chat", { body: withReview({ email, message: text }) });
       if (error) throw error;
       const reply: Msg = {
         id: `a-${Date.now()}`, role: "assistant",

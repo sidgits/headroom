@@ -1,16 +1,16 @@
 // Sync upcoming events for the user's connected calendar (Google or ICS).
-import { corsHeaders, normalizeEmail, serviceClient, isActiveSubscriber } from "../_shared/subscription.ts";
+import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 
 const DAYS_AHEAD = 14;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email } = await req.json();
+    const { email, reviewCode } = await req.json();
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     const sb = serviceClient();
-    if (!(await isActiveSubscriber(sb, e))) return j({ error: "Subscription required" }, 402);
+    if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
 
     const { data: conns } = await sb
       .from("calendar_connections")
