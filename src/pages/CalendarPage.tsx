@@ -37,7 +37,7 @@ export default function CalendarPage() {
       const { data: { session } } = await supabase.auth.getSession();
       let e = session?.user?.email ?? null;
       if (!e) { try { e = localStorage.getItem("headroom_assessment_email"); } catch { /**/ } }
-      if (!e) { navigate("/"); return; }
+      if (!e) { navigate("/login", { replace: true }); return; }
       setEmail(e);
       await refresh(e);
       setLoading(false);

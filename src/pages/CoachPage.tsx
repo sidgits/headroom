@@ -32,7 +32,7 @@ export default function CoachPage() {
       const { data: { session } } = await supabase.auth.getSession();
       let e = session?.user?.email ?? null;
       if (!e) { try { e = localStorage.getItem("headroom_assessment_email"); } catch { /**/ } }
-      if (!e) { navigate("/"); return; }
+      if (!e) { navigate("/login", { replace: true }); return; }
       setEmail(e);
       const { data, error } = await supabase.functions.invoke("get-coach-data", { body: { email: e } });
       if (error) {
