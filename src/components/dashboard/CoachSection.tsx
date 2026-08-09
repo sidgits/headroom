@@ -44,13 +44,18 @@ export default function CoachSection({ email, firstName }: { email: string; firs
     try {
       const { data, error } = await supabase.functions.invoke("coach-chat", { body: withReview({ email, message: text }) });
       if (error) throw error;
+      const calls = [
+        ...((data?.suggestions ?? []) as Suggestion[]).map((s) => ({ function: { name: "propose_schedule_edit", arguments: JSON.stringify(s) } })),
+        ...((data?.reports ?? []) as CoachReport[]).map((r) => ({ function: { name: "generate_pdf_report", arguments: JSON.stringify(r) } })),
+      ];
       const reply: Msg = {
         id: `a-${Date.now()}`, role: "assistant",
         content: data?.reply ?? "",
-        parts: data?.suggestions?.length ? { tool_calls: data.suggestions.map((s: Suggestion) => ({ function: { name: "propose_schedule_edit", arguments: JSON.stringify(s) } })) } : null,
+        parts: calls.length ? { tool_calls: calls } : null,
         created_at: new Date().toISOString(),
       };
       setMessages((m) => [...m, reply]);
+
     } catch (err) {
       console.error(err);
       toast.error("Coach is unavailable. Try again.");
