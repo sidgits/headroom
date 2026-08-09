@@ -191,8 +191,28 @@ const Dashboard = () => {
         ]);
 
         if (!isMounted) return;
-        if (completionsRes.data) setCompletions(completionsRes.data as Completion[]);
-        if (checkinsRes.data) setCheckins(checkinsRes.data as Checkin[]);
+        let loadedCompletions = (completionsRes.data ?? []) as Completion[];
+        let loadedCheckins = (checkinsRes.data ?? []) as Checkin[];
+        let subscribed = false;
+
+        // Older assessments were taken anonymously (no user_id), so RLS hides
+        // them from the signed-in query. Fall back to the email-based lookup.
+        if (loadedCompletions.length === 0 && identityEmail) {
+          const { data: fallback } = await supabase.functions.invoke("get-user-dashboard", {
+            body: { email: identityEmail },
+          });
+          if (!isMounted) return;
+          if (fallback) {
+            if (Array.isArray(fallback.completions)) loadedCompletions = fallback.completions as Completion[];
+            if (Array.isArray(fallback.checkins) && loadedCheckins.length === 0) {
+              loadedCheckins = fallback.checkins as Checkin[];
+            }
+            if (fallback.subscribed) subscribed = true;
+          }
+        }
+
+        setCompletions(loadedCompletions);
+        setCheckins(loadedCheckins);
 
         // Subscription status (drives the upgrade CTA visibility).
         const { data: subRow } = await supabase
@@ -200,7 +220,6 @@ const Dashboard = () => {
           .select("status, current_period_end")
           .eq("user_id", session.user.id)
           .maybeSingle();
-        let subscribed = false;
         if (
           subRow &&
           ["active", "trialing"].includes(subRow.status as string) &&
