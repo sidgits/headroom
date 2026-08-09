@@ -145,7 +145,7 @@ export default function CalendarPage() {
   const groupedByDay = (() => {
     const map = new Map<string, EventRow[]>();
     for (const ev of events) {
-      const d = ev.starts_at.slice(0, 10);
+      const d = localDateKey(ev.starts_at);
       if (!map.has(d)) map.set(d, []);
       map.get(d)!.push(ev);
     }
@@ -337,7 +337,7 @@ function LoadBar({ label, value, color }: { label: string; value: number; color:
 }
 
 function DayChip({ day }: { day: CltDay }) {
-  const d = new Date(day.analysis_date);
+  const d = new Date(day.analysis_date + "T00:00:00");
   const color =
     day.daily_load_score >= 70 ? "border-[hsl(var(--warm-red)/0.5)] bg-[hsl(var(--warm-red)/0.1)]"
     : day.daily_load_score >= 50 ? "border-[hsl(var(--deep-orange)/0.5)] bg-[hsl(var(--deep-orange)/0.1)]"
@@ -371,4 +371,10 @@ function dayLabel(date: string) {
   const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
   const base = d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
   return diff === 0 ? `Today · ${base}` : diff === 1 ? `Tomorrow · ${base}` : base;
+}
+
+/** Local calendar date (YYYY-MM-DD) for an instant — never bucket on the UTC date. */
+function localDateKey(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
