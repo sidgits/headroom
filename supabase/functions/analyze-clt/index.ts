@@ -205,8 +205,17 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   }
 
 
-  // Fragmentation penalty
+  // Fragmentation penalty: many blocks, and — more importantly — no window long
+  // enough to do real work in. A 3-hour day chopped into six pieces costs more
+  // than three hours booked in one run.
   if (events.length >= 6) extraneous += (events.length - 5) * 2;
+  const longestGap = largestFreeWindow(events, tz);
+  if (events.length >= 3 && longestGap < 90) {
+    extraneous += events.length >= 5 ? 14 : 9;
+  } else if (events.length >= 4 && longestGap < 120) {
+    extraneous += 6;
+  }
+
 
   // Cap each at ~100 for display
   const cap = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
