@@ -4,6 +4,7 @@ import { FileDown, Loader2, Send, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode } from "@/lib/reviewAccess";
 import { generateCoachPDF, type CoachReport } from "@/lib/generateCoachPDF";
+import { parseToolCalls, ReportCard } from "@/components/dashboard/CoachReportCard";
 import { toast } from "sonner";
 import coachAvatar from "@/assets/coach-avatar.jpg";
 
