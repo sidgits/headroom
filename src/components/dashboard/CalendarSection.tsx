@@ -170,7 +170,6 @@ export default function CalendarSection({ email }: { email: string }) {
   const maxStart = Math.max(0, clt.length - 7);
   const stripStart = Math.min(maxStart, Math.max(0, baseStart + stripOffset * 7));
   const visibleClt = clt.slice(stripStart, stripStart + 7);
-  const visibleDates = new Set(visibleClt.map((d) => d.analysis_date));
   const canPageBack = stripStart > 0;
   const canPageForward = stripStart < maxStart;
   // The strip pages week by week, but the cascade below always lists every
