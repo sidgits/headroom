@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Send, Sparkles } from "lucide-react";
+import { FileDown, Loader2, Send, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode } from "@/lib/reviewAccess";
+import { generateCoachPDF, type CoachReport } from "@/lib/generateCoachPDF";
 import { toast } from "sonner";
 import coachAvatar from "@/assets/coach-avatar.jpg";
 
@@ -13,6 +14,7 @@ interface Msg {
   created_at: string;
 }
 interface Suggestion { event_id: string; action: string; title: string; rationale: string }
+
 
 export default function CoachSection({ email, firstName }: { email: string; firstName: string }) {
   const [messages, setMessages] = useState<Msg[]>([]);
