@@ -1,64 +1,48 @@
-# Paid Features: Calendar Integration + AI Productivity Coach
+# Outlook Calendar Integration (delegated user access)
 
-Both features unlock after Stripe subscription becomes active. Locked tiles on the dashboard get replaced with full functional tabs.
+Goal: paid users connect their own Microsoft work or personal account and get the same 60-days-back / 30-days-ahead load analysis the ICS path already produces. Delegated permissions only — no admin-consent-only application permissions.
 
-## 1. Prerequisites you'll need to provide
+## What already exists
 
-- **OpenAI API key** — I'll request via secret prompt as `OPENAI_API_KEY`.
-- **Google OAuth credentials** — you create them in Google Cloud Console (Calendar API enabled, scope `https://www.googleapis.com/auth/calendar.readonly`, redirect URI = our edge function callback). I'll give you the exact redirect URL once the function is deployed. You'll add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+- `calendar_connections` already has `outlook_access_token`, `outlook_refresh_token`, `outlook_token_expires_at` and a `provider` column.
+- `sync-calendar` already contains a working `syncOutlook` (Graph `/me/calendarview`) plus refresh-token logic reading `OUTLOOK_CLIENT_ID` / `OUTLOOK_CLIENT_SECRET`.
+- Missing: the OAuth start/callback functions, the secrets, the dashboard UI, and disconnect handling for Outlook.
 
-## 2. Database (new tables)
+## 1. Microsoft Entra app registration (your steps)
 
-- `calendar_connections` — user email, provider (`google` | `ics`), encrypted tokens / ics_url, last_synced_at.
-- `calendar_events` — connection_id, external_id, title, start, end, attendee_count, is_recurring, source.
-- `clt_analyses` — email, date, daily_load_score (0–100), intrinsic/extraneous/germane breakdown, recommendations JSON.
-- `coach_conversations` + `coach_messages` — per-email threads with role/content/parts, indexed by email.
+In the Entra admin center → App registrations → New registration:
 
-All gated by `has_active_subscription` via email lookup in `subscribers`. Edge functions use service role.
+- Supported account types: **Accounts in any organizational directory and personal Microsoft accounts** (multitenant + MSA). This is what lets users from any tenant sign in.
+- Redirect URI (Web): the callback URL I will give you once the function is deployed — it will be the backend function endpoint `.../functions/v1/outlook-oauth-callback`.
+- Certificates & secrets → new client secret (24 months), copy the value once.
+- API permissions → Microsoft Graph → **Delegated**: `openid`, `profile`, `email`, `offline_access`, `Calendars.Read`. No admin consent required for these on most tenants; each user consents for themselves.
+- Publisher verification: link the app registration to a verified Microsoft Partner Network account so the consent screen shows a verified publisher and tenants with "verified publishers only" policies allow it. (Some tenants still block all third-party consent — those users keep the ICS path.)
 
-## 3. Edge functions
+Then I request `OUTLOOK_CLIENT_ID` and `OUTLOOK_CLIENT_SECRET` via the secure secret form.
 
-- `google-oauth-start` — returns auth URL with state.
-- `google-oauth-callback` — exchanges code, stores refresh token, triggers initial sync.
-- `sync-google-calendar` — pulls next 14 days of events using refresh token.
-- `ingest-ics` — accepts ICS URL or pasted text, parses with `ical.js`, stores events.
-- `analyze-clt` — runs the Sweller-CLT orchestration over events for a date range:
-  - **Intrinsic load**: estimated task complexity from event titles + duration.
-  - **Extraneous load**: context-switch count, back-to-back meetings, fragmented deep-work gaps, after-hours overflow.
-  - **Germane load**: focus blocks ≥ 90min, learning/review blocks, single-topic streaks.
-  - Returns daily score + per-block tips (add buffer, batch, chunk, switch modality, defer).
-- `coach-chat` — OpenAI Chat Completions (`gpt-4o-mini` default). System prompt injects: user's name, archetype, today's CLT analysis, upcoming events. Supports tool calls: `propose_schedule_edit({event_id, action, rationale})` returned to UI for user accept/reject. Verifies subscription on every call.
+## 2. Backend
 
-## 4. Frontend
+- New `outlook-oauth-start`: validates email + paid access (same `hasPaidAccess` helper as Google), builds the `login.microsoftonline.com/common/oauth2/v2.0/authorize` URL with the delegated scopes, `response_type=code`, `prompt=select_account`, and a base64 `state` carrying email / redirectTo / reviewCode.
+- New `outlook-oauth-callback`: exchanges code at the `/common` token endpoint, upserts the `outlook` row in `calendar_connections` (preserving an existing refresh token when Microsoft omits one), then 302s back to the dashboard with `?calendar=connected|denied|error`.
+- `sync-calendar` hardening for Outlook: follow `@odata.nextLink` pagination, add `Prefer: outlook.timezone="UTC"`, dedupe on `iCalUId`, skip cancelled events, and surface a clear "reconnect Outlook" message on 401/403 — matching what the Google path does.
+- `disconnect-calendar`: allow provider `outlook` and clear its token columns.
+- Both new functions are public (`verify_jwt = false`) like the Google pair, gated by paid access / review code.
 
-- **Dashboard gating**: when `isSubscribed`, the two locked tiles become live cards linking to `/dashboard/calendar` and `/dashboard/coach`.
-- **`/dashboard/calendar`**:
-  - Connect modal: "Connect Google Calendar" button + "Upload .ics file / Paste subscription URL" tab.
-  - Daily strip (next 7 days) with color-coded load score (warm palette — amber/orange/red, no green per project rules; low load = soft cream).
-  - Day detail: timeline of events, each with a CLT tip chip; daily summary card with the three load components and top 3 recommendations.
-- **`/dashboard/coach`**:
-  - Chat UI built with AI Elements (`conversation`, `message`, `prompt-input`, `tool`, `shimmer`).
-  - Header: "{FirstName}'s Personalized AI Productivity Coach" with a custom generated coach avatar (not Sparkles).
-  - Messages stored per email in `coach_messages`; one rolling conversation (matches existing one-conversation pattern in the app).
-  - Tool-call cards: when coach proposes a schedule edit, render an inline card with Accept / Dismiss; Accept marks the suggestion (calendar write-back is out of scope for v1 — read-only + suggestion only).
-  - Textarea stays focused; streaming via `streamText` + `toUIMessageStreamResponse`.
+## 3. Frontend
 
-## 5. Stripe webhook update
+- On the calendar card, replace the "Google / Outlook coming soon" placeholder with a **Connect Outlook Calendar** tile (Microsoft mark, one-click, opens consent, returns to `/dashboard/calendar`).
+- Google tile stays review-mode-only until Google verification lands.
+- Handle `?calendar=` query params with the existing toast pattern; after `connected`, trigger sync + analyze automatically.
+- Connected state shows "Connected via Outlook" with last-synced time and a Disconnect action.
 
-`stripe-webhook` already sets `subscribers.status`. No change needed — dashboard re-queries on mount.
+## 4. Error handling for tenant blocks
 
-## 6. Out of scope for v1 (call out)
+If consent fails with `AADSTS65001` / `AADSTS90094` (admin consent required by tenant policy), the callback redirects with a specific flag and the UI shows: "Your organisation blocks third-party calendar apps — use the .ics upload instead", with a link to the ICS instructions.
 
-- Writing edits back to Google Calendar (suggestions only).
-- Outlook / Apple Calendar (can add later).
-- Multi-thread coach history.
+## 5. Build order
 
-## 7. Build order
-
-1. Secrets (`OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`).
-2. Migration: 4 new tables + RLS + grants.
-3. Edge functions: oauth pair, sync, ingest-ics, analyze-clt, coach-chat.
-4. Dashboard routes + components, unlock logic.
-5. Smoke test: connect ICS → see CLT scores → chat with coach → receive a tool-call suggestion.
-
-Reply **approve** to start, or tell me what to change (e.g. skip Google for now, use Lovable AI instead of OpenAI direct, single coach model only).
+1. You create the Entra app; I supply the exact redirect URI after step 2 deploys.
+2. Deploy `outlook-oauth-start` + `outlook-oauth-callback` (they read the secrets).
+3. Add secrets, harden `sync-calendar`, update `disconnect-calendar`.
+4. Calendar page UI + query-param handling.
+5. End-to-end test with a personal Microsoft account and, if you have one, a work account.
