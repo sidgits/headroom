@@ -66,6 +66,21 @@ Deno.serve(async (req) => {
       avatar_url: avatarUrl,
     });
 
+    // Claim any assessments/checkins/subscriptions taken anonymously with this
+    // email so they show up on the dashboard after signing in (magic link or Google).
+    try {
+      await Promise.all([
+        admin.from("assessment_completions").update({ user_id: user.id })
+          .is("user_id", null).ilike("email", email),
+        admin.from("dashboard_checkins").update({ user_id: user.id })
+          .is("user_id", null).ilike("email", email),
+        admin.from("subscribers").update({ user_id: user.id })
+          .is("user_id", null).ilike("email", email),
+      ]);
+    } catch (e) {
+      console.error("backfill user_id failed", e);
+    }
+
     if (insertError) {
       console.error("Insert error:", insertError);
       return new Response(JSON.stringify({ error: insertError.message }), {
