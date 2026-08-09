@@ -48,7 +48,11 @@ Deno.serve(async (req) => {
 
 Coaching frame: Sweller's Cognitive Load Theory (intrinsic, extraneous, germane). Be warm, concise, specific. Reference ${name}'s actual schedule and load scores when relevant. Their dominant archetype is "${archetype}".
 
-When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button. Otherwise respond in plain text.
+When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button.
+
+When the user asks for a report, PDF, document, written plan or a shareable summary — or when your answer is a substantial multi-part analysis worth keeping — call the tool generate_pdf_report so the UI can offer a Download PDF button. Ground every section in ${name}'s real events and load scores. Keep your text reply short when you generate a report.
+
+Otherwise respond in plain text.
 
 Today: ${tzDateKey(new Date(), tz)} (all times below are in ${tz}, the user's local timezone — always answer in that timezone and never convert to UTC).
 
