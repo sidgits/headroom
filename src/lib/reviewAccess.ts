@@ -30,8 +30,20 @@ export function isReviewMode(): boolean {
   return !!getReviewCode();
 }
 
-/** Adds the review code to an edge function request body when present. */
-export function withReview<T extends Record<string, unknown>>(body: T): T & { reviewCode?: string } {
+/** The browser's IANA timezone, used so the backend buckets days and core hours locally. */
+export function localTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
+/** Adds the review code + the user's timezone to an edge function request body. */
+export function withReview<T extends Record<string, unknown>>(
+  body: T,
+): T & { reviewCode?: string; timeZone: string } {
   const code = getReviewCode();
-  return code ? { ...body, reviewCode: code } : body;
+  const withTz = { ...body, timeZone: localTimeZone() };
+  return code ? { ...withTz, reviewCode: code } : withTz;
 }

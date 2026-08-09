@@ -1,12 +1,14 @@
 // Sync upcoming events for the user's connected calendar (Google or ICS).
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
+import { safeTz, tzStartOfToday } from "../_shared/tz.ts";
 
 const DAYS_AHEAD = 14;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email, reviewCode } = await req.json();
+    const { email, reviewCode, timeZone } = await req.json();
+    const tz = safeTz(timeZone);
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     const sb = serviceClient();
@@ -26,9 +28,9 @@ Deno.serve(async (req) => {
       const { error: deleteError } = await sb.from("calendar_events").delete().eq("connection_id", conn.id);
       if (deleteError) throw deleteError;
       let events = 0;
-      if (conn.provider === "google") events = await syncGoogle(sb, conn, errors);
-      else if (conn.provider === "outlook") events = await syncOutlook(sb, conn, errors);
-      else events = await syncIcs(sb, conn, errors);
+      if (conn.provider === "google") events = await syncGoogle(sb, conn, errors, tz);
+      else if (conn.provider === "outlook") events = await syncOutlook(sb, conn, errors, tz);
+      else events = await syncIcs(sb, conn, errors, tz);
       totalEvents += events;
       await sb.from("calendar_connections").update({ last_synced_at: new Date().toISOString() }).eq("id", conn.id);
     }
@@ -47,7 +49,7 @@ function providerMessage(status: number, body: string): string {
   return `Calendar provider error (${status}).`;
 }
 
-async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
+async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = [], tz = "UTC"): Promise<number> {
   let access = conn.google_access_token as string | null;
   const expires = conn.google_token_expires_at ? new Date(conn.google_token_expires_at as string) : null;
   if (!access || !expires || expires < new Date()) {
@@ -55,7 +57,7 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
   }
   if (!access) { errors.push("Google access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const now = tzStartOfToday(tz);
   const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
 
   // Collect the calendars the user actually looks at (primary + any selected ones).
@@ -155,7 +157,7 @@ async function refreshAccess(sb: ReturnType<typeof serviceClient>, conn: Record<
   return tok.access_token;
 }
 
-async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
+async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = [], tz = "UTC"): Promise<number> {
   let access = conn.outlook_access_token as string | null;
   const expires = conn.outlook_token_expires_at ? new Date(conn.outlook_token_expires_at as string) : null;
   if (!access || !expires || expires < new Date()) {
@@ -163,7 +165,7 @@ async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<st
   }
   if (!access) { errors.push("Outlook access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const now = tzStartOfToday(tz);
   const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
   const url = new URL("https://graph.microsoft.com/v1.0/me/calendarview");
   url.searchParams.set("startDateTime", now.toISOString());
@@ -232,7 +234,7 @@ async function refreshOutlookAccess(sb: ReturnType<typeof serviceClient>, conn: 
   return tok.access_token;
 }
 
-async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = []): Promise<number> {
+async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = [], tz = "UTC"): Promise<number> {
   let text = conn.ics_content as string | null;
   if (!text && conn.ics_url) {
     // Some providers only serve ICS over webcal:// — normalise to https.
@@ -253,10 +255,9 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
     return 0;
   }
 
-  // Start at midnight today so the present day is fully covered, not just the hours left.
-  const now = new Date();
-  const from = new Date(now); from.setHours(0, 0, 0, 0);
-  const max = new Date(now.getTime() + DAYS_AHEAD * 24 * 3600 * 1000);
+  // Start at local midnight today so the present day is fully covered.
+  const from = tzStartOfToday(tz);
+  const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
   const parsed = parseIcs(text);
   const occurrences = expandOccurrences(parsed, from, max);
 
