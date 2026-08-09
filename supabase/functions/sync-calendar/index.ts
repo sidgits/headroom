@@ -286,7 +286,7 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
     if (error) throw error;
   }
   if (!rows.length) {
-    errors.push("We parsed your calendar but found no events in the next 14 days.");
+    errors.push("We parsed your calendar, but it contains no upcoming events. In Outlook use Save Calendar → More Options and set the date range to the next 2 weeks with Full details, then upload again.");
   }
   return rows.length;
 }
