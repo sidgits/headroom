@@ -173,9 +173,12 @@ export default function CalendarSection({ email }: { email: string }) {
   const visibleDates = new Set(visibleClt.map((d) => d.analysis_date));
   const canPageBack = stripStart > 0;
   const canPageForward = stripStart < maxStart;
-  const visibleDays = visibleDates.size
-    ? groupedByDay.filter(([date]) => visibleDates.has(date))
-    : groupedByDay;
+  // The strip pages week by week, but the cascade below always lists every
+  // analysed day so users can just scroll through the whole window.
+  const visibleDays = groupedByDay;
+  const dayAnchorId = (date: string) => `sec-day-${date}`;
+  const scrollToDay = (date: string) =>
+    document.getElementById(dayAnchorId(date))?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
     <section className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6 space-y-5">
@@ -301,7 +304,7 @@ export default function CalendarSection({ email }: { email: string }) {
               </button>
             </div>
               <div className="grid grid-cols-7 gap-2">
-                {visibleClt.map((d) => <DayChip key={d.analysis_date} day={d} />)}
+                {visibleClt.map((d) => <DayChip key={d.analysis_date} day={d} onSelect={scrollToDay} />)}
               </div>
             </div>
           )}
@@ -411,7 +414,7 @@ function LoadBar({ label, value, color }: { label: string; value: number; color:
   );
 }
 
-function DayChip({ day }: { day: CltDay }) {
+function DayChip({ day, onSelect }: { day: CltDay; onSelect?: (date: string) => void }) {
   const d = new Date(day.analysis_date + "T00:00:00");
   const color =
     day.daily_load_score >= 70 ? "border-[hsl(var(--warm-red)/0.5)] bg-[hsl(var(--warm-red)/0.1)]"
@@ -419,11 +422,12 @@ function DayChip({ day }: { day: CltDay }) {
     : day.daily_load_score >= 30 ? "border-[hsl(var(--golden)/0.5)] bg-[hsl(var(--golden)/0.1)]"
     : "border-border bg-card/40";
   return (
-    <div className={`rounded-xl border p-2 text-center ${color}`}>
+    <button type="button" onClick={() => onSelect?.(day.analysis_date)}
+      className={`w-full rounded-xl border p-2 text-center transition-colors hover:border-primary/60 ${color}`}>
       <div className="text-[10px] uppercase text-muted-foreground">{d.toLocaleDateString(undefined, { weekday: "short" })}</div>
       <div className="text-sm font-bold">{d.getDate()}</div>
       <div className="text-[11px] font-semibold mt-0.5">{day.daily_load_score}</div>
-    </div>
+    </button>
   );
 }
 
