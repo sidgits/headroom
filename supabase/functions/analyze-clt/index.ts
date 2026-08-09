@@ -41,9 +41,9 @@ Deno.serve(async (req) => {
     const sb = serviceClient();
     if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
 
-    // Today (from midnight) plus the week ahead.
-    const from = tzStartOfToday(tz);
-    const end = new Date(from.getTime() + 8 * 24 * 3600 * 1000);
+    // 60 days of history through 30 days ahead.
+    const from = new Date(tzStartOfToday(tz).getTime() - 60 * 24 * 3600 * 1000);
+    const end = new Date(tzStartOfToday(tz).getTime() + 31 * 24 * 3600 * 1000);
 
     const { data: events } = await sb
       .from("calendar_events")
