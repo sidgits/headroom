@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, Calendar, CheckCircle2, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode } from "@/lib/reviewAccess";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ export default function CalendarSection({ email }: { email: string }) {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [clt, setClt] = useState<CltDay[]>([]);
+  const [stripOffset, setStripOffset] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
   const [syncError, setSyncError] = useState<string | null>(null);
