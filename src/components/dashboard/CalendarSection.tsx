@@ -162,12 +162,19 @@ export default function CalendarSection({ email }: { email: string }) {
   })();
 
   const cltByDay = new Map(clt.map((d) => [d.analysis_date, d]));
-  // Strip shows the current week in context: today plus the following days,
-  // falling back to the most recent days when everything is in the past.
+  // Strip opens on today and can be paged back through history / forward.
   const todayKey = new Date().toLocaleDateString("en-CA");
   const todayIdx = clt.findIndex((d) => d.analysis_date >= todayKey);
-  const stripStart = todayIdx === -1 ? Math.max(0, clt.length - 7) : todayIdx;
+  const baseStart = todayIdx === -1 ? Math.max(0, clt.length - 7) : todayIdx;
+  const maxStart = Math.max(0, clt.length - 7);
+  const stripStart = Math.min(maxStart, Math.max(0, baseStart + stripOffset * 7));
   const visibleClt = clt.slice(stripStart, stripStart + 7);
+  const visibleDates = new Set(visibleClt.map((d) => d.analysis_date));
+  const canPageBack = stripStart > 0;
+  const canPageForward = stripStart < maxStart;
+  const visibleDays = visibleDates.size
+    ? groupedByDay.filter(([date]) => visibleDates.has(date))
+    : groupedByDay;
 
   return (
     <section className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6 space-y-5">
@@ -268,8 +275,33 @@ export default function CalendarSection({ email }: { email: string }) {
           )}
 
           {clt.length > 0 && (
-            <div className="grid grid-cols-7 gap-2">
-              {visibleClt.map((d) => <DayChip key={d.analysis_date} day={d} />)}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => setStripOffset((o) => o - 1)}
+                disabled={!canPageBack}
+                aria-label="Earlier dates"
+                className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">
+                {rangeLabel(visibleClt)}
+              </span>
+              <button
+                type="button"
+                onClick={() => setStripOffset((o) => o + 1)}
+                disabled={!canPageForward}
+                aria-label="Later dates"
+                className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+              <div className="grid grid-cols-7 gap-2">
+                {visibleClt.map((d) => <DayChip key={d.analysis_date} day={d} />)}
+              </div>
             </div>
           )}
 
@@ -295,7 +327,7 @@ export default function CalendarSection({ email }: { email: string }) {
 
 
           <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-            {groupedByDay.map(([date, evs]) => {
+            {visibleDays.map(([date, evs]) => {
               const day = cltByDay.get(date);
               return (
                 <motion.div key={date} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
@@ -419,4 +451,15 @@ function dayLabel(date: string) {
 function localDateKey(iso: string): string {
   const d = new Date(iso);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function rangeLabel(days: { analysis_date: string }[]) {
+  if (days.length === 0) return "";
+  const fmt = (k: string) => {
+    const [y, m, d] = k.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
+  const first = fmt(days[0].analysis_date);
+  const last = fmt(days[days.length - 1].analysis_date);
+  return first === last ? first : `${first} – ${last}`;
 }
