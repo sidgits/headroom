@@ -137,11 +137,15 @@ Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.scor
       parts: toolCalls.length ? { tool_calls: toolCalls } : null,
     });
 
+    type TC = { function: { name: string; arguments: string } };
+    const parsed = (toolCalls as TC[]).map((tc) => {
+      try { return { name: tc.function.name, args: JSON.parse(tc.function.arguments) }; } catch { return null; }
+    }).filter(Boolean) as { name: string; args: Record<string, unknown> }[];
+
     return j({
       reply,
-      suggestions: toolCalls.map((tc: { function: { arguments: string } }) => {
-        try { return JSON.parse(tc.function.arguments); } catch { return null; }
-      }).filter(Boolean),
+      suggestions: parsed.filter((p) => p.name === "propose_schedule_edit").map((p) => p.args),
+      reports: parsed.filter((p) => p.name === "generate_pdf_report").map((p) => p.args),
     });
   } catch (err) {
     console.error("coach-chat", err);
