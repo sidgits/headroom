@@ -18,7 +18,11 @@ Deno.serve(async (req) => {
     }
 
     const sb = serviceClient();
-    if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
+    if (!(await hasPaidAccess(sb, e, reviewCode))) {
+      console.error("ingest-ics denied: no paid access", { email: e });
+      return j({ error: "Subscription required" }, 402);
+    }
+    console.log("ingest-ics accepted", { email: e, bytes: (icsContent ?? "").length, url: !!icsUrl });
 
     // Validate first, then replace any prior ICS connection so a bad upload
     // cannot erase a previously working calendar.

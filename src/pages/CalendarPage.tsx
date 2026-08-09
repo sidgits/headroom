@@ -124,9 +124,13 @@ export default function CalendarPage() {
     setSyncError(null);
     setImportMessage(`Importing ${file.name}…`);
     try {
+      if (/\.zip$/i.test(file.name)) {
+        throw new Error("That's a .zip export — unzip it first and upload the .ics file inside.");
+      }
       const text = await file.text();
       if (!text.trim()) throw new Error("The selected file is empty.");
       if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error("Please select a valid .ics calendar file.");
+      if (!/BEGIN:VEVENT/i.test(text)) throw new Error("This calendar file has no events in it.");
       const { data, error } = await supabase.functions.invoke("ingest-ics", { body: withReview({ email, icsContent: text }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
