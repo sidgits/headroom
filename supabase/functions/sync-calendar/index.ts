@@ -2,7 +2,10 @@
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 import { safeTz, tzStartOfToday } from "../_shared/tz.ts";
 
-const DAYS_AHEAD = 14;
+const DAYS_AHEAD = 30;
+const DAYS_BACK = 60;
+const windowStartFrom = (tz: string) =>
+  new Date(tzStartOfToday(tz).getTime() - DAYS_BACK * 24 * 3600 * 1000);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -57,7 +60,7 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
   }
   if (!access) { errors.push("Google access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = tzStartOfToday(tz);
+  const now = windowStartFrom(tz);
   const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
 
   // Collect the calendars the user actually looks at (primary + any selected ones).
@@ -165,7 +168,7 @@ async function syncOutlook(sb: ReturnType<typeof serviceClient>, conn: Record<st
   }
   if (!access) { errors.push("Outlook access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = tzStartOfToday(tz);
+  const now = windowStartFrom(tz);
   const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
   const url = new URL("https://graph.microsoft.com/v1.0/me/calendarview");
   url.searchParams.set("startDateTime", now.toISOString());
@@ -255,8 +258,8 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
     return 0;
   }
 
-  // Start at local midnight today so the present day is fully covered.
-  const from = tzStartOfToday(tz);
+  // Start 60 days before local midnight today so past workload can be analysed too.
+  const from = windowStartFrom(tz);
   const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
   const parsed = parseIcs(text);
   const occurrences = expandOccurrences(parsed, from, max);
