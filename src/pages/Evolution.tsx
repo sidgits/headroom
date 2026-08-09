@@ -552,7 +552,7 @@ const Evolution = () => {
       <Section eyebrow="Layer one — today" title="Headroom measures the individual mind at work">
         <div className="grid md:grid-cols-3 gap-4">
           <Card icon={Brain} title="Cognitive load, decomposed">
-            Sweller's three loads — intrinsic, extraneous, germane — scored deterministically
+            Sweller's three loads — core, toxic, growth — scored deterministically
             from assessment responses and calendar telemetry.
           </Card>
           <Card icon={Activity} title="Work pattern archetypes">
@@ -578,9 +578,9 @@ const Evolution = () => {
             </p>
             <ul className="space-y-3 text-sm text-muted-foreground">
               {[
-                "Extraneous load: fragmentation, context switching, off-hours work",
-                "Intrinsic load: task complexity and duration weighting",
-                "Germane load: protected deep-work capacity",
+                "Toxic load: fragmentation, context switching, off-hours work",
+                "Core load: task complexity and duration weighting",
+                "Growth load: protected deep-work capacity",
                 "Archetype drift and burnout trajectory over time",
               ].map((t) => (
                 <li key={t} className="flex gap-3">

@@ -108,10 +108,10 @@ function getBurnoutRiskFromScores(archetypeId: string, E: number, I: number, G: 
     return {
       level: "high",
       label: "High — Active Risk",
-      signal: `E very high, G very low — chronic extraneous load with no germane recovery`,
+      signal: `E very high, G very low — chronic toxic load with no growth recovery`,
       description: archetypeId === "accumulator"
-        ? "The Accumulator carries the highest objective burnout risk in the Headroom system alongside the Firefighter. Both environmental noise and intrinsic task complexity are at maximum simultaneously. Near-zero germane load means there is no growth signal to offset the depletion. This is not a future risk. It is a present condition that has not yet produced visible symptoms."
-        : "This is the highest burnout risk profile in the Headroom system. High extraneous load combined with near-zero germane load is the precise signature of chronic occupational stress as defined by the WHO's burnout classification. You are not building capability. You are consuming it. Without deliberate intervention, the trajectory leads to exhaustion, cynicism, and sudden collapse of the high-performance identity you've built.",
+        ? "The Accumulator carries the highest objective burnout risk in the Headroom system alongside the Firefighter. Both environmental noise and core task complexity are at maximum simultaneously. Near-zero growth load means there is no growth signal to offset the depletion. This is not a future risk. It is a present condition that has not yet produced visible symptoms."
+        : "This is the highest burnout risk profile in the Headroom system. High toxic load combined with near-zero growth load is the precise signature of chronic occupational stress as defined by the WHO's burnout classification. You are not building capability. You are consuming it. Without deliberate intervention, the trajectory leads to exhaustion, cynicism, and sudden collapse of the high-performance identity you've built.",
       earlyIntervention: archetypeId === "accumulator"
         ? "One real no this week. Not a small no — a real one. The clarity that single act produces about what is optional versus mandatory is worth more than the commitment being declined."
         : "One protected non-urgent block per week is the minimum viable intervention. Not because it solves the problem — but because it breaks the urgency-only pattern long enough for you to see what the pattern is doing.",
@@ -122,8 +122,8 @@ function getBurnoutRiskFromScores(archetypeId: string, E: number, I: number, G: 
     return {
       level: "high",
       label: "High — Silent Burnout Risk",
-      signal: "G at minimum, I low — germane load effectively zero, meaning work provides no growth or meaning signal",
-      description: "The Ghost's burnout is the most dangerous profile precisely because it is invisible. There are no performance flags, no complaints, no obvious distress signals. But near-zero germane load means the work has stopped providing the intrinsic reward that sustains engagement. This is the pattern behind unexpected resignations that surprise managers.",
+      signal: "G at minimum, I low — growth load effectively zero, meaning work provides no growth or meaning signal",
+      description: "The Ghost's burnout is the most dangerous profile precisely because it is invisible. There are no performance flags, no complaints, no obvious distress signals. But near-zero growth load means the work has stopped providing the core reward that sustains engagement. This is the pattern behind unexpected resignations that surprise managers.",
       earlyIntervention: "One specific visible contribution goal, named and shared with one person. Accountability to something specific is the only intervention that works for this profile.",
     };
   }
@@ -147,7 +147,7 @@ function getBurnoutRiskFromScores(archetypeId: string, E: number, I: number, G: 
         : "E low, I high, G high — environment working against natural pattern",
       description: archetypeId === "conductor"
         ? "The Conductor's burnout path is distinct and underdiagnosed. It doesn't come from overwork — it comes from chronic underrecognition of invisible contribution combined with the gradual disappearance of personally meaningful work. The risk isn't exhaustion — it's the slow dimming of professional identity."
-        : "Your growth orientation and complexity appetite protect you from acute burnout — for now. But sustained fragmentation of your deep work environment creates slow accumulation of extraneous load that eventually overrides your germane load capacity. You won't see burnout coming. It arrives quietly, as disengagement disguised as busyness.",
+        : "Your growth orientation and complexity appetite protect you from acute burnout — for now. But sustained fragmentation of your deep work environment creates slow accumulation of toxic load that eventually overrides your growth load capacity. You won't see burnout coming. It arrives quietly, as disengagement disguised as busyness.",
       earlyIntervention: archetypeId === "conductor"
         ? "Four hours per week of protected personal creation time — not coordination, not facilitation, not other people's work. That window is what keeps the Conductor's own professional identity alive."
         : "Protect your first 90 minutes daily as deep work. The moment that window starts shrinking consistently, burnout risk escalates from moderate to high within weeks.",

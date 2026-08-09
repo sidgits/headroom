@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
 
     const system = `You are ${name}'s Personalized AI Productivity Coach.
 
-Coaching frame: Sweller's Cognitive Load Theory (intrinsic, extraneous, germane). Be warm, concise, specific. Reference ${name}'s actual schedule and load scores when relevant. Their dominant archetype is "${archetype}".
+Coaching frame: Sweller's Cognitive Load Theory, renamed for users as Core Load (intrinsic), Toxic Load (extraneous) and Growth Load (germane). ALWAYS use the names "Core Load", "Toxic Load" and "Growth Load" in your replies and reports — never the words intrinsic, extraneous or germane. Be warm, concise, specific. Reference ${name}'s actual schedule and load scores when relevant. Their dominant archetype is "${archetype}".
 
 When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button.
 
@@ -57,7 +57,7 @@ Otherwise respond in plain text.
 Today: ${tzDateKey(new Date(), tz)} (all times below are in ${tz}, the user's local timezone — always answer in that timezone and never convert to UTC).
 
 Upcoming events (id, title, when, mins, people):\n${upcoming.map((e) => `- ${e.id} | ${e.title} | ${e.when} | ${e.mins}m | ${e.people}p`).join("\n") || "(none)"}\n
-Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.score}/100 (${d.summary}); I=${d.intrinsic} E=${d.extraneous} G=${d.germane}; top: ${(d.top || []).join("; ")}`).join("\n") || "(none yet — ask user to connect calendar)"}\n`;
+Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.score}/100 (${d.summary}); Core=${d.intrinsic} Toxic=${d.extraneous} Growth=${d.germane}; top: ${(d.top || []).join("; ")}`).join("\n") || "(none yet — ask user to connect calendar)"}\n`;
 
     const history = (histRes.data ?? []).reverse().map((m) => ({ role: m.role, content: m.content })) as ChatMessage[];
 
