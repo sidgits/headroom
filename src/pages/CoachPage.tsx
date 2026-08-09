@@ -146,9 +146,7 @@ export default function CoachPage() {
 
 function MessageBubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === "user";
-  const suggestions: Suggestion[] = msg.parts?.tool_calls?.map((tc) => {
-    try { return JSON.parse(tc.function.arguments) as Suggestion; } catch { return null; }
-  }).filter(Boolean) as Suggestion[] ?? [];
+  const { suggestions, reports } = parseToolCalls(msg.parts);
 
   return (
     <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
@@ -164,6 +162,7 @@ function MessageBubble({ msg }: { msg: Msg }) {
           </div>
         )}
         {suggestions.map((s, i) => <SuggestionCard key={i} s={s} />)}
+        {reports.map((r, i) => <ReportCard key={`r${i}`} report={r} />)}
       </div>
     </motion.div>
   );
