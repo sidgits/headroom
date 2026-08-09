@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Loader2, Send, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode } from "@/lib/reviewAccess";
+import { type CoachReport } from "@/lib/generateCoachPDF";
+import { parseToolCalls, ReportCard } from "@/components/dashboard/CoachReportCard";
 import { toast } from "sonner";
 import coachAvatar from "@/assets/coach-avatar.jpg";
 
@@ -13,6 +15,7 @@ interface Msg {
   created_at: string;
 }
 interface Suggestion { event_id: string; action: string; title: string; rationale: string }
+
 
 export default function CoachSection({ email, firstName }: { email: string; firstName: string }) {
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -42,13 +45,18 @@ export default function CoachSection({ email, firstName }: { email: string; firs
     try {
       const { data, error } = await supabase.functions.invoke("coach-chat", { body: withReview({ email, message: text }) });
       if (error) throw error;
+      const calls = [
+        ...((data?.suggestions ?? []) as Suggestion[]).map((s) => ({ function: { name: "propose_schedule_edit", arguments: JSON.stringify(s) } })),
+        ...((data?.reports ?? []) as CoachReport[]).map((r) => ({ function: { name: "generate_pdf_report", arguments: JSON.stringify(r) } })),
+      ];
       const reply: Msg = {
         id: `a-${Date.now()}`, role: "assistant",
         content: data?.reply ?? "",
-        parts: data?.suggestions?.length ? { tool_calls: data.suggestions.map((s: Suggestion) => ({ function: { name: "propose_schedule_edit", arguments: JSON.stringify(s) } })) } : null,
+        parts: calls.length ? { tool_calls: calls } : null,
         created_at: new Date().toISOString(),
       };
       setMessages((m) => [...m, reply]);
+
     } catch (err) {
       console.error(err);
       toast.error("Coach is unavailable. Try again.");
@@ -108,9 +116,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
 
 function MessageBubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === "user";
-  const suggestions: Suggestion[] = msg.parts?.tool_calls?.map((tc) => {
-    try { return JSON.parse(tc.function.arguments) as Suggestion; } catch { return null; }
-  }).filter(Boolean) as Suggestion[] ?? [];
+  const { suggestions, reports } = parseToolCalls(msg.parts);
 
   return (
     <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
@@ -126,10 +132,12 @@ function MessageBubble({ msg }: { msg: Msg }) {
           </div>
         )}
         {suggestions.map((s, i) => <SuggestionCard key={i} s={s} />)}
+        {reports.map((r, i) => <ReportCard key={`r${i}`} report={r} />)}
       </div>
     </motion.div>
   );
 }
+
 
 function SuggestionCard({ s }: { s: Suggestion }) {
   const [accepted, setAccepted] = useState<null | boolean>(null);

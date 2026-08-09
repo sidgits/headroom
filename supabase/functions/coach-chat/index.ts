@@ -48,7 +48,11 @@ Deno.serve(async (req) => {
 
 Coaching frame: Sweller's Cognitive Load Theory (intrinsic, extraneous, germane). Be warm, concise, specific. Reference ${name}'s actual schedule and load scores when relevant. Their dominant archetype is "${archetype}".
 
-When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button. Otherwise respond in plain text.
+When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button.
+
+When the user asks for a report, PDF, document, written plan or a shareable summary — or when your answer is a substantial multi-part analysis worth keeping — call the tool generate_pdf_report so the UI can offer a Download PDF button. Ground every section in ${name}'s real events and load scores. Keep your text reply short when you generate a report.
+
+Otherwise respond in plain text.
 
 Today: ${tzDateKey(new Date(), tz)} (all times below are in ${tz}, the user's local timezone — always answer in that timezone and never convert to UTC).
 
@@ -85,7 +89,34 @@ Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.scor
               required: ["event_id", "action", "title", "rationale"],
             },
           },
+        }, {
+          type: "function",
+          function: {
+            name: "generate_pdf_report",
+            description: "Generate a downloadable PDF coaching report. Call this whenever the user asks for a report, summary document, PDF, or a written plan they can keep or share, and also proactively when a substantial multi-part analysis would be better delivered as a document.",
+            parameters: {
+              type: "object",
+              properties: {
+                title: { type: "string", description: "Report title, e.g. 'Weekly Cognitive Load Review'." },
+                summary: { type: "string", description: "One-paragraph executive summary grounded in the user's actual schedule and CLT scores." },
+                sections: {
+                  type: "array",
+                  description: "Ordered report sections. Use 3-6 sections with concrete, data-grounded prose.",
+                  items: {
+                    type: "object",
+                    properties: {
+                      heading: { type: "string" },
+                      body: { type: "string", description: "Plain prose or dash-prefixed bullet lines. No markdown syntax." },
+                    },
+                    required: ["heading", "body"],
+                  },
+                },
+              },
+              required: ["title", "summary", "sections"],
+            },
+          },
         }],
+
         tool_choice: "auto",
       }),
     });
@@ -106,11 +137,15 @@ Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.scor
       parts: toolCalls.length ? { tool_calls: toolCalls } : null,
     });
 
+    type TC = { function: { name: string; arguments: string } };
+    const parsed = (toolCalls as TC[]).map((tc) => {
+      try { return { name: tc.function.name, args: JSON.parse(tc.function.arguments) }; } catch { return null; }
+    }).filter(Boolean) as { name: string; args: Record<string, unknown> }[];
+
     return j({
       reply,
-      suggestions: toolCalls.map((tc: { function: { arguments: string } }) => {
-        try { return JSON.parse(tc.function.arguments); } catch { return null; }
-      }).filter(Boolean),
+      suggestions: parsed.filter((p) => p.name === "propose_schedule_edit").map((p) => p.args),
+      reports: parsed.filter((p) => p.name === "generate_pdf_report").map((p) => p.args),
     });
   } catch (err) {
     console.error("coach-chat", err);
