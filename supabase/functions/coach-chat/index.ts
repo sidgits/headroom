@@ -85,7 +85,34 @@ Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.scor
               required: ["event_id", "action", "title", "rationale"],
             },
           },
+        }, {
+          type: "function",
+          function: {
+            name: "generate_pdf_report",
+            description: "Generate a downloadable PDF coaching report. Call this whenever the user asks for a report, summary document, PDF, or a written plan they can keep or share, and also proactively when a substantial multi-part analysis would be better delivered as a document.",
+            parameters: {
+              type: "object",
+              properties: {
+                title: { type: "string", description: "Report title, e.g. 'Weekly Cognitive Load Review'." },
+                summary: { type: "string", description: "One-paragraph executive summary grounded in the user's actual schedule and CLT scores." },
+                sections: {
+                  type: "array",
+                  description: "Ordered report sections. Use 3-6 sections with concrete, data-grounded prose.",
+                  items: {
+                    type: "object",
+                    properties: {
+                      heading: { type: "string" },
+                      body: { type: "string", description: "Plain prose or dash-prefixed bullet lines. No markdown syntax." },
+                    },
+                    required: ["heading", "body"],
+                  },
+                },
+              },
+              required: ["title", "summary", "sections"],
+            },
+          },
         }],
+
         tool_choice: "auto",
       }),
     });
