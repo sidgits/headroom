@@ -153,7 +153,7 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
     if (big && complex) {
       evExtraneous += 3;
       evTips.push({ category: "extraneous", action: "chunk",
-        tip: "Large complex meeting — split into a pre-read + decision call to lower extraneous load." });
+        tip: "Large complex meeting — split into a pre-read + decision call to lower Toxic Load." });
     }
     if (routine && dur > 30) {
       evExtraneous += 2;
