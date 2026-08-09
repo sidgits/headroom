@@ -1,13 +1,15 @@
 // Personalized AI Productivity Coach — OpenAI Chat Completions with calendar/CLT context.
 // Supports a `propose_schedule_edit` tool call that the UI renders as an action card.
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
+import { safeTz, tzDateKey, tzFormat, tzStartOfToday } from "../_shared/tz.ts";
 
 interface ChatMessage { role: "user" | "assistant" | "system" | "tool"; content: string; tool_calls?: unknown; tool_call_id?: string }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email, message, reviewCode } = await req.json();
+    const { email, message, reviewCode, timeZone } = await req.json();
+    const tz = safeTz(timeZone);
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     if (!message || typeof message !== "string") return j({ error: "Missing message" }, 400);
@@ -25,7 +27,7 @@ Deno.serve(async (req) => {
     const [profileRes, todayClt, eventsRes, histRes] = await Promise.all([
       sb.from("assessment_completions").select("name, archetype_name, result_data").ilike("email", e).order("created_at", { ascending: false }).limit(1).maybeSingle(),
       sb.from("clt_analyses").select("*").ilike("email", e).order("analysis_date", { ascending: true }).limit(7),
-      sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count").ilike("email", e).gte("starts_at", (() => { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString(); })()).order("starts_at").limit(40),
+      sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count").ilike("email", e).gte("starts_at", tzStartOfToday(tz).toISOString()).order("starts_at").limit(40),
       sb.from("coach_messages").select("role, content").ilike("email", e).order("created_at", { ascending: false }).limit(20),
     ]);
 
@@ -33,7 +35,7 @@ Deno.serve(async (req) => {
     const archetype = profileRes.data?.archetype_name ?? "your archetype";
     const upcoming = (eventsRes.data ?? []).slice(0, 20).map((ev) => ({
       id: ev.id, title: ev.title,
-      when: new Date(ev.starts_at).toLocaleString(),
+      when: tzFormat(ev.starts_at, tz),
       mins: Math.round((new Date(ev.ends_at).getTime() - new Date(ev.starts_at).getTime()) / 60000),
       people: ev.attendee_count,
     }));
@@ -48,7 +50,7 @@ Coaching frame: Sweller's Cognitive Load Theory (intrinsic, extraneous, germane)
 
 When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button. Otherwise respond in plain text.
 
-Today: ${new Date().toISOString().slice(0,10)}.
+Today: ${tzDateKey(new Date(), tz)} (all times below are in ${tz}, the user's local timezone — always answer in that timezone and never convert to UTC).
 
 Upcoming events (id, title, when, mins, people):\n${upcoming.map((e) => `- ${e.id} | ${e.title} | ${e.when} | ${e.mins}m | ${e.people}p`).join("\n") || "(none)"}\n
 Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.score}/100 (${d.summary}); I=${d.intrinsic} E=${d.extraneous} G=${d.germane}; top: ${(d.top || []).join("; ")}`).join("\n") || "(none yet — ask user to connect calendar)"}\n`;

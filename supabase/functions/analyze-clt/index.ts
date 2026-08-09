@@ -60,6 +60,15 @@ Deno.serve(async (req) => {
       .filter((d) => d.events.length > 0)
       .map((d) => analyzeDay(d.date, d.events, tz));
 
+    // Clear stale rows in the window (e.g. a day whose events were removed) so
+    // an empty day never keeps an old score.
+    const keep = analyses.map((a) => a.date);
+    let del = sb.from("clt_analyses").delete().ilike("email", e)
+      .gte("analysis_date", tzDateKey(from, tz))
+      .lte("analysis_date", tzDateKey(end, tz));
+    if (keep.length) del = del.not("analysis_date", "in", `(${keep.join(",")})`);
+    await del;
+
     // Persist (one row per day)
     for (const a of analyses) {
       await sb.from("clt_analyses").upsert({
