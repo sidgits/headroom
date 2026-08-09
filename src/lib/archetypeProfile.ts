@@ -127,7 +127,7 @@ export const ARCHETYPE_META: Record<string, ArchetypeProfileMeta> = {
     defaultBurnout: {
       level: "high",
       label: "High — Active Risk",
-      signal: "Max extraneous + core load with no growth offset.",
+      signal: "Max toxic + core load with no growth offset.",
       description: "Carries the highest objective burnout risk in the system alongside the Firefighter. Environmental noise and core complexity are at maximum simultaneously. Near-zero growth load means no growth signal to offset depletion. Not a future risk — a present condition that has not yet produced visible symptoms.",
       earlyIntervention: "One real no this week. Not a small one. The clarity that single act produces about what is optional versus mandatory is worth more than the commitment being declined.",
     },
