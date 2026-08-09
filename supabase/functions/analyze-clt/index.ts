@@ -1,6 +1,7 @@
 // Run the Cognitive Load Theory (Sweller) orchestration over upcoming events.
 // Produces a daily load score (0-100) and per-block tips for the next 7 days.
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
+import { safeTz, tzDateKey, tzHour, tzStartOfToday } from "../_shared/tz.ts";
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
@@ -33,15 +34,15 @@ interface DayAnalysis {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { email, reviewCode } = await req.json();
+    const { email, reviewCode, timeZone } = await req.json();
+    const tz = safeTz(timeZone);
     const e = normalizeEmail(email);
     if (!e) return j({ error: "Invalid email" }, 400);
     const sb = serviceClient();
     if (!(await hasPaidAccess(sb, e, reviewCode))) return j({ error: "Subscription required" }, 402);
 
     // Today (from midnight) plus the week ahead.
-    const now = new Date();
-    const from = new Date(now); from.setHours(0, 0, 0, 0);
+    const from = tzStartOfToday(tz);
     const end = new Date(from.getTime() + 8 * 24 * 3600 * 1000);
 
     const { data: events } = await sb
@@ -52,8 +53,12 @@ Deno.serve(async (req) => {
       .lte("starts_at", end.toISOString())
       .order("starts_at");
 
-    const days = groupByDay(events ?? []);
-    const analyses: DayAnalysis[] = days.map((d) => analyzeDay(d.date, d.events));
+    const days = groupByDay(events ?? [], tz);
+    // Only days that actually have events get a score — an empty day must never
+    // synthesise a load number.
+    const analyses: DayAnalysis[] = days
+      .filter((d) => d.events.length > 0)
+      .map((d) => analyzeDay(d.date, d.events, tz));
 
     // Persist (one row per day)
     for (const a of analyses) {
@@ -76,10 +81,10 @@ Deno.serve(async (req) => {
   }
 });
 
-function groupByDay(events: EventRow[]) {
+function groupByDay(events: EventRow[], tz: string) {
   const map = new Map<string, EventRow[]>();
   for (const ev of events) {
-    const d = ev.starts_at.slice(0, 10);
+    const d = tzDateKey(ev.starts_at, tz);
     if (!map.has(d)) map.set(d, []);
     map.get(d)!.push(ev);
   }
@@ -90,13 +95,13 @@ function durationMin(ev: EventRow) {
   return (new Date(ev.ends_at).getTime() - new Date(ev.starts_at).getTime()) / 60000;
 }
 
-function hour(ev: EventRow) {
-  return new Date(ev.starts_at).getHours();
+function hour(ev: EventRow, tz: string) {
+  return tzHour(ev.starts_at, tz);
 }
 
 // Sweller-CLT orchestration: intrinsic = complexity of task, extraneous = fragmentation/
 // context-switching/after-hours, germane = sustained focus & learning blocks.
-function analyzeDay(date: string, events: EventRow[]): DayAnalysis {
+function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   let intrinsic = 0, extraneous = 0, germane = 0;
   const tips: BlockTip[] = [];
 
@@ -106,7 +111,7 @@ function analyzeDay(date: string, events: EventRow[]): DayAnalysis {
   for (let i = 0; i < events.length; i++) {
     const ev = events[i];
     const dur = durationMin(ev);
-    const h = hour(ev);
+    const h = hour(ev, tz);
     const complex = COMPLEX.test(ev.title);
     const routine = ROUTINE.test(ev.title);
     const big = ev.attendee_count >= 6;
@@ -207,7 +212,6 @@ function analyzeDay(date: string, events: EventRow[]): DayAnalysis {
   const recs: string[] = [];
   if (extraneous > 40) recs.push("Reduce context switching: batch similar meetings into one block.");
   if (intrinsic > 50 && germane < 15) recs.push("High-complexity day with no deep-work block — carve out 90 min.");
-  if (events.length === 0) recs.push("Open day — schedule one 90-min focus block before it fills up.");
   if (score >= 70) recs.push("Overload risk. Move one meeting to tomorrow or convert it to async.");
   if (germane >= 20 && score < 50) recs.push("Healthy balance — keep this pattern.");
 
