@@ -343,9 +343,9 @@ export default function CalendarSection({ email }: { email: string }) {
                   </div>
                   {day && (
                     <div className="grid grid-cols-3 gap-2 text-[11px]">
-                      <LoadBar label="Intrinsic" value={day.intrinsic_load} color="bg-[hsl(var(--golden))]" />
-                      <LoadBar label="Extraneous" value={day.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
-                      <LoadBar label="Germane" value={day.germane_load} color="bg-[hsl(var(--deep-orange))]" />
+                      <LoadBar label="Core" value={day.intrinsic_load} color="bg-[hsl(var(--golden))]" />
+                      <LoadBar label="Toxic" value={day.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
+                      <LoadBar label="Growth" value={day.germane_load} color="bg-[hsl(var(--deep-orange))]" />
                     </div>
                   )}
                   <div className="divide-y divide-border/40">
