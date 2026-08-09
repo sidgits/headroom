@@ -1,7 +1,7 @@
 // Run the Cognitive Load Theory (Sweller) orchestration over upcoming events.
 // Produces a daily load score (0-100) and per-block tips for the next 7 days.
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
-import { safeTz, tzDateKey, tzHour, tzStartOfToday } from "../_shared/tz.ts";
+import { safeTz, tzDateKey, tzHour, tzStartOfDay, tzStartOfToday } from "../_shared/tz.ts";
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
@@ -229,6 +229,7 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
 
   const recs: string[] = [];
   if (extraneous > 40) recs.push("Reduce context switching: batch similar meetings into one block.");
+  if (events.length >= 3 && largestFreeWindow(events, tz) < 90) recs.push("The day is fragmented — no 90-min window survives. Consolidate meetings to open one.");
   if (intrinsic > 50 && germane < 15) recs.push("High-complexity day with no deep-work block — carve out 90 min.");
   if (score >= 70) recs.push("Overload risk. Move one meeting to tomorrow or convert it to async.");
   if (germane >= 20 && score < 50) recs.push("Healthy balance — keep this pattern.");
@@ -242,6 +243,25 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
       : events.length === 0 ? "Open" : "Light",
     events,
   };
+}
+
+/** Longest uninterrupted free stretch (minutes) inside local core hours 08:00-18:00. */
+function largestFreeWindow(events: EventRow[], tz: string): number {
+  if (events.length === 0) return 600;
+  const dayKey = tzDateKey(events[0].starts_at, tz);
+  const start = tzStartOfDay(dayKey, tz).getTime() + 8 * 3600 * 1000;
+  const end = start + 10 * 3600 * 1000;
+  const busy = events
+    .map((ev) => [new Date(ev.starts_at).getTime(), new Date(ev.ends_at).getTime()] as const)
+    .filter(([s2, e2]) => e2 > start && s2 < end)
+    .sort((a, b) => a[0] - b[0]);
+  let cursor = start, best = 0;
+  for (const [s2, e2] of busy) {
+    best = Math.max(best, (Math.max(start, s2) - cursor) / 60000);
+    cursor = Math.max(cursor, Math.min(end, e2));
+  }
+  best = Math.max(best, (end - cursor) / 60000);
+  return Math.round(best);
 }
 
 function j(b: unknown, s = 200) {
