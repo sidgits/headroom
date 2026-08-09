@@ -334,8 +334,8 @@ export default function CalendarSection({ email }: { email: string }) {
             {visibleDays.map(([date, evs]) => {
               const day = cltByDay.get(date);
               return (
-                <motion.div key={date} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-border bg-background/40 p-3 sm:p-4 space-y-3">
+                <motion.div key={date} id={dayAnchorId(date)} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                  className="scroll-mt-2 rounded-xl border border-border bg-background/40 p-3 sm:p-4 space-y-3">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h4 className="font-semibold text-sm">
                       {dayLabel(date)}

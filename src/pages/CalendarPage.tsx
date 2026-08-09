@@ -301,8 +301,8 @@ export default function CalendarPage() {
         {visibleDays.map(([date, evs]) => {
           const day = cltByDay.get(date);
           return (
-            <motion.section key={date} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-border bg-card/40 p-4 sm:p-5 space-y-3">
+            <motion.section key={date} id={dayAnchorId(date)} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+              className="scroll-mt-4 rounded-2xl border border-border bg-card/40 p-4 sm:p-5 space-y-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3 className="font-semibold">
                   {dayLabel(date)}
