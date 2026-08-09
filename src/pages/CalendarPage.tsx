@@ -157,6 +157,12 @@ export default function CalendarPage() {
   })();
 
   const cltByDay = new Map(clt.map((d) => [d.analysis_date, d]));
+  // Strip shows the current week in context: today plus the following days,
+  // falling back to the most recent days when everything is in the past.
+  const todayKey = new Date().toLocaleDateString("en-CA");
+  const todayIdx = clt.findIndex((d) => d.analysis_date >= todayKey);
+  const stripStart = todayIdx === -1 ? Math.max(0, clt.length - 7) : todayIdx;
+  const visibleClt = clt.slice(stripStart, stripStart + 7);
 
   if (loading) return <div className="h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
 
@@ -246,7 +252,7 @@ export default function CalendarPage() {
         {/* 7-day strip */}
         {clt.length > 0 && (
           <div className="grid grid-cols-7 gap-2">
-            {clt.slice(0, 7).map((d) => (
+            {visibleClt.map((d) => (
               <DayChip key={d.analysis_date} day={d} />
             ))}
           </div>
