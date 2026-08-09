@@ -245,13 +245,15 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   };
 }
 
-/** Longest uninterrupted free stretch (minutes) inside local core hours 08:00-18:00. */
+/** Longest stretch (minutes) inside local core hours 09:00-17:00 that is either free
+ *  or already a solo focus block — i.e. time actually usable for deep work. */
 function largestFreeWindow(events: EventRow[], tz: string): number {
   if (events.length === 0) return 600;
   const dayKey = tzDateKey(events[0].starts_at, tz);
-  const start = tzStartOfDay(dayKey, tz).getTime() + 8 * 3600 * 1000;
-  const end = start + 10 * 3600 * 1000;
+  const start = tzStartOfDay(dayKey, tz).getTime() + 9 * 3600 * 1000;
+  const end = start + 8 * 3600 * 1000;
   const busy = events
+    .filter((ev) => !(ev.attendee_count <= 1 && durationMin(ev) >= 90))
     .map((ev) => [new Date(ev.starts_at).getTime(), new Date(ev.ends_at).getTime()] as const)
     .filter(([s2, e2]) => e2 > start && s2 < end)
     .sort((a, b) => a[0] - b[0]);
