@@ -1,8 +1,21 @@
 # Headroom
 
-> Headroom is a cognitive load assessment platform that helps you discover your Work Pattern archetype. Answer a short quiz about how you experience mental workload, task switching, and focus — and get personalized insights into how you work best.
+> Headroom is a cognitive load and burnout-risk platform. Take a short assessment to discover your Work Pattern archetype, then sync your calendar to track Core Load, Toxic Load and Growth Load, burnout risk markers, and get AI coaching on a sustainable way of working.
 
 ## Pages
 
-- [/](/): Take the cognitive load assessment quiz and discover your Work Pattern archetype.
-- [/admin](/admin): Admin dashboard for reviewing assessment completion analytics.
+- [/](/): Take the free cognitive load assessment and discover your Work Pattern archetype.
+- [/evolution](/evolution): How Headroom evolves into a Behavioral OS — the Behavioral Equation of Profit, variable matrix, and worked examples.
+- [/evolution/demo](/evolution/demo): Interactive Behavioral OS mockup showing data sources, risk logic, delivery indicators and profit calculation.
+- [/login](/login): Sign in with Google or an email magic link.
+- [/dashboard](/dashboard): Personal results, cognitive load and burnout risk insights (requires sign-in).
+- [/calendar](/calendar): Upload an .ics calendar for a 90-day cognitive load analysis (requires sign-in).
+- [/coach](/coach): AI coach chat with auto-generated PDF reports (requires sign-in).
+- [/privacy](/privacy): Privacy policy, data handling, GDPR/CCPA commitments.
+
+## Concepts
+
+- Core Load: the intrinsic mental effort a task genuinely requires.
+- Toxic Load: avoidable overhead — context switching, interruptions, unclear process.
+- Growth Load: effort that builds durable skill and capability.
+- Burnout Risk: deterministic score derived from calendar density, fragmentation, after-hours work and recovery gaps.
