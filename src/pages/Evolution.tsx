@@ -743,6 +743,27 @@ const Evolution = () => {
         </div>
       </Section>
 
+      {/* Mid-page demo CTA */}
+      <motion.section
+        className="max-w-5xl mx-auto px-6 pb-6 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Link
+          to="/evolution/demo"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity"
+        >
+          <PlayCircle className="w-4 h-4" />
+          Experience Demo
+        </Link>
+        <p className="mt-3 text-xs text-muted-foreground">
+          See the Behavioral OS run end to end on live sample data.
+        </p>
+      </motion.section>
+
+
       {/* Reconciliation */}
       <Section
         eyebrow="Reconciliation"
