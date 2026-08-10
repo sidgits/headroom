@@ -445,20 +445,26 @@ export default function EvolutionDemo() {
           </div>
 
           <div className="ml-auto md:ml-0 flex items-center gap-2">
-            <button
-              onClick={() => (stage < 0 ? start() : setPlaying((p) => !p))}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              {playing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              {playing ? "Pause" : stage < 0 ? "Run" : "Play"}
-            </button>
-            <button
-              onClick={reset}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" /> Replay
-            </button>
+            {!finished && (
+              <button
+                id="demo-play-button"
+                onClick={() => (stage < 0 ? start() : setPlaying((p) => !p))}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                {playing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                {playing ? "Pause" : stage < 0 ? "Run" : "Play"}
+              </button>
+            )}
+            {(finished || stage >= 0) && (
+              <button
+                onClick={start}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Replay
+              </button>
+            )}
           </div>
+
         </div>
         <div className="h-0.5 bg-muted">
           <motion.div
