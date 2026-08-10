@@ -350,12 +350,16 @@ const Term = ({
 export default function EvolutionDemo() {
   const [stage, setStage] = useState(-1);
   const [playing, setPlaying] = useState(false);
+  const [hint, setHint] = useState(false);
   const startedRef = useRef(false);
+
+  const finished = stage >= STAGES.length - 1;
 
   const start = useCallback(() => {
     setStage(0);
     setPlaying(true);
     startedRef.current = true;
+    setHint(false);
   }, []);
 
   const reset = useCallback(() => {
@@ -370,11 +374,12 @@ export default function EvolutionDemo() {
     return () => window.clearTimeout(id);
   }, [playing, stage]);
 
-  // Auto-start shortly after mount so the page is alive on arrival.
+  // Subtle invitation to press play shortly after arrival.
   useEffect(() => {
-    const id = window.setTimeout(() => { if (!startedRef.current) start(); }, 700);
+    const id = window.setTimeout(() => { if (!startedRef.current) setHint(true); }, 900);
     return () => window.clearTimeout(id);
-  }, [start]);
+  }, []);
+
 
   // Follow the playhead.
   useEffect(() => {
