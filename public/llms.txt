@@ -9,8 +9,8 @@
 - [/evolution/demo](/evolution/demo): Interactive Behavioral OS mockup showing data sources, risk logic, delivery indicators and profit calculation.
 - [/login](/login): Sign in with Google or an email magic link.
 - [/dashboard](/dashboard): Personal results, cognitive load and burnout risk insights (requires sign-in).
-- [/calendar](/calendar): Upload an .ics calendar for a 90-day cognitive load analysis (requires sign-in).
-- [/coach](/coach): AI coach chat with auto-generated PDF reports (requires sign-in).
+- [/dashboard/calendar](/dashboard/calendar): Upload an .ics calendar for a 90-day cognitive load analysis (requires sign-in).
+- [/dashboard/coach](/dashboard/coach): AI coach chat with auto-generated PDF reports (requires sign-in).
 - [/privacy](/privacy): Privacy policy, data handling, GDPR/CCPA commitments.
 
 ## Concepts
