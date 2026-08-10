@@ -285,9 +285,10 @@ const Privacy = () => {
             <h3 className="text-base font-semibold pt-2">7.7 Retention & deletion of Google user data</h3>
             <ul className="list-disc pl-6 text-sm space-y-1">
               <li>
-                Calendar events are retained only for the rolling analysis window (today plus the next 8 days) and
-                are overwritten on each sync; superseded events are deleted automatically.
+                Calendar events are retained only for the rolling analysis window (the past 60 days through the next
+                30 days) and are overwritten on each sync; superseded events are deleted automatically.
               </li>
+
               <li>
                 Disconnecting your calendar in the Headroom dashboard immediately deletes the stored OAuth tokens,
                 all synced calendar events, and the derived analyses for that connection.
