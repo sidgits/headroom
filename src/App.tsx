@@ -14,6 +14,7 @@ const Admin = lazy(() => import("./pages/Admin.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Evolution = lazy(() => import("./pages/Evolution.tsx"));
+const EvolutionDemo = lazy(() => import("./pages/EvolutionDemo.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
 const CalendarPage = lazy(() => import("./pages/CalendarPage.tsx"));
 const CoachPage = lazy(() => import("./pages/CoachPage.tsx"));
