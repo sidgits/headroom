@@ -475,6 +475,33 @@ export default function EvolutionDemo() {
         </div>
       </div>
 
+      {/* Subtle invitation to start */}
+      <AnimatePresence>
+        {hint && stage < 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.45 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          >
+            <button
+              onClick={start}
+              className="group inline-flex items-center gap-3 rounded-full border border-border bg-background/90 backdrop-blur-xl pl-3 pr-5 py-2.5 shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <span className="relative flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
+                <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping" />
+                <Play className="w-3.5 h-3.5 relative" />
+              </span>
+              <span className="text-xs text-foreground">
+                Press play to see the demo
+              </span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
       {/* Hero */}
       <header className="max-w-6xl mx-auto px-5 pt-14 pb-8">
         <p className="text-[11px] tracking-[0.3em] uppercase text-primary mb-4">Working mockup · v1</p>
