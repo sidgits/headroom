@@ -386,7 +386,7 @@ export default function EvolutionDemo() {
   const jump = (i: number) => { setStage(i); setPlaying(false); };
 
   const summary = useTypewriter(
-    "Reported margin says this account earns $790,000. The Behavioral OS says it loses $98,008. The gap is $888,008 of shadow labor and cognitive drag that never reached the P&L.",
+    "Reported margin says this account earns $790,000. The Behavioral OS says it loses $98,210. The gap is $888,210 of shadow labor and cognitive drag that never reached the P&L.",
     stage >= 4,
     600,
   );
