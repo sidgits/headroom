@@ -193,15 +193,16 @@ const Privacy = () => {
               <li>
                 <strong>.../auth/calendar.readonly</strong> — read-only access to your Google Calendar events, used
                 solely to compute your cognitive load and burnout-risk analysis. Raw data accessed: event title,
-                start and end times, time zone, recurrence flag, location, attendee count, and busy/free status
-                for events in a rolling window of today plus the next 8 days. We never request write, update, or
-                delete access, and we never modify or create events in your calendar.
+                event description, start and end times, time zone, recurrence flag, location, and attendee count
+                for events in a rolling window of the past 60 days through the next 30 days. We never request write,
+                update, or delete access, and we never modify or create events in your calendar.
               </li>
             </ul>
             <p className="text-sm leading-relaxed">
               We do not access Gmail, Drive, Contacts, Photos, Chat, Meet, Health, YouTube, or Data Portability APIs,
-              and we do not read attachments, meeting notes, or event descriptions beyond the fields listed above.
+              and we do not read attachments or files linked from events beyond the fields listed above.
             </p>
+
 
             <h3 className="text-base font-semibold pt-2">7.2 How we use it (Data Use)</h3>
             <ul className="list-disc pl-6 text-sm space-y-1">
@@ -284,9 +285,10 @@ const Privacy = () => {
             <h3 className="text-base font-semibold pt-2">7.7 Retention & deletion of Google user data</h3>
             <ul className="list-disc pl-6 text-sm space-y-1">
               <li>
-                Calendar events are retained only for the rolling analysis window (today plus the next 8 days) and
-                are overwritten on each sync; superseded events are deleted automatically.
+                Calendar events are retained only for the rolling analysis window (the past 60 days through the next
+                30 days) and are overwritten on each sync; superseded events are deleted automatically.
               </li>
+
               <li>
                 Disconnecting your calendar in the Headroom dashboard immediately deletes the stored OAuth tokens,
                 all synced calendar events, and the derived analyses for that connection.
