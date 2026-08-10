@@ -21,7 +21,9 @@ import {
   User,
   Crosshair,
   Sigma,
+  PlayCircle,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = {
