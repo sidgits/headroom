@@ -21,7 +21,9 @@ import {
   User,
   Crosshair,
   Sigma,
+  PlayCircle,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = {
@@ -741,6 +743,27 @@ const Evolution = () => {
         </div>
       </Section>
 
+      {/* Mid-page demo CTA */}
+      <motion.section
+        className="max-w-5xl mx-auto px-6 pb-6 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Link
+          to="/evolution/demo"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity"
+        >
+          <PlayCircle className="w-4 h-4" />
+          Experience Demo
+        </Link>
+        <p className="mt-3 text-xs text-muted-foreground">
+          See the Behavioral OS run end to end on live sample data.
+        </p>
+      </motion.section>
+
+
       {/* Reconciliation */}
       <Section
         eyebrow="Reconciliation"
@@ -863,13 +886,22 @@ const Evolution = () => {
             We are building the system for enterprise teams. Register your interest and we
             will reach out when the beta version goes live.
           </p>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-          >
-            Register Early Interest
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Register Early Interest
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <Link
+              to="/evolution/demo"
+              className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-background/60 px-7 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              <PlayCircle className="w-4 h-4 text-primary" />
+              Experience Demo
+            </Link>
+          </div>
         </div>
       </section>
 
