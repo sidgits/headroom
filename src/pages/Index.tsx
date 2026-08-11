@@ -30,16 +30,22 @@ const PENDING_KEY = "headroom_pending_quiz";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [screen, setScreen] = useState<Screen>(() => {
+  // Read retake intent after hydration — window/sessionStorage don't exist on the server,
+  // and reading them during render would mismatch the SSR-rendered landing screen.
+  const [screen, setScreen] = useState<Screen>("landing");
+
+  useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get("retake") === "1" || sessionStorage.getItem("headroom_retake") === "1") {
         sessionStorage.removeItem("headroom_retake");
-        return "role";
+        setScreen("role");
       }
-    } catch {}
-    return "landing";
-  });
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+
   const returning = useReturningUserProfile();
 
   // Clean ?retake=1 from the URL once we've consumed it.
