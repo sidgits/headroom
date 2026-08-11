@@ -72,7 +72,11 @@ Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.scor
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
         model: "gpt-5.5",
+        // Google Workspace API Limited Use compliance: zero data retention — OpenAI must not
+        // persist prompts/completions, and API data is never used for model training.
+        store: false,
         messages,
+
         tools: [{
           type: "function",
           function: {
