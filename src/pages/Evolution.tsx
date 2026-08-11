@@ -129,8 +129,8 @@ const GENERIC_EMAIL_DOMAINS = new Set([
 
 const isCompanyEmail = (email: string) => {
   const match = email.toLowerCase().trim().match(/@([^@]+)$/);
-  if (!match) return false;
-  const domain = match[1];
+  const domain = match?.[1];
+  if (!domain) return false;
   if (GENERIC_EMAIL_DOMAINS.has(domain)) return false;
   // Also block subdomains of generic providers, e.g. mail.google.com
   const parts = domain.split(".");

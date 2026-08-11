@@ -375,7 +375,7 @@ export function calculateResults(
   for (let q = 1; q <= 6; q++) {
     const answer = answers[q];
     const key = `Q${q}`;
-    const scores = SCORING_MATRIX[key]?.[answer];
+    const scores = answer ? SCORING_MATRIX[key]?.[answer] : undefined;
     if (scores) {
       rawE += scores.E;
       rawI += scores.I;
@@ -388,7 +388,7 @@ export function calculateResults(
   const G = normalise(rawG);
 
   const archetypeId = classify(E, I, G, answers, sprinterAnswer);
-  const archetypeData = ARCHETYPES[archetypeId] || ARCHETYPES.conductor;
+  const archetypeData = ARCHETYPES[archetypeId] ?? ARCHETYPES["conductor"]!;
 
   const archetype: Archetype = {
     id: archetypeData.id,
@@ -407,7 +407,7 @@ export function calculateResults(
       plainLanguage: "How much environmental noise affects you",
       score: E,
       maxScore: 10,
-      interpretation: archetypeData.dimensionInterpretations.E(E),
+      interpretation: archetypeData.dimensionInterpretations["E"]!(E),
     },
     {
       name: "Complexity",
@@ -415,7 +415,7 @@ export function calculateResults(
       plainLanguage: "How much challenge you naturally seek",
       score: I,
       maxScore: 10,
-      interpretation: archetypeData.dimensionInterpretations.I(I),
+      interpretation: archetypeData.dimensionInterpretations["I"]!(I),
     },
     {
       name: "Growth",
@@ -423,7 +423,7 @@ export function calculateResults(
       plainLanguage: "How much your work is building capability",
       score: G,
       maxScore: 10,
-      interpretation: archetypeData.dimensionInterpretations.G(G),
+      interpretation: archetypeData.dimensionInterpretations["G"]!(G),
     },
   ];
 

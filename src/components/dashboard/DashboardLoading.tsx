@@ -9,7 +9,7 @@ const STEPS = [
 
 interface DashboardLoadingProps {
   /** Overrides the rotating copy with a single fixed message. */
-  message?: string;
+  message?: string | undefined;
 }
 
 /**
