@@ -62,7 +62,7 @@ const AdminLogin = ({ onAuth }: { onAuth: (token: string) => void }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter password"
-          className="w-full px-4 py-3 rounded-xl border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full px-4 py-3 rounded-xl border bg-card text-foreground text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/40"
           autoFocus
         />
         {error && <p className="text-xs text-warm-red text-center">{error}</p>}

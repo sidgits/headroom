@@ -39,7 +39,7 @@ const SprintCheck = ({ onAnswer, onBack }: SprintCheckProps) => {
 
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-sm"
+        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-xs"
         aria-label="Go back"
       >
         <ChevronLeft className="w-5 h-5" />
@@ -89,7 +89,7 @@ const SprintCheck = ({ onAnswer, onBack }: SprintCheckProps) => {
                 transition={{ delay: 0.35 + i * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={!selected ? { scale: 1.02, y: -1 } : {}}
                 whileTap={!selected ? { scale: 0.98 } : {}}
-                className={`w-full min-h-[56px] px-5 py-4 rounded-xl border text-left transition-all duration-300 shadow-sm ${
+                className={`w-full min-h-[56px] px-5 py-4 rounded-xl border text-left transition-all duration-300 shadow-xs ${
                   isSelected
                     ? "border-primary bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg shadow-primary/25"
                     : "border-border/60 bg-card/60 backdrop-blur-sm text-foreground hover:border-primary/60 hover:bg-secondary/80 hover:shadow-md hover:shadow-primary/10"

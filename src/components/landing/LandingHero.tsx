@@ -241,7 +241,7 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
                   placeholder="your@email.com"
                   required
                   autoFocus
-                  className="w-full h-12 px-4 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-primary/60"
+                  className="w-full h-12 px-4 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground placeholder:text-muted-foreground text-sm focus:outline-hidden focus:border-primary/60"
                 />
                 <button
                   type="submit"

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@/lib/router-compat";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Download, LogOut, RefreshCw, Shield, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
 import { isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
+import { getCheckoutSession } from "@/lib/get-checkout-session.functions";
 
 import type { ScoringResult } from "@/lib/scoring";
 
@@ -108,10 +109,7 @@ const Dashboard = () => {
       })();
       if (sessionId && !hasLocalEmail) {
         setRecoveringIdentity(true);
-        // Use fetch directly so we can pass session_id as a query param.
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-checkout-session?session_id=${encodeURIComponent(sessionId)}`;
-        fetch(url, { headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } })
-          .then((r) => r.json())
+        getCheckoutSession({ data: { sessionId } })
           .then((data) => {
             if (data?.email) {
               try { localStorage.setItem("headroom_assessment_email", data.email); } catch {}

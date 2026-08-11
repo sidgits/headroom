@@ -1,0 +1,32 @@
+{
+  "customizations": [
+    { "token": "--background (warm paper 36 33% 97%)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--card / --card-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--popover / --popover-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--primary / --primary-foreground (copper 28 56% 46%)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--secondary / --secondary-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--muted / --muted-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--accent / --accent-foreground (burnt orange)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--destructive / --destructive-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--border / --input / --ring", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--radius: 0.75rem", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-* (8 tokens)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--warm-red", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--deep-orange", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--golden", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".dark class palette (mirrors :root)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".light class palette (mirrors :root)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "font-sans: DM Sans", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "font-heading: Space Grotesk", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "container (center, 2rem padding, 1400px)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "warm-red / deep-orange / golden Tailwind colors", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "accordion-down / accordion-up keyframes+animations", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "body { padding-bottom: 3rem }", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "body.evolution-page { padding-bottom: 0 }", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "h1-h6 heading font + letter-spacing", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "body::before copper radial glow", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "#root z-index stacking (ported as body > *)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "html/body font smoothing + bg/fg base styles", "source": "src/index.css", "reappliedIn": "src/styles.css" }
+  ]
+}

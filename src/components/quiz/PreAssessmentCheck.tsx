@@ -66,7 +66,7 @@ const PreAssessmentCheck = ({ onIndividual, onCorporateVerified, onBack }: PreAs
 
       <button
         onClick={handleBack}
-        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-sm"
+        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-xs"
         aria-label="Go back"
       >
         <ChevronLeft className="w-5 h-5" />
@@ -108,7 +108,7 @@ const PreAssessmentCheck = ({ onIndividual, onCorporateVerified, onBack }: PreAs
               transition={{ delay: 0.18, duration: 0.45 }}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full min-h-[64px] px-5 py-4 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm text-left transition-colors hover:border-primary/60 hover:bg-secondary/80 shadow-sm hover:shadow-md hover:shadow-primary/10 flex items-start gap-3"
+              className="w-full min-h-[64px] px-5 py-4 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm text-left transition-colors hover:border-primary/60 hover:bg-secondary/80 shadow-xs hover:shadow-md hover:shadow-primary/10 flex items-start gap-3"
             >
               <User className="w-5 h-5 mt-0.5 text-primary shrink-0" />
               <span>
@@ -126,7 +126,7 @@ const PreAssessmentCheck = ({ onIndividual, onCorporateVerified, onBack }: PreAs
               transition={{ delay: 0.26, duration: 0.45 }}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full min-h-[64px] px-5 py-4 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm text-left transition-colors hover:border-primary/60 hover:bg-secondary/80 shadow-sm hover:shadow-md hover:shadow-primary/10 flex items-start gap-3"
+              className="w-full min-h-[64px] px-5 py-4 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm text-left transition-colors hover:border-primary/60 hover:bg-secondary/80 shadow-xs hover:shadow-md hover:shadow-primary/10 flex items-start gap-3"
             >
               <Building2 className="w-5 h-5 mt-0.5 text-primary shrink-0" />
               <span>

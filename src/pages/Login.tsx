@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import { Mail, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -90,7 +90,7 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
             required
-            className="w-full h-12 px-4 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-primary/60"
+            className="w-full h-12 px-4 rounded-xl bg-card/60 backdrop-blur-sm border border-border/60 text-foreground placeholder:text-muted-foreground text-sm focus:outline-hidden focus:border-primary/60"
           />
           <button
             type="submit"

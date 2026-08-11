@@ -74,7 +74,7 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
-          className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/60 p-7 shadow-sm text-center space-y-3"
+          className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/60 p-7 shadow-xs text-center space-y-3"
         >
           <div className="text-5xl">{meta.emoji}</div>
           <div>
