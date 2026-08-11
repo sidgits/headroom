@@ -411,18 +411,141 @@ export default function EvolutionDemo() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>Behavioral OS Demo — From ERP Data to Behavioral Profit | Headroom</title>
+        <title>BehavioralOS — Loss-making engagements, flagged 90 days early</title>
         <meta
           name="description"
-          content="An interactive walkthrough of the Behavioral OS: ERP, Excel and Workday data flowing through MarginMix risk logic and Headroom cognitive load into the Behavioral Equation of Profit."
+          content="BehavioralOS is an early warning system for services delivery: the engagement that's about to lose money, flagged 90 days before the P&L shows it — proven by the Behavioral Equation of Profit."
         />
-        <meta property="og:title" content="Behavioral OS Demo — Headroom" />
+        <link rel="canonical" href="https://headroomapp.co/evolution/demo" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://headroomapp.co/evolution/demo" />
+        <meta
+          property="og:title"
+          content="BehavioralOS — the engagement that's about to lose money, flagged 90 days early"
+        />
         <meta
           property="og:description"
-          content="Watch source data become delivery leading indicators, cognitive load and a behavioral profit number."
+          content="An interactive sample-data walkthrough: an early warning on a live engagement, and the Behavioral Equation of Profit arithmetic that produced it."
         />
+        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="BehavioralOS — the engagement that's about to lose money, flagged 90 days early"
+        />
+        <meta
+          name="twitter:description"
+          content="An interactive sample-data walkthrough: an early warning on a live engagement, and the arithmetic behind it."
+        />
+        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
       </Helmet>
 
+      {/* ---------------- Layer 1: the early warning ---------------- */}
+      <section className="max-w-3xl mx-auto px-5 pt-10 md:pt-16 pb-6">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <Link
+            to="/evolution"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> The thesis
+          </Link>
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground border border-border rounded-full px-3 py-1">
+            Sample data · not a live customer
+          </span>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="rounded-3xl border overflow-hidden shadow-sm"
+          style={{ borderColor: "#E5D5BE" }}
+        >
+          <div
+            className="flex items-center gap-2 px-5 py-3 border-b"
+            style={{ background: "#FBF0EC", borderColor: "#F0DBD3" }}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#B84A3E" }} />
+            <p
+              className="text-[11px] tracking-[0.22em] uppercase font-medium"
+              style={{ color: "#B84A3E" }}
+            >
+              Early warning · {WARNING.engagement}
+            </p>
+            <span className="ml-auto text-[10px] tracking-[0.15em] uppercase text-muted-foreground">
+              {WARNING.account}
+            </span>
+          </div>
+
+          <div className="bg-card/70 backdrop-blur px-5 md:px-7 py-6">
+            <h1 className="font-heading text-3xl md:text-4xl font-semibold leading-tight text-foreground">
+              {WARNING.headline}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Forecast window: {WARNING.window} · {WARNING.confidence}
+            </p>
+
+            <div className="my-6 h-px bg-border" />
+
+            <p className="text-[11px] tracking-[0.22em] uppercase text-muted-foreground mb-4">
+              What changed
+            </p>
+            <ul className="space-y-4">
+              {WARNING_SIGNALS.map((s, i) => (
+                <motion.li
+                  key={s.text}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.25 + i * 0.12, duration: 0.45 }}
+                  className="flex gap-3"
+                >
+                  <span
+                    className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ background: "#B84A3E" }}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm md:text-[15px] text-foreground leading-snug">{s.text}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      {s.source} → <span className="font-mono">{s.term}</span>
+                    </p>
+                  </div>
+                </motion.li>
+              ))}
+            </ul>
+
+            <div
+              className="mt-6 rounded-2xl border px-5 py-4"
+              style={{ background: "#FBF0EC", borderColor: "#F0DBD3" }}
+            >
+              <p className="text-[10px] tracking-[0.22em] uppercase mb-1" style={{ color: "#B84A3E" }}>
+                Recommended
+              </p>
+              <p className="text-sm text-foreground">{WARNING.recommendation}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <button
+            onClick={() => {
+              setDrillOpen((o) => !o);
+              if (!drillOpen && stage < 0) window.setTimeout(start, 320);
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card/70 px-6 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            {drillOpen ? "Hide the calculation" : "How was this calculated?"}
+            <ChevronDown
+              className={`w-4 h-4 text-primary transition-transform ${drillOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+          <p className="text-[11px] text-muted-foreground text-center">
+            The warning is the product. Π — the Behavioral Equation of Profit — is why it is right.
+          </p>
+        </div>
+      </section>
+
+      {drillOpen && (
+        <>
       {/* Playback bar */}
       <div className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-5 py-3 flex items-center gap-3">
