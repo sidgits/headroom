@@ -93,8 +93,8 @@ const Index = () => {
         const email = session.user.email ?? "";
         const meta = session.user.user_metadata as Record<string, unknown> | undefined;
         const name =
-          (typeof meta?.full_name === "string" && meta.full_name) ||
-          (typeof meta?.name === "string" && meta.name) ||
+          (typeof meta?.["full_name"] === "string" && meta["full_name"]) ||
+          (typeof meta?.["name"] === "string" && meta["name"]) ||
           email.split("@")[0] ||
           "";
 
@@ -198,7 +198,9 @@ const Index = () => {
 
   const handleAnswer = useCallback(
     (answerId: string) => {
-      const questionId = quizQuestions[currentQuestion].id;
+      const question = quizQuestions[currentQuestion];
+      if (!question) return;
+      const questionId = question.id;
       const updatedAnswers = { ...quizState.answers, [questionId]: answerId };
 
       setQuizState((prev) => ({ ...prev, answers: updatedAnswers }));
