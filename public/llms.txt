@@ -19,3 +19,9 @@
 - Toxic Load: avoidable overhead — context switching, interruptions, unclear process.
 - Growth Load: effort that builds durable skill and capability.
 - Burnout Risk: deterministic score derived from calendar density, fragmentation, after-hours work and recovery gaps.
+
+## Optional
+
+- [Full reference](/llms-full.txt): expanded description of the product, concepts, Behavioral OS equation, pages and data handling.
+- [Sitemap](/sitemap.xml)
+
