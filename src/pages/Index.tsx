@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
@@ -31,16 +30,24 @@ const PENDING_KEY = "headroom_pending_quiz";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [screen, setScreen] = useState<Screen>(() => {
+  // Read retake intent after hydration — window/sessionStorage don't exist on the server,
+  // and reading them during render would mismatch the SSR-rendered landing screen.
+  const [screen, setScreen] = useState<Screen>("landing");
+  const [retakeResolved, setRetakeResolved] = useState(false);
+
+  useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get("retake") === "1" || sessionStorage.getItem("headroom_retake") === "1") {
         sessionStorage.removeItem("headroom_retake");
-        return "role";
+        setScreen("role");
       }
-    } catch {}
-    return "landing";
-  });
+    } catch {
+      /* storage unavailable */
+    }
+    setRetakeResolved(true);
+  }, []);
+
   const returning = useReturningUserProfile();
 
   // Clean ?retake=1 from the URL once we've consumed it.
@@ -57,6 +64,7 @@ const Index = () => {
   // Returning signed-in users should land on their dashboard, not the marketing page,
   // unless they're mid-quiz (PENDING_KEY) or actively retaking (screen !== "landing").
   useEffect(() => {
+    if (!retakeResolved) return;
     if (returning.loading) return;
     if (!returning.user) return;
     if (screen !== "landing") return;
@@ -65,7 +73,7 @@ const Index = () => {
     })();
     if (hasPending) return;
     navigate("/dashboard", { replace: true });
-  }, [returning.loading, returning.user, screen, navigate]);
+  }, [retakeResolved, returning.loading, returning.user, screen, navigate]);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizState, setQuizState] = useState<QuizState>({
@@ -289,14 +297,6 @@ const Index = () => {
   return (
     <div className="flex min-h-screen flex-col relative">
       
-      <Helmet>
-        <title>Headroom — Cognitive Load Assessment</title>
-        <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
-        <link rel="canonical" href="https://headroomapp.co/" />
-        <meta property="og:title" content="Headroom — Cognitive Load Assessment" />
-        <meta property="og:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
-        <meta property="og:url" content="https://headroomapp.co/" />
-      </Helmet>
       <div className="flex-1">
         <AnimatePresence mode="wait">
           {screen === "landing" && (

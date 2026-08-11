@@ -1,21 +1,9 @@
-import { Helmet } from "react-helmet-async";
 import { Link } from "@/lib/router-compat";
 import Footer from "@/components/Footer";
 
 const Privacy = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <Helmet>
-        <title>Privacy Policy — Headroom</title>
-        <meta
-          name="description"
-          content="How Headroom collects, uses, and protects your personal data. GDPR & CCPA compliant."
-        />
-        <link rel="canonical" href="https://headroomapp.co/privacy" />
-        <meta property="og:title" content="Privacy Policy — Headroom" />
-        <meta property="og:description" content="How Headroom collects, uses, and protects your personal data. GDPR & CCPA compliant." />
-        <meta property="og:url" content="https://headroomapp.co/privacy" />
-      </Helmet>
 
       <main className="flex-1 px-6 py-12">
         <article className="mx-auto w-full max-w-3xl space-y-6 text-foreground">

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Download, LogOut, RefreshCw, Shield, Sparkles } from "lucide-react";
@@ -280,15 +279,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Dashboard — Headroom</title>
-        <meta name="description" content="Your personal Headroom dashboard — track cognitive load, review past assessments, and see how your burnout patterns shift over time." />
-        <meta name="robots" content="noindex" />
-        <link rel="canonical" href="https://headroomapp.co/dashboard" />
-        <meta property="og:title" content="Dashboard — Headroom" />
-        <meta property="og:description" content="Track your cognitive load and burnout patterns over time on your personal Headroom dashboard." />
-        <meta property="og:url" content="https://headroomapp.co/dashboard" />
-      </Helmet>
 
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-6 flex flex-col gap-4">
         <motion.div

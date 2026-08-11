@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Upload } from "lucide-react";
@@ -178,7 +177,6 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet><title>Calendar — Headroom</title><meta name="robots" content="noindex" /></Helmet>
       <ProfileBadge />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-3 pb-12 space-y-6">
         <div className="flex items-center justify-between">

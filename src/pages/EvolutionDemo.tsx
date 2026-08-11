@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@/lib/router-compat";
 import {
@@ -411,35 +410,6 @@ export default function EvolutionDemo() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Helmet>
-        <title>BehavioralOS — Loss-making engagements, flagged 90 days early</title>
-        <meta
-          name="description"
-          content="BehavioralOS is an early warning system for services delivery: the engagement that's about to lose money, flagged 90 days before the P&L shows it — proven by the Behavioral Equation of Profit."
-        />
-        <link rel="canonical" href="https://headroomapp.co/evolution/demo" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://headroomapp.co/evolution/demo" />
-        <meta
-          property="og:title"
-          content="BehavioralOS — the engagement that's about to lose money, flagged 90 days early"
-        />
-        <meta
-          property="og:description"
-          content="An interactive sample-data walkthrough: an early warning on a live engagement, and the Behavioral Equation of Profit arithmetic that produced it."
-        />
-        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="BehavioralOS — the engagement that's about to lose money, flagged 90 days early"
-        />
-        <meta
-          name="twitter:description"
-          content="An interactive sample-data walkthrough: an early warning on a live engagement, and the arithmetic behind it."
-        />
-        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
-      </Helmet>
 
       {/* ---------------- Layer 1: the early warning ---------------- */}
       <section className="max-w-3xl mx-auto px-5 pt-10 md:pt-16 pb-6">

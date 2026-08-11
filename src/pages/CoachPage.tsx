@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, Send, Sparkles } from "lucide-react";
@@ -92,7 +91,6 @@ export default function CoachPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Helmet><title>{title} — Headroom</title><meta name="robots" content="noindex" /></Helmet>
       <ProfileBadge />
       <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 pt-3 pb-4 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-3">
