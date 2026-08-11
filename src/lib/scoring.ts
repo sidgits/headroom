@@ -190,7 +190,7 @@ interface ArchetypeData {
   emoji: string;
   headline: string;
   mirror: MirrorContent;
-  shadow-sm: ShadowArchetype;
+  shadow: ShadowArchetype;
   unlock: string;
   dimensionInterpretations: Record<string, (score: number) => string>;
 }
@@ -206,7 +206,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But your environment keeps fragmenting your day. Interruptions, context switching, reactive demands — each one is smaller than it seems, but together they're consuming the headroom where your best work lives. You're not underperforming. Your conditions are.",
       patternNotNoticed: "Here's what you probably haven't noticed: your most frustrating days aren't your busiest days. They're the days where you almost got into deep focus — and kept getting pulled out. The near-misses are more draining than the chaos.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Firefighter",
       description: "When your headroom collapses — too many demands, too little space — you stop architecting and start reacting. You know this version of yourself. It feels busy but hollow. Recognising that shift early is the move.",
     },
@@ -227,7 +227,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But urgency has become your default operating mode, not your emergency mode. You're not just responding to fires anymore — you're unconsciously creating the conditions for them. A calm week doesn't feel productive. It feels wrong. And that's the pattern worth examining.",
       patternNotNoticed: "Here's what you probably haven't noticed: your growth has slowed significantly. You're highly skilled at execution under pressure, but you're not building new capability. The Firefighter archetype is one of the most capable in the short term and one of the most stagnant over time.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Accumulator",
       description: "When the fires stop coming, you fill the void by taking on more. More projects, more responsibilities, more commitments. It looks like ambition. It's actually the same urgency addiction in a different form.",
     },
@@ -248,7 +248,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But your contribution is almost entirely invisible. You don't produce the deck, ship the code, or close the deal — you make all of that possible. In environments that measure output over orchestration, your value is chronically underrecognised. That's not a you problem. It's a measurement problem.",
       patternNotNoticed: "Here's what you probably haven't noticed: you've become so good at managing everyone else's cognitive load that you've stopped prioritising your own. Your day is a series of other people's priorities. You're excellent at it. But when did you last do work that was purely yours?",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Ghost",
       description: "When the coordination demand gets too high and the recognition too low, you start to disengage quietly. Still present in every meeting. Diminishing in every room. It happens slowly and then suddenly.",
     },
@@ -269,7 +269,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But your rhythm is cyclical by nature, and linear work environments punish that. You're expected to produce consistently when your biology runs in waves. The recovery periods — which you actually need — read as laziness or inconsistency to people who don't understand your pattern.",
       patternNotNoticed: "Here's what you probably haven't noticed: you spend enormous energy managing other people's perception of your recovery phases rather than actually recovering. That friction is extending your recovery time and shortening your sprint windows.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Burnout State",
       description: "When sprint cycles shorten and recovery is skipped or cut short — usually because of external pressure — the system breaks down. Not gradually. Suddenly. The Sprinter who ignores recovery signals doesn't slow down. They stop.",
     },
@@ -290,7 +290,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But you're running well below your actual capacity. The work isn't challenging you anymore. You've mastered your environment so thoroughly that there's no friction left — and no friction means no growth signal. The comfort is real. So is the cost.",
       patternNotNoticed: "Here's what you probably haven't noticed: the quiet disengagement has been building for longer than you think. You're still delivering. But the energy behind the delivery has been declining steadily.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Ghost",
       description: "When disengagement extends long enough, presence becomes performance. Still in every meeting. Still delivering. But the light behind it has dimmed. The Steady Hand who isn't challenged enough drifts toward the Ghost without realising it.",
     },
@@ -311,7 +311,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But drift has become your default state. The days pass — full of meetings, conversations, and small tasks — without a clear sense of what you're actually building or moving forward. You're present everywhere and accountable to nothing specific.",
       patternNotNoticed: "Here's what you probably haven't noticed: you've stopped expecting work to be meaningful. Not consciously. But the expectation has quietly lowered to the point where you're no longer looking for the work that would actually engage you.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Steady Hand",
       description: "On good weeks you stabilise into Steady Hand territory — consistent, reliable, calm. But without deliberate intervention, the drift pulls you back. The difference between Ghost and Steady Hand is intentionality, not capability.",
     },
@@ -332,7 +332,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But async work environments, solo deliverables, and remote setups are quietly depleting you. You're doing the same hours but in conditions that don't activate your best thinking. The output is fine. The experience is draining in a way that's hard to explain to colleagues who thrive in solitude.",
       patternNotNoticed: "Here's what you probably haven't noticed: you're judging your solo output against your collaborative output and finding yourself lacking. But that's not a capability gap — it's an environment mismatch.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Ghost",
       description: "Extended periods of isolated work don't just drain you — they disengage you. When the social signal disappears for long enough, motivation follows. The Connector in a solo environment for too long becomes the Ghost.",
     },
@@ -353,7 +353,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
       workingAgainstYou: "But your capacity for high-quality work has become a liability. The more you deliver, the more arrives. Your plate isn't full by accident — it's full because you're competent and because the system has learned that you'll absorb what others won't. You're being quietly exploited by your own reputation.",
       patternNotNoticed: "Here's what you probably haven't noticed: the quality of your output has been declining slowly for longer than you've admitted. The work that used to energise you now just gets done. That shift — from energised to functional — is the signal that the accumulation has crossed a line.",
     },
-    shadow-sm: {
+    shadow: {
       name: "The Firefighter",
       description: "When the accumulation peaks, everything becomes urgent by default. You shift from strategic overload to reactive chaos — not because you've lost capability but because the system has exceeded its capacity. The Accumulator in crisis looks exactly like a Firefighter.",
     },
@@ -439,6 +439,6 @@ export function calculateResults(
     dimensionScores,
     recommendations: [archetypeData.unlock],
     mirror: archetypeData.mirror,
-    shadowArchetype: archetypeData.shadow-sm,
+    shadowArchetype: archetypeData.shadow,
   };
 }
