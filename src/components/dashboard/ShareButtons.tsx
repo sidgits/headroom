@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { logShareClick as logShareClickFn } from "@/lib/log-share-click.functions";
 
 interface ShareButtonsProps {
   archetypeName: string;
@@ -10,8 +10,8 @@ const ShareButtons = ({ archetypeName }: ShareButtonsProps) => {
   const shareText = `I'm ${archetypeName}, visit headroomapp.co to know your headroom profile!`;
 
   const logShareClick = (platform: string, completed: boolean = false) => {
-    supabase.functions.invoke("log-share-click", {
-      body: { platform, archetype_name: archetypeName, completed },
+    logShareClickFn({
+      data: { platform, archetype_name: archetypeName, completed },
     }).catch(() => {});
   };
 

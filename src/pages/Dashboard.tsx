@@ -108,10 +108,7 @@ const Dashboard = () => {
       })();
       if (sessionId && !hasLocalEmail) {
         setRecoveringIdentity(true);
-        // Use fetch directly so we can pass session_id as a query param.
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-checkout-session?session_id=${encodeURIComponent(sessionId)}`;
-        fetch(url, { headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } })
-          .then((r) => r.json())
+        getCheckoutSession({ data: { sessionId } })
           .then((data) => {
             if (data?.email) {
               try { localStorage.setItem("headroom_assessment_email", data.email); } catch {}
