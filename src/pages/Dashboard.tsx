@@ -14,6 +14,7 @@ import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
 import { isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
+import { getCheckoutSession } from "@/lib/get-checkout-session.functions";
 
 import type { ScoringResult } from "@/lib/scoring";
 
