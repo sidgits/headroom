@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
@@ -289,14 +288,6 @@ const Index = () => {
   return (
     <div className="flex min-h-screen flex-col relative">
       
-      <Helmet>
-        <title>Headroom — Cognitive Load Assessment</title>
-        <meta name="description" content="Your brain has a capacity. Nobody told you what's filling it!" />
-        <link rel="canonical" href="https://headroomapp.co/" />
-        <meta property="og:title" content="Headroom — Cognitive Load Assessment" />
-        <meta property="og:description" content="Your brain has a capacity. Nobody told you what's filling it!" />
-        <meta property="og:url" content="https://headroomapp.co/" />
-      </Helmet>
       <div className="flex-1">
         <AnimatePresence mode="wait">
           {screen === "landing" && (

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
-import { Helmet } from "react-helmet-async";
 import { Mail, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,11 +47,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col items-center justify-center px-6">
-      <Helmet>
-        <title>Sign In | Headroom</title>
-        <meta name="description" content="Sign in to Headroom to view your work profile, calendar insights and AI coach." />
-        <link rel="canonical" href="https://www.headroomapp.co/login" />
-      </Helmet>
 
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[50%] translate-x-[-50%] w-[140%] h-[60%] rounded-full bg-gradient-to-b from-primary/15 via-accent/10 to-transparent blur-3xl" />

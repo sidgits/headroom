@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
@@ -392,35 +391,6 @@ const Evolution = () => {
 
   return (
     <div className="light min-h-screen bg-background">
-      <Helmet>
-        <title>The Behavioral Equation of Profit — Margin and Burnout Are One Problem</title>
-        <meta
-          name="description"
-          content="In services firms, margin erosion and people burnout are managed as two problems by two functions. One causes the other. The Behavioral OS turns that lagging indicator into a 90-day early warning."
-        />
-        <link rel="canonical" href="https://headroomapp.co/evolution" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://headroomapp.co/evolution" />
-        <meta
-          property="og:title"
-          content="The Behavioral Equation of Profit — why margin and burnout are one problem"
-        />
-        <meta
-          property="og:description"
-          content="Profit doesn't erode randomly — it erodes behaviourally. The thesis, the equation and the worked example behind a 90-day early warning for services delivery."
-        />
-        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="The Behavioral Equation of Profit — why margin and burnout are one problem"
-        />
-        <meta
-          name="twitter:description"
-          content="Profit doesn't erode randomly — it erodes behaviourally. The thesis behind a 90-day early warning for services delivery."
-        />
-        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
-      </Helmet>
       {/* Hero */}
       <header className="relative overflow-hidden">
         <div
