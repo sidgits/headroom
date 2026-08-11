@@ -359,6 +359,7 @@ export default function EvolutionDemo() {
   const [stage, setStage] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [hint, setHint] = useState(false);
+  const [drillOpen, setDrillOpen] = useState(false);
   const startedRef = useRef(false);
 
   const finished = stage >= STAGES.length - 1;
@@ -1026,6 +1027,8 @@ export default function EvolutionDemo() {
           </div>
         </div>
       </main>
+        </>
+      )}
     </div>
   );
 }
