@@ -3,11 +3,13 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
+  AlertTriangle,
   ArrowDown,
   ArrowLeft,
   Brain,
   Building2,
   Check,
+  ChevronDown,
   Database,
   FileSpreadsheet,
   Gauge,
@@ -20,6 +22,7 @@ import {
   Sigma,
   Sparkles,
   Table2,
+  TrendingDown,
   Users,
 } from "lucide-react";
 import {
@@ -40,6 +43,9 @@ import {
   M_PARTS,
   money,
   PI,
+  PI_FORECAST,
+  PI_FORECAST_DELTAS,
+  PI_TODAY,
   R_ideal,
   RECOMMENDATIONS,
   reportedMargin,
@@ -48,6 +54,8 @@ import {
   TEAM_RISK,
   verdict,
   W_scope,
+  WARNING,
+  WARNING_SIGNALS,
 } from "@/lib/behavioralOSDemo";
 
 /* ------------------------------------------------------------------ */
