@@ -131,7 +131,7 @@ export default function CoachPage() {
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
               rows={2}
               placeholder="Ask about today's load, a meeting, or how to protect deep work…"
-              className="flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/40"
             />
             <button onClick={send} disabled={sending || !input.trim()}
               className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary text-primary-foreground disabled:opacity-50">

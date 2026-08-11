@@ -16,7 +16,7 @@ const Disclaimer = ({ onStart, onBack }: DisclaimerProps) => {
 
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-sm"
+        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-xs"
         aria-label="Go back"
       >
         <ChevronLeft className="w-5 h-5" />

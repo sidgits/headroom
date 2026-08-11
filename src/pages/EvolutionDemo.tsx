@@ -400,7 +400,7 @@ export default function EvolutionDemo() {
   const jump = (i: number) => { setStage(i); setPlaying(false); };
 
   const summary = useTypewriter(
-    "Reported margin says this account earns $790,000. The Behavioral OS says it loses $98,210. The gap is $888,210 of shadow labor and cognitive drag that never reached the P&L.",
+    "Reported margin says this account earns $790,000. The Behavioral OS says it loses $98,210. The gap is $888,210 of shadow-sm labor and cognitive drag that never reached the P&L.",
     stage >= 4,
     600,
   );
@@ -459,7 +459,7 @@ export default function EvolutionDemo() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-3xl border overflow-hidden shadow-sm"
+          className="rounded-3xl border overflow-hidden shadow-xs"
           style={{ borderColor: "#E5D5BE" }}
         >
           <div

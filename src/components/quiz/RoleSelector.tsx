@@ -26,7 +26,7 @@ const RoleSelector = ({ onSelect, onBack }: RoleSelectorProps) => {
 
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-sm"
+        className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-card/80 border border-border/60 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-secondary hover:border-primary/40 transition-all shadow-xs"
         aria-label="Go back"
       >
         <ChevronLeft className="w-5 h-5" />
@@ -68,7 +68,7 @@ const RoleSelector = ({ onSelect, onBack }: RoleSelectorProps) => {
             variants={fadeUp}
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full min-h-[56px] px-5 py-4 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm text-left transition-colors hover:border-primary/60 hover:bg-secondary/80 shadow-sm hover:shadow-md hover:shadow-primary/10"
+            className="w-full min-h-[56px] px-5 py-4 rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm text-left transition-colors hover:border-primary/60 hover:bg-secondary/80 shadow-xs hover:shadow-md hover:shadow-primary/10"
           >
             <span className="font-semibold text-foreground">{role.label}</span>
             <span className="block text-sm text-muted-foreground mt-0.5">

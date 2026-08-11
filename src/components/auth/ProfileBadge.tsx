@@ -41,7 +41,7 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-2 py-1.5 pl-1.5 pr-3 rounded-xl bg-card/90 backdrop-blur-md border border-border/60 shadow-sm">
+      <div className="flex items-center gap-2 py-1.5 pl-1.5 pr-3 rounded-xl bg-card/90 backdrop-blur-md border border-border/60 shadow-xs">
         {avatarUrl ? (
           <img
             src={avatarUrl}
