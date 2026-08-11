@@ -33,6 +33,7 @@ const Index = () => {
   // Read retake intent after hydration — window/sessionStorage don't exist on the server,
   // and reading them during render would mismatch the SSR-rendered landing screen.
   const [screen, setScreen] = useState<Screen>("landing");
+  const [retakeResolved, setRetakeResolved] = useState(false);
 
   useEffect(() => {
     try {
@@ -44,6 +45,7 @@ const Index = () => {
     } catch {
       /* storage unavailable */
     }
+    setRetakeResolved(true);
   }, []);
 
   const returning = useReturningUserProfile();
@@ -62,6 +64,7 @@ const Index = () => {
   // Returning signed-in users should land on their dashboard, not the marketing page,
   // unless they're mid-quiz (PENDING_KEY) or actively retaking (screen !== "landing").
   useEffect(() => {
+    if (!retakeResolved) return;
     if (returning.loading) return;
     if (!returning.user) return;
     if (screen !== "landing") return;
@@ -70,7 +73,7 @@ const Index = () => {
     })();
     if (hasPending) return;
     navigate("/dashboard", { replace: true });
-  }, [returning.loading, returning.user, screen, navigate]);
+  }, [retakeResolved, returning.loading, returning.user, screen, navigate]);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quizState, setQuizState] = useState<QuizState>({
