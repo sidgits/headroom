@@ -23,7 +23,7 @@ import {
   Sigma,
   PlayCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = {
