@@ -445,9 +445,9 @@ const Evolution = () => {
             transition={{ duration: 0.7, delay: 0.05 }}
             className="font-heading text-4xl md:text-6xl font-semibold leading-[1.05] text-foreground max-w-3xl"
           >
-            Headroom becomes a{" "}
+            The engagement that's about to lose money —{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-              Behavioral OS
+              flagged 90 days early
             </span>
           </motion.h1>
           <motion.p
@@ -456,36 +456,121 @@ const Evolution = () => {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed"
           >
-            Traditional corporate accounting treats human capital as a static, linear
-            expense. Knowledge work does not behave that way — it runs on finite mental
-            energy. Profitability is a lagging indicator of aligned human behaviour, and
-            the Behavioral OS is the system that measures it.
+            Profitability is a lagging indicator of aligned human behaviour. The Behavioral OS
+            turns that lagging indicator into a leading one: it watches how work is actually
+            being done and warns you which engagement is going to erode, while there is still
+            time to reprice or restaff.
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="mt-10 rounded-2xl border border-primary/30 bg-card/60 backdrop-blur p-6 md:p-8"
+            className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-3"
           >
-            <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
-              The engine — the refined formula
-            </p>
-            <p className="font-heading text-xl md:text-3xl text-foreground leading-snug">
-              Π = (M<sub className="text-sm text-muted-foreground">discipline</sub> × R
-              <sub className="text-sm text-muted-foreground">ideal</sub>) − [C
-              <sub className="text-sm text-muted-foreground">baseline</sub> + L
-              <sub className="text-sm text-muted-foreground">shadow</sub> + (H
-              <sub className="text-sm text-muted-foreground">drag</sub> × W
-              <sub className="text-sm text-muted-foreground">scope</sub>)]
-            </p>
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-              The Behavioral Equation of Profit, refined edition. Every term on the right
-              is something the OS can measure — and the scope weight factor keeps
-              behavioural cost matched to the revenue stream being evaluated.
+            <Link
+              to="/evolution/demo"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-7 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity"
+            >
+              <PlayCircle className="w-4 h-4" />
+              See a live warning
+            </Link>
+            <p className="text-xs text-muted-foreground max-w-xs">
+              The warning is the product. Π — the Behavioral Equation of Profit — is why the
+              warning is right.
             </p>
           </motion.div>
         </div>
       </header>
+
+      {/* 1 — The problem */}
+      <Section
+        eyebrow="The problem"
+        title="Two functions manage two problems that are actually one"
+      >
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card icon={LineChart} title="Finance owns the margin">
+            Margin erosion shows up in the P&L a quarter after it happened, as a variance to
+            explain rather than a condition to treat.
+          </Card>
+          <Card icon={Users} title="People owns the burnout">
+            Engagement scores, attrition and wellbeing budgets — measured on a separate cycle, in
+            a separate system, with no currency value attached.
+          </Card>
+          <Card icon={ShieldAlert} title="Nobody owns the connection">
+            One causes the other. Because no function owns the link, nobody measures it — so the
+            first evidence of behavioural erosion is a missed number.
+          </Card>
+        </div>
+      </Section>
+
+      {/* 2 — The insight */}
+      <Section
+        eyebrow="The insight"
+        title="Profit doesn't erode randomly — it erodes behaviourally"
+      >
+        <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-3xl">
+          Deal by deal, person by person, month by month. A scope concession here, a senior lead
+          absorbed into firefighting there, a fortnight where no one on the pod gets a protected
+          deep-work block. Each event is small, traceable and dated — which means the erosion has
+          a signature long before it has a number.
+        </p>
+      </Section>
+
+      {/* 3 — What the system produces */}
+      <Section
+        eyebrow="What the system produces"
+        title="An early warning, not a scorecard"
+      >
+        <div className="rounded-2xl border border-primary/30 bg-card/60 backdrop-blur p-6 md:p-8">
+          <p className="text-xs tracking-[0.25em] uppercase text-accent mb-4">The output</p>
+          <p className="font-heading text-xl md:text-2xl text-foreground leading-snug max-w-3xl">
+            "Engagement #4471 is at elevated slippage risk over the next 90 days. Senior
+            allocation drifted 35% → 51%, two of three leads are trending into red-zone load, and
+            three deliverables shipped outside scope this month. Reprice or restaff before the Q3
+            review."
+          </p>
+          <p className="mt-5 text-sm text-muted-foreground leading-relaxed max-w-3xl">
+            One artefact, owned by one person — the delivery or operations lead. It arrives before
+            the P&L does, it names the behaviour that caused it, and every clause in it is
+            traceable to a measured input. The equation below is what makes it a forecast instead
+            of an opinion.
+          </p>
+          <Link
+            to="/evolution/demo"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-background/60 px-6 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            <PlayCircle className="w-4 h-4 text-primary" />
+            Open the working demo
+          </Link>
+        </div>
+      </Section>
+
+      {/* 4 — Why the warning isn't a guess */}
+      <Section
+        eyebrow="Why the warning isn't a guess"
+        title="The Behavioral Equation of Profit"
+      >
+        <div className="rounded-2xl border border-primary/30 bg-card/60 backdrop-blur p-6 md:p-8">
+          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
+            The engine — the refined formula
+          </p>
+          <p className="font-heading text-xl md:text-3xl text-foreground leading-snug">
+            Π = (M<sub className="text-sm text-muted-foreground">discipline</sub> × R
+            <sub className="text-sm text-muted-foreground">ideal</sub>) − [C
+            <sub className="text-sm text-muted-foreground">baseline</sub> + L
+            <sub className="text-sm text-muted-foreground">shadow</sub> + (H
+            <sub className="text-sm text-muted-foreground">drag</sub> × W
+            <sub className="text-sm text-muted-foreground">scope</sub>)]
+          </p>
+          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+            Every term on the right is something the OS can measure, and the scope weight factor
+            keeps behavioural cost matched to the revenue stream being evaluated. The warning
+            fires when these terms move — which is why it can be interrogated line by line rather
+            than argued about.
+          </p>
+        </div>
+      </Section>
+
 
       {/* Variable definitions */}
       <Section
