@@ -78,9 +78,20 @@ const AdminLogin = ({ onAuth }: { onAuth: (token: string) => void }) => {
 };
 
 const Admin = () => {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem("headroom_admin") === "1");
-  const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem("headroom_admin_token") || "");
+  // sessionStorage is unavailable during SSR — read it after hydration.
+  const [authed, setAuthed] = useState(false);
+  const [adminToken, setAdminToken] = useState("");
   const [completions, setCompletions] = useState<AssessmentCompletion[]>([]);
+
+  useEffect(() => {
+    try {
+      setAuthed(sessionStorage.getItem("headroom_admin") === "1");
+      setAdminToken(sessionStorage.getItem("headroom_admin_token") || "");
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
