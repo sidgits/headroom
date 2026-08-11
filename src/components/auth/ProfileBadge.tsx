@@ -21,13 +21,13 @@ const ProfileBadge = ({ className = "fixed top-4 right-4 z-50" }: ProfileBadgePr
   }, []);
 
   const displayName =
-    (user?.user_metadata?.full_name as string | undefined) ??
-    (user?.user_metadata?.name as string | undefined) ??
+    (user?.user_metadata?.["full_name"] as string | undefined) ??
+    (user?.user_metadata?.["name"] as string | undefined) ??
     user?.email ??
     "";
   const avatarUrl =
-    (user?.user_metadata?.avatar_url as string | undefined) ??
-    (user?.user_metadata?.picture as string | undefined) ??
+    (user?.user_metadata?.["avatar_url"] as string | undefined) ??
+    (user?.user_metadata?.["picture"] as string | undefined) ??
     null;
 
 

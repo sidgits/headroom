@@ -57,7 +57,8 @@ const staggerContainer = {
 const readCookie = (name: string): string | null => {
   try {
     const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : null;
+    const value = match?.[1];
+    return value != null ? decodeURIComponent(value) : null;
   } catch {
     return null;
   }
@@ -94,8 +95,8 @@ const LandingHero = ({ onStart }: LandingHeroProps) => {
   }, []);
 
   const displayName =
-    (user?.user_metadata?.full_name as string | undefined) ??
-    (user?.user_metadata?.name as string | undefined) ??
+    (user?.user_metadata?.["full_name"] as string | undefined) ??
+    (user?.user_metadata?.["name"] as string | undefined) ??
     user?.email ??
     "";
 

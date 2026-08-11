@@ -27,7 +27,7 @@ const PreAssessmentCheck = ({ onIndividual, onCorporateVerified, onBack }: PreAs
     if (trimmedName.length > 80) return setError("Name is too long");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) return setError("Please enter a valid email");
 
-    const domain = trimmedEmail.split("@")[1];
+    const domain = trimmedEmail.split("@")[1] ?? "";
     setChecking(true);
     try {
       const { data, error: queryError } = await supabase

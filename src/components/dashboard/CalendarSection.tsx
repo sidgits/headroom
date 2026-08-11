@@ -59,7 +59,7 @@ export default function CalendarSection({ email }: { email: string }) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const errs: string[] = data?.errors ?? [];
-      if (errs.length) setSyncError(errs[0]);
+      if (errs.length) setSyncError(errs[0] ?? null);
       await supabase.functions.invoke("analyze-clt", { body: withReview({ email }) });
       await refresh();
       if (errs.length) toast.error(errs[0]);
@@ -258,7 +258,7 @@ export default function CalendarSection({ email }: { email: string }) {
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
             <span className="flex-1 min-w-[180px]">
               Connected via ICS.
-              {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
+              {connections[0]?.last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
             </span>
             <button onClick={disconnect} disabled={!!busy}
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border hover:bg-secondary text-foreground">
@@ -460,10 +460,10 @@ function localDateKey(iso: string): string {
 function rangeLabel(days: { analysis_date: string }[]) {
   if (days.length === 0) return "";
   const fmt = (k: string) => {
-    const [y, m, d] = k.split("-").map(Number);
+    const [y = 0, m = 1, d = 1] = k.split("-").map(Number);
     return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
   };
-  const first = fmt(days[0].analysis_date);
-  const last = fmt(days[days.length - 1].analysis_date);
+  const first = fmt(days[0]?.analysis_date ?? "");
+  const last = fmt(days[days.length - 1]?.analysis_date ?? "");
   return first === last ? first : `${first} – ${last}`;
 }

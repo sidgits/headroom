@@ -35,8 +35,8 @@ const ReturningUserHome = ({ user, completion, onRetake }: ReturningUserHomeProp
   const burnoutStyles = burnoutLevelStyles[meta.defaultBurnout.level];
 
   const displayName =
-    (user.user_metadata?.full_name as string | undefined)?.split(" ")[0] ??
-    (user.user_metadata?.name as string | undefined)?.split(" ")[0] ??
+    (user.user_metadata?.["full_name"] as string | undefined)?.split(" ")[0] ??
+    (user.user_metadata?.["name"] as string | undefined)?.split(" ")[0] ??
     user.email?.split("@")[0] ??
     "";
 

@@ -242,7 +242,7 @@ export default function CalendarPage() {
           <div className="rounded-xl border border-border bg-card/40 p-3 text-xs text-muted-foreground flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-primary" />
             Connected via ICS.
-            {connections[0].last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
+            {connections[0]?.last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
           </div>
         )}
 
@@ -428,10 +428,10 @@ function localDateKey(iso: string): string {
 function rangeLabel(days: { analysis_date: string }[]) {
   if (days.length === 0) return "";
   const fmt = (k: string) => {
-    const [y, m, d] = k.split("-").map(Number);
+    const [y = 0, m = 1, d = 1] = k.split("-").map(Number);
     return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
   };
-  const first = fmt(days[0].analysis_date);
-  const last = fmt(days[days.length - 1].analysis_date);
+  const first = fmt(days[0]?.analysis_date ?? "");
+  const last = fmt(days[days.length - 1]?.analysis_date ?? "");
   return first === last ? first : `${first} – ${last}`;
 }

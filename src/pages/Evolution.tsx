@@ -129,8 +129,8 @@ const GENERIC_EMAIL_DOMAINS = new Set([
 
 const isCompanyEmail = (email: string) => {
   const match = email.toLowerCase().trim().match(/@([^@]+)$/);
-  if (!match) return false;
-  const domain = match[1];
+  const domain = match?.[1];
+  if (!domain) return false;
   if (GENERIC_EMAIL_DOMAINS.has(domain)) return false;
   // Also block subdomains of generic providers, e.g. mail.google.com
   const parts = domain.split(".");
@@ -164,24 +164,24 @@ const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
   const validate = () => {
     const nextErrors: Record<string, string> = {};
     if (!formData.name.trim()) {
-      nextErrors.name = "Name is required";
+      nextErrors['name'] = "Name is required";
     } else if (formData.name.trim().length < 2) {
-      nextErrors.name = "Name must be at least 2 characters";
+      nextErrors['name'] = "Name must be at least 2 characters";
     }
 
     const email = formData.email.trim().toLowerCase();
     if (!email) {
-      nextErrors.email = "Email is required";
+      nextErrors['email'] = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      nextErrors.email = "Please enter a valid email address";
+      nextErrors['email'] = "Please enter a valid email address";
     } else if (!isCompanyEmail(email)) {
-      nextErrors.email = "Please use your company email address";
+      nextErrors['email'] = "Please use your company email address";
     }
 
     if (!formData.company.trim()) {
-      nextErrors.company = "Company name is required";
+      nextErrors['company'] = "Company name is required";
     } else if (formData.company.trim().length < 2) {
-      nextErrors.company = "Company name must be at least 2 characters";
+      nextErrors['company'] = "Company name must be at least 2 characters";
     }
 
     setErrors(nextErrors);
@@ -303,8 +303,8 @@ const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
                         className="w-full rounded-xl border border-border bg-background/80 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                       />
                     </div>
-                    {errors.name && (
-                      <p className="mt-1.5 text-xs text-red-500">{errors.name}</p>
+                    {errors['name'] && (
+                      <p className="mt-1.5 text-xs text-red-500">{errors['name']}</p>
                     )}
                   </div>
 
@@ -328,8 +328,8 @@ const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
                         className="w-full rounded-xl border border-border bg-background/80 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                       />
                     </div>
-                    {errors.email && (
-                      <p className="mt-1.5 text-xs text-red-500">{errors.email}</p>
+                    {errors['email'] && (
+                      <p className="mt-1.5 text-xs text-red-500">{errors['email']}</p>
                     )}
                   </div>
 
@@ -353,13 +353,13 @@ const EarlyInterestModal = ({ isOpen, onClose }: EarlyInterestModalProps) => {
                         className="w-full rounded-xl border border-border bg-background/80 pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                       />
                     </div>
-                    {errors.company && (
-                      <p className="mt-1.5 text-xs text-red-500">{errors.company}</p>
+                    {errors['company'] && (
+                      <p className="mt-1.5 text-xs text-red-500">{errors['company']}</p>
                     )}
                   </div>
 
-                  {errors.submit && (
-                    <p className="text-xs text-red-500 text-center">{errors.submit}</p>
+                  {errors['submit'] && (
+                    <p className="text-xs text-red-500 text-center">{errors['submit']}</p>
                   )}
 
                   <button

@@ -36,12 +36,12 @@ function isScoringResult(value: unknown): value is ScoringResult {
   if (!value || typeof value !== "object") return false;
   const v = value as Record<string, unknown>;
   return (
-    !!v.archetype &&
-    !!v.burnoutRisk &&
-    Array.isArray(v.dimensionScores) &&
-    Array.isArray(v.recommendations) &&
-    !!v.mirror &&
-    !!v.shadowArchetype
+    !!v["archetype"] &&
+    !!v["burnoutRisk"] &&
+    Array.isArray(v["dimensionScores"]) &&
+    Array.isArray(v["recommendations"]) &&
+    !!v["mirror"] &&
+    !!v["shadowArchetype"]
   );
 }
 
@@ -56,7 +56,7 @@ const MIN_LONGITUDINAL_CHECKINS = 5;
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string | undefined } | null>(null);
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
@@ -131,6 +131,7 @@ const Dashboard = () => {
       toast.info("Checkout cancelled.");
       cleanUrl();
     }
+    return undefined;
   }, []);
 
   useEffect(() => {
