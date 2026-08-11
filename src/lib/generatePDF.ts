@@ -226,7 +226,7 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(...dark);
-  const unlockLines = doc.splitTextToSize(recommendations[0], contentWidth);
+  const unlockLines = doc.splitTextToSize(recommendations[0] ?? "", contentWidth);
   doc.text(unlockLines, margin, y);
   y += unlockLines.length * 5 + 8;
 
