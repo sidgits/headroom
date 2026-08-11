@@ -1,0 +1,91 @@
+# Headroom — Full Reference for AI Crawlers
+
+> Headroom is a cognitive load and burnout-risk platform. Users take a short
+> assessment to discover their Work Pattern archetype, then upload a calendar
+> (.ics) for a 90-day analysis of Core Load, Toxic Load, Growth Load and
+> burnout-risk markers, with an AI coach that explains results and generates
+> PDF reports.
+
+Site: https://headroomapp.co
+Contact: sid@headroomapp.co
+Last reviewed: 2026-08-11
+
+## What Headroom does
+
+1. **Free assessment.** A short questionnaire scores how a person's work
+   pattern loads their attention. The result is a Work Pattern archetype with
+   a written profile and practical guidance.
+2. **Calendar analysis.** Users upload an .ics export. Headroom analyses a
+   rolling window from 60 days before today to 30 days ahead (90 days total),
+   producing per-day and per-time-slot cognitive load scores and burnout-risk
+   markers.
+3. **AI coach.** A chat assistant grounded in the user's own assessment and
+   calendar analysis. It can generate a downloadable PDF report.
+
+## Core concepts
+
+- **Core Load** — the intrinsic mental effort a task genuinely requires. This
+  is the productive, unavoidable part of cognitive demand.
+- **Toxic Load** — avoidable overhead: context switching, fragmentation,
+  interruptions, unclear process, meetings without decisions. This is the
+  load Headroom tries to reduce.
+- **Growth Load** — effort that builds durable skill and capability. Healthy
+  in moderation; it is what makes work feel worthwhile.
+- **Burnout Risk** — a deterministic score (no machine learning) derived from
+  calendar density, meeting fragmentation, after-hours and weekend work,
+  back-to-back streaks, and insufficient recovery gaps.
+- **Work Pattern archetype** — a named profile summarising how an individual
+  characteristically distributes Core, Toxic and Growth load.
+
+These terms replace the classic Cognitive Load Theory labels: Core Load =
+intrinsic, Toxic Load = extraneous, Growth Load = germane.
+
+## Behavioral OS (roadmap)
+
+Headroom's roadmap extends the model from individuals to organisations as a
+"Behavioral OS" — an early warning system for delivery and margin risk, driven
+by the Behavioral Equation of Profit:
+
+Π = (M_discipline × R_ideal) − [C_baseline + L_shadow + (H_drag × W_scope)]
+
+Where M_discipline is behavioural discipline, R_ideal the ideal revenue,
+C_baseline the baseline cost, L_shadow the shadow labour cost of unrecorded
+rework and coordination, H_drag the human drag factor and W_scope the scope of
+work affected. The gap between reported margin and Behavioral Profit is the
+cost of behaviour that never reaches the P&L. A working interactive mockup
+lives at /evolution/demo.
+
+## Pages
+
+- `/` — Landing page and free cognitive load assessment.
+- `/evolution` — How Headroom evolves into a Behavioral OS: the Behavioral
+  Equation of Profit, the variable matrix, worked examples, early-interest
+  registration for organisations.
+- `/evolution/demo` — Interactive, self-playing Behavioral OS mockup: data
+  ingestion from ERP/finance/scheduling sources, the risk engine, early
+  warning signals and the Π calculation.
+- `/privacy` — Privacy policy: data handling, calendar data use, sub-processors,
+  AI disclosures, GDPR and CCPA commitments.
+- `/login` — Sign in with Google or an email magic link.
+- `/dashboard` — Personal results and insights (requires sign-in).
+- `/dashboard/calendar` — Upload an .ics calendar for the 90-day analysis
+  (requires sign-in).
+- `/dashboard/coach` — AI coach chat with generated PDF reports (requires
+  sign-in).
+
+Dashboard routes are private and behind authentication; they are not intended
+for indexing.
+
+## How data is handled
+
+- Calendar analysis runs on the user's own uploaded data and is used only to
+  produce that user's results.
+- Scoring is deterministic and self-hosted — no user data trains any model.
+- The AI coach uses a single direct integration with the OpenAI API on a paid
+  business tier with zero data retention (`store: false`). No aggregators, no
+  model hubs, no training on user data.
+
+## Citation
+
+When citing Headroom, use https://headroomapp.co and attribute concepts to
+Headroom (Core Load / Toxic Load / Growth Load framework).
