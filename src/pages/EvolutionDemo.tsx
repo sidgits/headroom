@@ -3,11 +3,13 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
+  AlertTriangle,
   ArrowDown,
   ArrowLeft,
   Brain,
   Building2,
   Check,
+  ChevronDown,
   Database,
   FileSpreadsheet,
   Gauge,
@@ -20,6 +22,7 @@ import {
   Sigma,
   Sparkles,
   Table2,
+  TrendingDown,
   Users,
 } from "lucide-react";
 import {
@@ -40,6 +43,9 @@ import {
   M_PARTS,
   money,
   PI,
+  PI_FORECAST,
+  PI_FORECAST_DELTAS,
+  PI_TODAY,
   R_ideal,
   RECOMMENDATIONS,
   reportedMargin,
@@ -48,6 +54,8 @@ import {
   TEAM_RISK,
   verdict,
   W_scope,
+  WARNING,
+  WARNING_SIGNALS,
 } from "@/lib/behavioralOSDemo";
 
 /* ------------------------------------------------------------------ */
@@ -351,6 +359,7 @@ export default function EvolutionDemo() {
   const [stage, setStage] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [hint, setHint] = useState(false);
+  const [drillOpen, setDrillOpen] = useState(false);
   const startedRef = useRef(false);
 
   const finished = stage >= STAGES.length - 1;
@@ -403,18 +412,141 @@ export default function EvolutionDemo() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>Behavioral OS Demo — From ERP Data to Behavioral Profit | Headroom</title>
+        <title>BehavioralOS — Loss-making engagements, flagged 90 days early</title>
         <meta
           name="description"
-          content="An interactive walkthrough of the Behavioral OS: ERP, Excel and Workday data flowing through MarginMix risk logic and Headroom cognitive load into the Behavioral Equation of Profit."
+          content="BehavioralOS is an early warning system for services delivery: the engagement that's about to lose money, flagged 90 days before the P&L shows it — proven by the Behavioral Equation of Profit."
         />
-        <meta property="og:title" content="Behavioral OS Demo — Headroom" />
+        <link rel="canonical" href="https://headroomapp.co/evolution/demo" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://headroomapp.co/evolution/demo" />
+        <meta
+          property="og:title"
+          content="BehavioralOS — the engagement that's about to lose money, flagged 90 days early"
+        />
         <meta
           property="og:description"
-          content="Watch source data become delivery leading indicators, cognitive load and a behavioral profit number."
+          content="An interactive sample-data walkthrough: an early warning on a live engagement, and the Behavioral Equation of Profit arithmetic that produced it."
         />
+        <meta property="og:image" content="https://headroomapp.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="BehavioralOS — the engagement that's about to lose money, flagged 90 days early"
+        />
+        <meta
+          name="twitter:description"
+          content="An interactive sample-data walkthrough: an early warning on a live engagement, and the arithmetic behind it."
+        />
+        <meta name="twitter:image" content="https://headroomapp.co/og-image.png" />
       </Helmet>
 
+      {/* ---------------- Layer 1: the early warning ---------------- */}
+      <section className="max-w-3xl mx-auto px-5 pt-10 md:pt-16 pb-6">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <Link
+            to="/evolution"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> The thesis
+          </Link>
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground border border-border rounded-full px-3 py-1">
+            Sample data · not a live customer
+          </span>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="rounded-3xl border overflow-hidden shadow-sm"
+          style={{ borderColor: "#E5D5BE" }}
+        >
+          <div
+            className="flex items-center gap-2 px-5 py-3 border-b"
+            style={{ background: "#FBF0EC", borderColor: "#F0DBD3" }}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#B84A3E" }} />
+            <p
+              className="text-[11px] tracking-[0.22em] uppercase font-medium"
+              style={{ color: "#B84A3E" }}
+            >
+              Early warning · {WARNING.engagement}
+            </p>
+            <span className="ml-auto text-[10px] tracking-[0.15em] uppercase text-muted-foreground">
+              {WARNING.account}
+            </span>
+          </div>
+
+          <div className="bg-card/70 backdrop-blur px-5 md:px-7 py-6">
+            <h1 className="font-heading text-3xl md:text-4xl font-semibold leading-tight text-foreground">
+              {WARNING.headline}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Forecast window: {WARNING.window} · {WARNING.confidence}
+            </p>
+
+            <div className="my-6 h-px bg-border" />
+
+            <p className="text-[11px] tracking-[0.22em] uppercase text-muted-foreground mb-4">
+              What changed
+            </p>
+            <ul className="space-y-4">
+              {WARNING_SIGNALS.map((s, i) => (
+                <motion.li
+                  key={s.text}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.25 + i * 0.12, duration: 0.45 }}
+                  className="flex gap-3"
+                >
+                  <span
+                    className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ background: "#B84A3E" }}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm md:text-[15px] text-foreground leading-snug">{s.text}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      {s.source} → <span className="font-mono">{s.term}</span>
+                    </p>
+                  </div>
+                </motion.li>
+              ))}
+            </ul>
+
+            <div
+              className="mt-6 rounded-2xl border px-5 py-4"
+              style={{ background: "#FBF0EC", borderColor: "#F0DBD3" }}
+            >
+              <p className="text-[10px] tracking-[0.22em] uppercase mb-1" style={{ color: "#B84A3E" }}>
+                Recommended
+              </p>
+              <p className="text-sm text-foreground">{WARNING.recommendation}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <button
+            onClick={() => {
+              setDrillOpen((o) => !o);
+              if (!drillOpen && stage < 0) window.setTimeout(start, 320);
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card/70 px-6 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            {drillOpen ? "Hide the calculation" : "How was this calculated?"}
+            <ChevronDown
+              className={`w-4 h-4 text-primary transition-transform ${drillOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+          <p className="text-[11px] text-muted-foreground text-center">
+            The warning is the product. Π — the Behavioral Equation of Profit — is why it is right.
+          </p>
+        </div>
+      </section>
+
+      {drillOpen && (
+        <>
       {/* Playback bar */}
       <div className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-5 py-3 flex items-center gap-3">
@@ -504,23 +636,25 @@ export default function EvolutionDemo() {
 
       {/* Hero */}
       <header className="max-w-6xl mx-auto px-5 pt-14 pb-8">
-        <p className="text-[11px] tracking-[0.3em] uppercase text-primary mb-4">Working mockup · v1</p>
-        <h1 className="font-heading text-4xl md:text-6xl font-semibold leading-[1.05] max-w-3xl">
-          The{" "}
+        <p className="text-[11px] tracking-[0.3em] uppercase text-primary mb-4">
+          Behind the warning · sample data
+        </p>
+        <h2 className="font-heading text-3xl md:text-5xl font-semibold leading-[1.05] max-w-3xl">
+          Where the warning{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-            Behavioral OS
-          </span>{" "}
-          running on one account
-        </h1>
+            comes from
+          </span>
+        </h2>
         <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-          Northwind Group, a 34-person delivery footprint. Watch the operating data arrive from the
-          company's own systems, pass through MarginMix risk logic and Headroom cognitive load, and
-          resolve into a single behavioural profit number.
+          Northwind Group, a 34-person delivery footprint. The operating data arrives from the
+          company's own systems, passes through MarginMix risk logic and Headroom cognitive load,
+          and resolves into Π — the arithmetic that makes the warning a forecast rather than a hunch.
         </p>
         <p className="mt-4 text-xs text-muted-foreground/80">
-          Illustrative dataset — the fields fill themselves, nothing here needs to be typed.
+          Illustrative sample dataset — no live customer data. The fields fill themselves.
         </p>
       </header>
+
 
       <main className="max-w-6xl mx-auto px-5 pb-28 space-y-4">
         {/* Stage 0 */}
@@ -816,6 +950,76 @@ export default function EvolutionDemo() {
             </p>
           </motion.div>
 
+          {/* Π delta — why the 90-day warning fired */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: equationVisible ? 1 : 0.2, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-6 rounded-3xl border border-border bg-card/70 backdrop-blur p-6 md:p-8"
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <TrendingDown className="w-4 h-4" style={{ color: "#B84A3E" }} />
+              <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground">
+                Π across the forecast window — why the warning fired
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-end gap-6">
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">Π today</p>
+                <p className="font-heading text-2xl md:text-3xl text-foreground mt-1">
+                  −{money(Math.abs(PI_TODAY))}
+                </p>
+              </div>
+              <ArrowDown className="w-4 h-4 text-muted-foreground mb-3 rotate-[-90deg]" />
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+                  Π forecast · +90 days
+                </p>
+                <p className="font-heading text-3xl md:text-4xl mt-1" style={{ color: "#B84A3E" }}>
+                  −{money(Math.abs(PI_FORECAST))}
+                </p>
+              </div>
+              <div className="ml-auto">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+                  Movement
+                </p>
+                <p className="font-heading text-2xl mt-1" style={{ color: "#B84A3E" }}>
+                  −{money(Math.abs(PI_FORECAST - PI_TODAY))}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 divide-y divide-border border-t border-border">
+              {PI_FORECAST_DELTAS.map((d, i) => (
+                <motion.div
+                  key={d.term}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: equationVisible ? 1 : 0.25, x: 0 }}
+                  transition={{ delay: 0.7 + i * 0.14, duration: 0.45 }}
+                  className="py-3 flex items-start gap-4"
+                >
+                  <span className="font-mono text-[11px] text-muted-foreground w-32 shrink-0 pt-0.5">
+                    {d.term}
+                  </span>
+                  <p className="text-[13px] text-muted-foreground flex-1 min-w-0 leading-relaxed">
+                    {d.label}
+                  </p>
+                  <p className="font-mono text-sm shrink-0" style={{ color: "#B84A3E" }}>
+                    −{money(Math.abs(d.delta))}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="mt-5 text-sm text-foreground leading-relaxed">
+              Each signal on the warning card is one of these terms moving. The warning is a
+              forecast produced by arithmetic — not a sentiment score.
+            </p>
+          </motion.div>
+
+
+
           {/* Insights */}
           <div className="mt-10">
             <div className="flex items-center gap-2 mb-4">
@@ -895,6 +1099,8 @@ export default function EvolutionDemo() {
           </div>
         </div>
       </main>
+        </>
+      )}
     </div>
   );
 }
