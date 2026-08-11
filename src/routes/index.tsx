@@ -8,7 +8,7 @@ import Evolution from "@/pages/Evolution";
 export const Route = createFileRoute("/")({
   loader: async () => {
     let hostname = "";
-    if (typeof window === "undefined") {
+    if (import.meta.env.SSR) {
       const { getRequestHeader } = await import("@tanstack/react-start/server");
       hostname = (getRequestHeader("host") ?? "").split(":")[0] ?? "";
     } else {
