@@ -950,6 +950,76 @@ export default function EvolutionDemo() {
             </p>
           </motion.div>
 
+          {/* Π delta — why the 90-day warning fired */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: equationVisible ? 1 : 0.2, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-6 rounded-3xl border border-border bg-card/70 backdrop-blur p-6 md:p-8"
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <TrendingDown className="w-4 h-4" style={{ color: "#B84A3E" }} />
+              <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground">
+                Π across the forecast window — why the warning fired
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-end gap-6">
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">Π today</p>
+                <p className="font-heading text-2xl md:text-3xl text-foreground mt-1">
+                  −{money(Math.abs(PI_TODAY))}
+                </p>
+              </div>
+              <ArrowDown className="w-4 h-4 text-muted-foreground mb-3 rotate-[-90deg]" />
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+                  Π forecast · +90 days
+                </p>
+                <p className="font-heading text-3xl md:text-4xl mt-1" style={{ color: "#B84A3E" }}>
+                  −{money(Math.abs(PI_FORECAST))}
+                </p>
+              </div>
+              <div className="ml-auto">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+                  Movement
+                </p>
+                <p className="font-heading text-2xl mt-1" style={{ color: "#B84A3E" }}>
+                  −{money(Math.abs(PI_FORECAST - PI_TODAY))}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 divide-y divide-border border-t border-border">
+              {PI_FORECAST_DELTAS.map((d, i) => (
+                <motion.div
+                  key={d.term}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: equationVisible ? 1 : 0.25, x: 0 }}
+                  transition={{ delay: 0.7 + i * 0.14, duration: 0.45 }}
+                  className="py-3 flex items-start gap-4"
+                >
+                  <span className="font-mono text-[11px] text-muted-foreground w-32 shrink-0 pt-0.5">
+                    {d.term}
+                  </span>
+                  <p className="text-[13px] text-muted-foreground flex-1 min-w-0 leading-relaxed">
+                    {d.label}
+                  </p>
+                  <p className="font-mono text-sm shrink-0" style={{ color: "#B84A3E" }}>
+                    −{money(Math.abs(d.delta))}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="mt-5 text-sm text-foreground leading-relaxed">
+              Each signal on the warning card is one of these terms moving. The warning is a
+              forecast produced by arithmetic — not a sentiment score.
+            </p>
+          </motion.div>
+
+
+
           {/* Insights */}
           <div className="mt-10">
             <div className="flex items-center gap-2 mb-4">
