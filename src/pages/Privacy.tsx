@@ -233,10 +233,14 @@ const Privacy = () => {
                 events and analyses on our behalf as a processor under contractual data-protection terms.
               </li>
               <li>
-                <strong>Our AI model provider</strong> — when you use the AI productivity coach, the minimum
-                necessary derived schedule context (event titles, times, durations, and computed load scores) is
-                sent to the model provider solely to generate your response. The provider is contractually bound
-                not to use this data to train or improve its models, and no data is retained by it for training.
+                <strong>OpenAI, L.L.C.</strong> (OpenAI API platform, paid pay-as-you-go business tier) — when you
+                use the AI productivity coach, the minimum necessary derived schedule context (event titles, times,
+                durations, attendee counts, and computed load scores) is sent to the OpenAI API solely to generate
+                your response in real time. Under the OpenAI API data usage policy, data submitted through the API
+                is <strong>not</strong> used to train or improve OpenAI models. Headroom has not opted in to any
+                data-sharing or model-improvement programme, and every request is sent with the API's
+                zero-retention flag (<code>store: false</code>) so no prompt or completion is persisted by OpenAI
+                beyond the request itself.
               </li>
             </ul>
             <p className="text-sm leading-relaxed">
@@ -252,6 +256,16 @@ const Privacy = () => {
               uses it for such training. AI processing is limited to generating personalized output for the
               individual user the data belongs to, in real time, and is not retained for model development.
             </p>
+            <p className="text-sm leading-relaxed">
+              Headroom uses exactly one AI provider: <strong>OpenAI</strong>, called directly at
+              <code> api.openai.com</code> on the paid API platform tier. Headroom does <strong>not</strong> route
+              Google user data through any AI aggregator, gateway, model hub, router, or multi-model broker, and
+              does not use any other AI or ML service. Headroom does not train, fine-tune, or evaluate any model of
+              its own on Google user data. The cognitive-load and burnout scores shown in the product are produced
+              by a fixed, deterministic rules engine that runs inside Headroom's own infrastructure — it contains no
+              learned parameters and nothing about it changes on the basis of your data.
+            </p>
+
 
             <h3 className="text-base font-semibold pt-2">7.5 Limited Use compliance statement</h3>
             <p className="text-sm leading-relaxed italic">
