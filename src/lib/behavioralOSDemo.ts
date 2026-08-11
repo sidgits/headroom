@@ -209,3 +209,62 @@ export const RECOMMENDATIONS = [
   { action: "Protect 2 deep-work blocks / week", impact: 148_000, detail: "Cuts toxic load from 71 to an estimated 58, reducing velocity degradation by roughly 3.3 points." },
   { action: "Redistribute senior dependency", impact: 96_000, detail: "Shift 1,400 senior hours to mid-level with a review gate; lowers Workforce Intensity from 78 to ~66." },
 ];
+
+// --- Early warning layer -------------------------------------------------
+// The product surface: the warning comes first, Π is the proof underneath.
+export const WARNING = {
+  engagement: "Engagement #4471",
+  account: "Northwind Group",
+  headline: "Elevated slippage risk",
+  window: "Next 90 days",
+  recommendation:
+    "Reprice or restaff before the Q3 review.",
+  confidence: "High — 3 of 3 leading signals moving in the same direction",
+};
+
+export interface WarningSignal {
+  text: string;
+  source: string;
+  term: string;
+}
+
+export const WARNING_SIGNALS: WarningSignal[] = [
+  {
+    text: "Senior allocation drifted 35% → 51% over six weeks",
+    source: "MarginMix effort bands (Senior / Mid / Execution split)",
+    term: "M_discipline · H_drag",
+  },
+  {
+    text: "2 of 3 engagement leads trending into red-zone load",
+    source: "Headroom Core / Toxic / Growth load + burnout risk band",
+    term: "H_drag",
+  },
+  {
+    text: "3 deliverables shipped outside contracted scope this month",
+    source: "L_shadow drivers (unscoped deliverables × baseline hours)",
+    term: "L_shadow",
+  },
+];
+
+// Π today vs Π forecast at the end of the warning window, decomposed by term.
+export const PI_TODAY = PI;
+export const PI_FORECAST_DELTAS = [
+  {
+    term: "M_discipline",
+    label: "Pricing integrity slips 0.81 → 0.76 as scope drifts",
+    delta: -0.049 * R_ideal,
+  },
+  {
+    term: "L_shadow",
+    label: "Unscoped deliverables add ~1,900 unbilled hours",
+    delta: -1_900 * 62,
+  },
+  {
+    term: "H_drag × W_scope",
+    label: "Senior concentration lifts churn probability 12% → 17%",
+    delta: -0.05 * 34 * 48_000 * W_scope,
+  },
+];
+
+export const PI_FORECAST =
+  PI_TODAY + PI_FORECAST_DELTAS.reduce((s, d) => s + d.delta, 0);
