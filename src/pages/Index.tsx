@@ -336,7 +336,7 @@ const Index = () => {
           {screen === "quiz" && (
             <motion.div key={`quiz-${currentQuestion}`} {...pageTransition}>
               <QuizQuestion
-                question={quizQuestions[currentQuestion]}
+                question={quizQuestions[currentQuestion]!}
                 current={currentQuestion + 1}
                 total={quizQuestions.length}
                 onAnswer={handleAnswer}
