@@ -636,23 +636,25 @@ export default function EvolutionDemo() {
 
       {/* Hero */}
       <header className="max-w-6xl mx-auto px-5 pt-14 pb-8">
-        <p className="text-[11px] tracking-[0.3em] uppercase text-primary mb-4">Working mockup · v1</p>
-        <h1 className="font-heading text-4xl md:text-6xl font-semibold leading-[1.05] max-w-3xl">
-          The{" "}
+        <p className="text-[11px] tracking-[0.3em] uppercase text-primary mb-4">
+          Behind the warning · sample data
+        </p>
+        <h2 className="font-heading text-3xl md:text-5xl font-semibold leading-[1.05] max-w-3xl">
+          Where the warning{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-            Behavioral OS
-          </span>{" "}
-          running on one account
-        </h1>
+            comes from
+          </span>
+        </h2>
         <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-          Northwind Group, a 34-person delivery footprint. Watch the operating data arrive from the
-          company's own systems, pass through MarginMix risk logic and Headroom cognitive load, and
-          resolve into a single behavioural profit number.
+          Northwind Group, a 34-person delivery footprint. The operating data arrives from the
+          company's own systems, passes through MarginMix risk logic and Headroom cognitive load,
+          and resolves into Π — the arithmetic that makes the warning a forecast rather than a hunch.
         </p>
         <p className="mt-4 text-xs text-muted-foreground/80">
-          Illustrative dataset — the fields fill themselves, nothing here needs to be typed.
+          Illustrative sample dataset — no live customer data. The fields fill themselves.
         </p>
       </header>
+
 
       <main className="max-w-6xl mx-auto px-5 pb-28 space-y-4">
         {/* Stage 0 */}
