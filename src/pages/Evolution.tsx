@@ -500,7 +500,7 @@ const Evolution = () => {
             review."
           </p>
           <p className="mt-5 text-sm text-muted-foreground leading-relaxed max-w-3xl">
-            One artefact, owned by one person — the delivery or operations lead. It arrives before
+            One artifact, owned by one person — the delivery or operations lead. It arrives before
             the P&L does, it names the behavior that caused it, and every clause in it is
             traceable to a measured input. The equation below is what makes it a forecast instead
             of an opinion.
