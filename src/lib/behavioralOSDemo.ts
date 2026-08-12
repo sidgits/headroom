@@ -38,10 +38,10 @@ export const SOURCES: SourceSystem[] = [
   {
     id: "excel",
     name: "Excel / Rate card",
-    kind: "Commercial modelling",
+    kind: "Commercial modeling",
     fields: [
       { label: "Card-rate ideal revenue", value: "$2,950,000", hint: "R_ideal" },
-      { label: "Realised vs card rate", value: "0.81" },
+      { label: "Realized vs card rate", value: "0.81" },
       { label: "Blended cost rate", value: "$62 / hour" },
       { label: "Replacement cost per exit", value: "$48,000" },
       { label: "Delivery headcount", value: "34 FTE" },
@@ -64,9 +64,9 @@ export const SOURCES: SourceSystem[] = [
   {
     id: "headroom",
     name: "Headroom + MarginMix",
-    kind: "Behavioural telemetry",
+    kind: "Behavioral telemetry",
     fields: [
-      { label: "Calendar events analysed", value: "3,418 (90-day window)" },
+      { label: "Calendar events analyzed", value: "3,418 (90-day window)" },
       { label: "Core load (avg)", value: "58 / 100" },
       { label: "Toxic load (avg)", value: "71 / 100" },
       { label: "Growth load (avg)", value: "22 / 100" },
@@ -204,7 +204,7 @@ export const INSIGHTS = [
 ];
 
 export const RECOMMENDATIONS = [
-  { action: "Reprice at renewal", impact: 325_000, detail: "Move realised rate from 0.81 to 0.92 of card rate; MarginMix verdict is Structurally Fragile, which is a repricing trigger." },
+  { action: "Reprice at renewal", impact: 325_000, detail: "Move realized rate from 0.81 to 0.92 of card rate; MarginMix verdict is Structurally Fragile, which is a repricing trigger." },
   { action: "Cap coordination at 15% of hours", impact: 186_000, detail: "Convert 3 of 7 recurring status forums to async; releases ~4,220 hours back to on-scope delivery." },
   { action: "Protect 2 deep-work blocks / week", impact: 148_000, detail: "Cuts toxic load from 71 to an estimated 58, reducing velocity degradation by roughly 3.3 points." },
   { action: "Redistribute senior dependency", impact: 96_000, detail: "Shift 1,400 senior hours to mid-level with a review gate; lowers Workforce Intensity from 78 to ~66." },

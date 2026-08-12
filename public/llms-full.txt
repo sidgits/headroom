@@ -34,7 +34,7 @@ Last reviewed: 2026-08-11
 - **Burnout Risk** — a deterministic score (no machine learning) derived from
   calendar density, meeting fragmentation, after-hours and weekend work,
   back-to-back streaks, and insufficient recovery gaps.
-- **Work Pattern archetype** — a named profile summarising how an individual
+- **Work Pattern archetype** — a named profile summarizing how an individual
   characteristically distributes Core, Toxic and Growth load.
 
 These terms replace the classic Cognitive Load Theory labels: Core Load =
@@ -42,17 +42,17 @@ intrinsic, Toxic Load = extraneous, Growth Load = germane.
 
 ## Behavioral OS (roadmap)
 
-Headroom's roadmap extends the model from individuals to organisations as a
+Headroom's roadmap extends the model from individuals to organizations as a
 "Behavioral OS" — an early warning system for delivery and margin risk, driven
 by the Behavioral Equation of Profit:
 
 Π = (M_discipline × R_ideal) − [C_baseline + L_shadow + (H_drag × W_scope)]
 
-Where M_discipline is behavioural discipline, R_ideal the ideal revenue,
-C_baseline the baseline cost, L_shadow the shadow labour cost of unrecorded
+Where M_discipline is behavioral discipline, R_ideal the ideal revenue,
+C_baseline the baseline cost, L_shadow the shadow labor cost of unrecorded
 rework and coordination, H_drag the human drag factor and W_scope the scope of
 work affected. The gap between reported margin and Behavioral Profit is the
-cost of behaviour that never reaches the P&L. A working interactive mockup
+cost of behavior that never reaches the P&L. A working interactive mockup
 lives at /evolution/demo.
 
 ## Pages
@@ -60,7 +60,7 @@ lives at /evolution/demo.
 - `/` — Landing page and free cognitive load assessment.
 - `/evolution` — How Headroom evolves into a Behavioral OS: the Behavioral
   Equation of Profit, the variable matrix, worked examples, early-interest
-  registration for organisations.
+  registration for organizations.
 - `/evolution/demo` — Interactive, self-playing Behavioral OS mockup: data
   ingestion from ERP/finance/scheduling sources, the risk engine, early
   warning signals and the Π calculation.

@@ -240,7 +240,7 @@ async function refreshOutlookAccess(sb: ReturnType<typeof serviceClient>, conn: 
 async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>, errors: string[] = [], tz = "UTC"): Promise<number> {
   let text = conn.ics_content as string | null;
   if (!text && conn.ics_url) {
-    // Some providers only serve ICS over webcal:// — normalise to https.
+    // Some providers only serve ICS over webcal:// — normalize to https.
     const raw = (conn.ics_url as string).trim().replace(/^webcal:\/\//i, "https://");
     let r: Response;
     try {
@@ -258,7 +258,7 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
     return 0;
   }
 
-  // Start 60 days before local midnight today so past workload can be analysed too.
+  // Start 60 days before local midnight today so past workload can be analyzed too.
   const from = windowStartFrom(tz);
   const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
   const parsed = parseIcs(text);

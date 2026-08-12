@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Per-IP burst limit (defence-in-depth against enumeration), plus a
+    // Per-IP burst limit (defense-in-depth against enumeration), plus a
     // tighter per-(IP+email) limit so a single attacker can't sweep many
     // addresses from the same IP.
     const ip = clientIp(req);

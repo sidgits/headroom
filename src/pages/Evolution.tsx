@@ -426,7 +426,7 @@ const Evolution = () => {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed"
           >
-            Profitability is a lagging indicator of aligned human behaviour. The Behavioral OS
+            Profitability is a lagging indicator of aligned human behavior. The Behavioral OS
             turns that lagging indicator into a leading one: it watches how work is actually
             being done and warns you which engagement is going to erode, while there is still
             time to reprice or restaff.
@@ -468,7 +468,7 @@ const Evolution = () => {
           </Card>
           <Card icon={ShieldAlert} title="Nobody owns the connection">
             One causes the other. Because no function owns the link, nobody measures it — so the
-            first evidence of behavioural erosion is a missed number.
+            first evidence of behavioral erosion is a missed number.
           </Card>
         </div>
       </Section>
@@ -476,7 +476,7 @@ const Evolution = () => {
       {/* 2 — The insight */}
       <Section
         eyebrow="The insight"
-        title="Profit doesn't erode randomly — it erodes behaviourally"
+        title="Profit doesn't erode randomly — it erodes behaviorally"
       >
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-3xl">
           Deal by deal, person by person, month by month. A scope concession here, a senior lead
@@ -501,7 +501,7 @@ const Evolution = () => {
           </p>
           <p className="mt-5 text-sm text-muted-foreground leading-relaxed max-w-3xl">
             One artefact, owned by one person — the delivery or operations lead. It arrives before
-            the P&L does, it names the behaviour that caused it, and every clause in it is
+            the P&L does, it names the behavior that caused it, and every clause in it is
             traceable to a measured input. The equation below is what makes it a forecast instead
             of an opinion.
           </p>
@@ -534,7 +534,7 @@ const Evolution = () => {
           </p>
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
             Every term on the right is something the OS can measure, and the scope weight factor
-            keeps behavioural cost matched to the revenue stream being evaluated. The warning
+            keeps behavioral cost matched to the revenue stream being evaluated. The warning
             fires when these terms move — which is why it can be interrogated line by line rather
             than argued about.
           </p>
@@ -545,7 +545,7 @@ const Evolution = () => {
       {/* Variable definitions */}
       <Section
         eyebrow="The vocabulary"
-        title="Seven variables that turn behaviour into a ledger"
+        title="Seven variables that turn behavior into a ledger"
       >
         <div className="overflow-hidden rounded-2xl border border-border">
           {[
@@ -553,7 +553,7 @@ const Evolution = () => {
               symbol: "Π",
               name: "Behavioral Profit",
               icon: Sigma,
-              def: "The true financial surplus remaining after accounting for real-world human behaviour across the project lifecycle. Currency/time.",
+              def: "The true financial surplus remaining after accounting for real-world human behavior across the project lifecycle. Currency/time.",
             },
             {
               symbol: "M_discipline",
@@ -571,7 +571,7 @@ const Evolution = () => {
               symbol: "C_baseline",
               name: "Baseline Cost",
               icon: Users,
-              def: "Visible, fixed accounting costs already on the balance sheet: direct salaries, hardware, licences and basic overhead.",
+              def: "Visible, fixed accounting costs already on the balance sheet: direct salaries, hardware, licenses and basic overhead.",
             },
             {
               symbol: "L_shadow",
@@ -589,7 +589,7 @@ const Evolution = () => {
               symbol: "W_scope",
               name: "Scope Weight Factor",
               icon: Crosshair,
-              def: "A dimensionless scaling factor (≤ 1.0) matching behavioural cost to the revenue stream measured: localized statutory revenue ÷ total ecosystem portfolio value.",
+              def: "A dimensionless scaling factor (≤ 1.0) matching behavioral cost to the revenue stream measured: localized statutory revenue ÷ total ecosystem portfolio value.",
             },
           ].map((row, i) => (
             <div
@@ -632,7 +632,7 @@ const Evolution = () => {
       {/* Signals */}
       <Section
         eyebrow="Layer two — signal fusion"
-        title="Two telemetry streams, one behavioural ledger"
+        title="Two telemetry streams, one behavioral ledger"
       >
         <div className="grid md:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-border bg-card/60 backdrop-blur p-6">
@@ -680,7 +680,7 @@ const Evolution = () => {
         <div className="mt-6 flex flex-col items-center gap-3 text-muted-foreground">
           <ArrowDown className="w-5 h-5 text-primary" />
           <p className="text-sm text-center max-w-xl">
-            Workflow telemetry is continuously cross-referenced with the organisation's
+            Workflow telemetry is continuously cross-referenced with the organization's
             fully loaded blended cost rate per hour — individual to team, team to
             engagement, engagement to portfolio.
           </p>
@@ -690,7 +690,7 @@ const Evolution = () => {
       {/* Algorithmic conversions */}
       <Section
         eyebrow="Layer three — the conversions"
-        title="How abstract behaviour lands on a standard P&L"
+        title="How abstract behavior lands on a standard P&L"
       >
         <div className="grid md:grid-cols-2 gap-4">
           {[
@@ -715,7 +715,7 @@ const Evolution = () => {
               title: "Shadow Labor",
               formula:
                 "L_shadow = [Σ(Unscoped Deliverables × Baseline Production Hours) + Excess Meeting Hours] × Blended Hourly Cost Rate",
-              body: "Monitors the unbilled effort required to fix systemic workflow friction. Hours logged as shadow labour are strictly mutually exclusive from deep focus blocks, so nothing is double-counted.",
+              body: "Monitors the unbilled effort required to fix systemic workflow friction. Hours logged as shadow labor are strictly mutually exclusive from deep focus blocks, so nothing is double-counted.",
             },
             {
               n: "04",
@@ -760,7 +760,7 @@ const Evolution = () => {
         <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-3xl">
           A localized $20,000,000 statutory revenue line, managed by a 37,000-person
           ecosystem that handles $1.7 billion in total cross-border contract portfolio
-          value. The scope weight factor isolates the behavioural cost that actually
+          value. The scope weight factor isolates the behavioral cost that actually
           belongs to this segment.
         </p>
 
@@ -846,7 +846,7 @@ const Evolution = () => {
             ["Discipline-adjusted inflow", "$20,575,000", "$20,575,000", true],
             ["Visible balance sheet costs (C_baseline)", "−$16,000,000", "−$16,000,000", false],
             ["Traditional net profit baseline", "+$4,575,000", "—", true],
-            ["Invisible shadow labour (L_shadow)", "Hidden in salaries", "−$78,300", false],
+            ["Invisible shadow labor (L_shadow)", "Hidden in salaries", "−$78,300", false],
             ["Systemic cognitive drag (H_drag × W_scope)", "Hidden in HR/salaries", "−$252,813", false],
           ].map(([label, trad, beh, bold], i) => (
             <div
@@ -874,7 +874,7 @@ const Evolution = () => {
           ))}
           <div className="grid grid-cols-[1fr_120px_120px] md:grid-cols-[1fr_200px_200px] gap-3 md:gap-6 p-5 border-t border-primary/30 bg-primary/10">
             <p className="text-sm font-semibold text-foreground">
-              Π — true behavioural profit
+              Π — true behavioral profit
             </p>
             <p className="text-sm text-right text-muted-foreground">—</p>
             <p className="text-sm text-right font-semibold text-foreground">
@@ -900,7 +900,7 @@ const Evolution = () => {
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Below the surface of the ledger, $331,113 is destroyed by human friction —
-              $78,300 in unbilled reactive shadow labour and $252,813 in cognitive fatigue
+              $78,300 in unbilled reactive shadow labor and $252,813 in cognitive fatigue
               from focus disruption and turnover. Scaled across the full $1.7 billion
               managed contract value, the same friction accounts for{" "}
               <span className="text-foreground font-medium">
@@ -919,7 +919,7 @@ const Evolution = () => {
       >
         <div className="grid md:grid-cols-2 gap-4">
           <Card icon={LineChart} title="Portfolio margin telemetry">
-            Every engagement carries a live behavioural profit figure, not a quarterly
+            Every engagement carries a live behavioral profit figure, not a quarterly
             post-mortem. Erosion is visible while it is still reversible.
           </Card>
           <Card icon={Cpu} title="Deterministic, not generative">
@@ -928,11 +928,11 @@ const Evolution = () => {
           </Card>
           <Card icon={Crosshair} title="Scoped, not double-counted">
             The scope weight factor and mutually exclusive hour accounting keep every
-            behavioural cost attributed once, to the revenue line it actually damages.
+            behavioral cost attributed once, to the revenue line it actually damages.
           </Card>
           <Card icon={ShieldAlert} title="Intervention before attrition">
             Burnout markers become an operating metric with a currency value attached —
-            which is when organisations finally act on them.
+            which is when organizations finally act on them.
           </Card>
         </div>
       </Section>

@@ -60,8 +60,8 @@ const SCORING_MATRIX: Record<string, Record<string, { E: number; I: number; G: n
   Q6: { A: { E: 3, I: 2, G: 1 }, B: { E: 1, I: 1, G: 1 }, C: { E: 3, I: 3, G: 2 }, D: { E: 2, I: 1, G: 1 } },
 };
 
-// Normalise raw score (6-18) to 1-10 scale
-function normalise(raw: number): number {
+// Normalize raw score (6-18) to 1-10 scale
+function normalize(raw: number): number {
   return Math.round(((raw - 6) / 12) * 10 * 10) / 10;
 }
 
@@ -208,7 +208,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
     },
     shadow: {
       name: "The Firefighter",
-      description: "When your headroom collapses — too many demands, too little space — you stop architecting and start reacting. You know this version of yourself. It feels busy but hollow. Recognising that shift early is the move.",
+      description: "When your headroom collapses — too many demands, too little space — you stop architecting and start reacting. You know this version of yourself. It feels busy but hollow. Recognizing that shift early is the move.",
     },
     unlock: "Block the first 90 minutes of your day as non-negotiable deep work. No meetings, no messages, no exceptions. One protected window changes everything for your archetype.",
     dimensionInterpretations: {
@@ -245,8 +245,8 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
     headline: "Your job is to make everyone else's job possible. Nobody sees the cost of that.",
     mirror: {
       atYourBest: "You hold more threads simultaneously than almost anyone around you. Projects, people, priorities, politics — you track all of it and nothing falls through. The team moves faster because of you, even when they can't articulate why. That's a rare and genuinely valuable skill.",
-      workingAgainstYou: "But your contribution is almost entirely invisible. You don't produce the deck, ship the code, or close the deal — you make all of that possible. In environments that measure output over orchestration, your value is chronically underrecognised. That's not a you problem. It's a measurement problem.",
-      patternNotNoticed: "Here's what you probably haven't noticed: you've become so good at managing everyone else's cognitive load that you've stopped prioritising your own. Your day is a series of other people's priorities. You're excellent at it. But when did you last do work that was purely yours?",
+      workingAgainstYou: "But your contribution is almost entirely invisible. You don't produce the deck, ship the code, or close the deal — you make all of that possible. In environments that measure output over orchestration, your value is chronically underrecognized. That's not a you problem. It's a measurement problem.",
+      patternNotNoticed: "Here's what you probably haven't noticed: you've become so good at managing everyone else's cognitive load that you've stopped prioritizing your own. Your day is a series of other people's priorities. You're excellent at it. But when did you last do work that was purely yours?",
     },
     shadow: {
       name: "The Ghost",
@@ -286,13 +286,13 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🤝",
     headline: "You could do this in your sleep. That might be the problem.",
     mirror: {
-      atYourBest: "You're the person everyone counts on. Reliable, consistent, low-drama, high-trust. When something needs to get done without fanfare, it lands with you. That dependability is genuinely valuable — more valuable than most organisations admit.",
+      atYourBest: "You're the person everyone counts on. Reliable, consistent, low-drama, high-trust. When something needs to get done without fanfare, it lands with you. That dependability is genuinely valuable — more valuable than most organizations admit.",
       workingAgainstYou: "But you're running well below your actual capacity. The work isn't challenging you anymore. You've mastered your environment so thoroughly that there's no friction left — and no friction means no growth signal. The comfort is real. So is the cost.",
       patternNotNoticed: "Here's what you probably haven't noticed: the quiet disengagement has been building for longer than you think. You're still delivering. But the energy behind the delivery has been declining steadily.",
     },
     shadow: {
       name: "The Ghost",
-      description: "When disengagement extends long enough, presence becomes performance. Still in every meeting. Still delivering. But the light behind it has dimmed. The Steady Hand who isn't challenged enough drifts toward the Ghost without realising it.",
+      description: "When disengagement extends long enough, presence becomes performance. Still in every meeting. Still delivering. But the light behind it has dimmed. The Steady Hand who isn't challenged enough drifts toward the Ghost without realizing it.",
     },
     unlock: "Deliberately take on one project in the next 30 days that you're not sure you can do. The discomfort of genuine uncertainty is the growth signal your system is missing.",
     dimensionInterpretations: {
@@ -359,7 +359,7 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
     },
     unlock: "Say no to one commitment this week that you would normally say yes to. Not a small one. A real one. The discomfort of that single no will show you exactly how much of your load is optional versus mandatory.",
     dimensionInterpretations: {
-      E: (s) => `${getScoreLabel(s)} — ${s}/10: Environmental noise is constant and high. You've normalised it — that's not the same as managing it.`,
+      E: (s) => `${getScoreLabel(s)} — ${s}/10: Environmental noise is constant and high. You've normalized it — that's not the same as managing it.`,
       I: (s) => `${getScoreLabel(s)} — ${s}/10: You handle high complexity — but at the cost of everything else.`,
       G: (s) => `${getScoreLabel(s)} — ${s}/10: No recovery signal. You're consuming capability, not building it.`,
     },
@@ -383,9 +383,9 @@ export function calculateResults(
     }
   }
 
-  const E = normalise(rawE);
-  const I = normalise(rawI);
-  const G = normalise(rawG);
+  const E = normalize(rawE);
+  const I = normalize(rawI);
+  const G = normalize(rawG);
 
   const archetypeId = classify(E, I, G, answers, sprinterAnswer);
   const archetypeData = ARCHETYPES[archetypeId] ?? ARCHETYPES["conductor"]!;

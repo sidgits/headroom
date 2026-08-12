@@ -173,7 +173,7 @@ export default function CalendarSection({ email }: { email: string }) {
   const canPageBack = stripStart > 0;
   const canPageForward = stripStart < maxStart;
   // The strip pages week by week, but the cascade below always lists every
-  // analysed day so users can just scroll through the whole window.
+  // analyzed day so users can just scroll through the whole window.
   const visibleDays = groupedByDay;
   const dayAnchorId = (date: string) => `sec-day-${date}`;
   const scrollToDay = (date: string) =>

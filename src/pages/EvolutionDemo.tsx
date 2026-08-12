@@ -297,7 +297,7 @@ const RiskEngine = ({ active }: { active: boolean }) => (
       </div>
       <p className="text-[11px] text-muted-foreground ml-auto max-w-xs">
         Confidence signal is neutral, so no hard override fires. Score routes straight into the
-        behavioural cost terms below.
+        behavioral cost terms below.
       </p>
     </div>
   </div>
@@ -633,7 +633,7 @@ export default function EvolutionDemo() {
           current={stage}
           eyebrow="Company's own sources"
           title="Data arrives from systems that already exist"
-          lede="No new tracking layer. The OS reads what finance, commercial and resourcing already maintain, plus the behavioural telemetry Headroom and MarginMix generate."
+          lede="No new tracking layer. The OS reads what finance, commercial and resourcing already maintain, plus the behavioral telemetry Headroom and MarginMix generate."
         >
           <div className="grid md:grid-cols-2 gap-4">
             {SOURCES.map((s, i) => (
@@ -697,7 +697,7 @@ export default function EvolutionDemo() {
                     <th className="text-right font-normal px-5 py-3">FTE</th>
                     <th className="text-right font-normal px-5 py-3">Hours</th>
                     <th className="text-right font-normal px-5 py-3">Senior mix</th>
-                    <th className="text-right font-normal px-5 py-3">Utilisation</th>
+                    <th className="text-right font-normal px-5 py-3">Utilization</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
