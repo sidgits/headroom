@@ -16,7 +16,7 @@ export const Route = createFileRoute("/dashboard/coach")({
       { property: "og:title", content: "AI Coach — Headroom" },
       {
         property: "og:description",
-        content: "Personalised coaching on your workload and burnout risk.",
+        content: "Personalized coaching on your workload and burnout risk.",
       },
     ],
   }),

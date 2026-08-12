@@ -226,7 +226,7 @@ const Privacy = () => {
                 durations, attendee counts, and computed load scores) is sent to the OpenAI API solely to generate
                 your response in real time. Under the OpenAI API data usage policy, data submitted through the API
                 is <strong>not</strong> used to train or improve OpenAI models. Headroom has not opted in to any
-                data-sharing or model-improvement programme, and every request is sent with the API's
+                data-sharing or model-improvement program, and every request is sent with the API's
                 zero-retention flag (<code>store: false</code>) so no prompt or completion is persisted by OpenAI
                 beyond the request itself.
               </li>

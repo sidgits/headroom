@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
             {
               property: "og:description",
               content:
-                "Profit doesn't erode randomly — it erodes behaviourally. The thesis, the equation and the worked example behind a 90-day early warning for services delivery.",
+                "Profit doesn't erode randomly — it erodes behaviorally. The thesis, the equation and the worked example behind a 90-day early warning for services delivery.",
             },
             { property: "og:image", content: "https://headroomapp.co/og-image.png" },
             { name: "twitter:card", content: "summary_large_image" },

@@ -1,4 +1,4 @@
-// Timezone helpers. Edge functions run in UTC, but every calendar judgement
+// Timezone helpers. Edge functions run in UTC, but every calendar judgment
 // (which day an event belongs to, whether it is inside core hours, how a time
 // is described to the coach) must happen in the *user's* calendar timezone.
 
