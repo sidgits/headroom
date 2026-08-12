@@ -528,7 +528,7 @@ const Evolution = () => {
             Π = (M<sub className="text-sm text-muted-foreground">discipline</sub> × R
             <sub className="text-sm text-muted-foreground">ideal</sub>) − [C
             <sub className="text-sm text-muted-foreground">baseline</sub> + L
-            <sub className="text-sm text-muted-foreground">shadow-sm</sub> + (H
+            <sub className="text-sm text-muted-foreground">shadow</sub> + (H
             <sub className="text-sm text-muted-foreground">drag</sub> × W
             <sub className="text-sm text-muted-foreground">scope</sub>)]
           </p>
@@ -620,7 +620,7 @@ const Evolution = () => {
           </Card>
           <Card icon={Activity} title="Work pattern archetypes">
             A ten-rule cascade that classifies how a person actually operates, plus the
-            shadow-sm archetype they shift into under pressure.
+            shadow archetype they shift into under pressure.
           </Card>
           <Card icon={ShieldAlert} title="Burnout risk markers">
             A seven-rule cascade producing an early-intervention signal before performance
@@ -715,7 +715,7 @@ const Evolution = () => {
               title: "Shadow Labor",
               formula:
                 "L_shadow = [Σ(Unscoped Deliverables × Baseline Production Hours) + Excess Meeting Hours] × Blended Hourly Cost Rate",
-              body: "Monitors the unbilled effort required to fix systemic workflow friction. Hours logged as shadow-sm labour are strictly mutually exclusive from deep focus blocks, so nothing is double-counted.",
+              body: "Monitors the unbilled effort required to fix systemic workflow friction. Hours logged as shadow labour are strictly mutually exclusive from deep focus blocks, so nothing is double-counted.",
             },
             {
               n: "04",
@@ -846,7 +846,7 @@ const Evolution = () => {
             ["Discipline-adjusted inflow", "$20,575,000", "$20,575,000", true],
             ["Visible balance sheet costs (C_baseline)", "−$16,000,000", "−$16,000,000", false],
             ["Traditional net profit baseline", "+$4,575,000", "—", true],
-            ["Invisible shadow-sm labour (L_shadow)", "Hidden in salaries", "−$78,300", false],
+            ["Invisible shadow labour (L_shadow)", "Hidden in salaries", "−$78,300", false],
             ["Systemic cognitive drag (H_drag × W_scope)", "Hidden in HR/salaries", "−$252,813", false],
           ].map(([label, trad, beh, bold], i) => (
             <div
@@ -900,7 +900,7 @@ const Evolution = () => {
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Below the surface of the ledger, $331,113 is destroyed by human friction —
-              $78,300 in unbilled reactive shadow-sm labour and $252,813 in cognitive fatigue
+              $78,300 in unbilled reactive shadow labour and $252,813 in cognitive fatigue
               from focus disruption and turnover. Scaled across the full $1.7 billion
               managed contract value, the same friction accounts for{" "}
               <span className="text-foreground font-medium">
