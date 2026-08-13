@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { withReview, isReviewMode } from "@/lib/reviewAccess";
+import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 
