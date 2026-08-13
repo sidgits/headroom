@@ -12,7 +12,7 @@ Headroom normally requires a paid subscription for the calendar feature. We have
 dedicated **reviewer access link** that removes every blocker — no sign-up, no password,
 no payment, no phone or credit-card verification:
 
-**Reviewer link:** `https://www.headroomapp.co/reviewer?code=<REVIEW_CODE>`
+**Reviewer link:** `https://www.headroomapp.co/reviewer?code=google-verify-2026`
 
 No other credentials are needed. The reviewer identity used by the app is
 `appreview@headroomapp.co` (created and maintained by us; you never need to log into it).
@@ -22,7 +22,7 @@ calendar events for the account that grants consent.
 
 ## 2. Step-by-step navigation
 
-1. Open `https://www.headroomapp.co/reviewer?code=<REVIEW_CODE>` in a normal (non-incognito)
+1. Open `https://www.headroomapp.co/reviewer?code=google-verify-2026` in a normal (non-incognito)
    Chrome window.
 2. Click **Enter review mode**. You land on the Calendar Analysis screen.
 3. Click **Connect Google Calendar**.
@@ -64,7 +64,7 @@ steps. Total ~90 seconds.
 1. **0:00–0:08** — Show the browser address bar with `www.headroomapp.co` clearly visible.
    Say/caption: "This is Headroom, the app requesting verification for project
    headroom-494601."
-2. **0:08–0:18** — Open `https://www.headroomapp.co/reviewer?code=<REVIEW_CODE>` and click
+2. **0:08–0:18** — Open `https://www.headroomapp.co/reviewer?code=google-verify-2026` and click
    **Enter review mode**. Show the Calendar Analysis screen.
 3. **0:18–0:25** — Click **Connect Google Calendar**. Keep recording continuously.
 4. **0:25–0:35** — **Google account chooser** on `accounts.google.com` — keep it on screen
