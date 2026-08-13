@@ -38,6 +38,8 @@ export default function CalendarPage() {
       const { data: { session } } = await supabase.auth.getSession();
       let e = session?.user?.email ?? null;
       if (!e) { try { e = localStorage.getItem("headroom_assessment_email"); } catch { /**/ } }
+      // App-review mode: reviewers get a dedicated identity, no sign-in or payment needed.
+      if (!e && isReviewMode()) e = REVIEW_EMAIL;
       if (!e) { navigate("/login", { replace: true }); return; }
       setEmail(e);
       await refresh(e);

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ReviewerRouteImport } from './routes/reviewer'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardCalendarRouteImport } from './routes/dashboard/calendar'
 import { Route as DashboardCoachRouteImport } from './routes/dashboard/coach'
@@ -37,6 +38,11 @@ const LoginRoute = LoginRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewerRoute = ReviewerRouteImport.update({
+  id: '/reviewer',
+  path: '/reviewer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/reviewer': typeof ReviewerRoute
   '/dashboard/calendar': typeof DashboardCalendarRoute
   '/dashboard/coach': typeof DashboardCoachRoute
   '/evolution/demo': typeof EvolutionDemoRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/reviewer': typeof ReviewerRoute
   '/dashboard/calendar': typeof DashboardCalendarRoute
   '/dashboard/coach': typeof DashboardCoachRoute
   '/evolution/demo': typeof EvolutionDemoRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/reviewer': typeof ReviewerRoute
   '/dashboard/calendar': typeof DashboardCalendarRoute
   '/dashboard/coach': typeof DashboardCoachRoute
   '/evolution/demo': typeof EvolutionDemoRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/privacy'
+    | '/reviewer'
     | '/dashboard/calendar'
     | '/dashboard/coach'
     | '/evolution/demo'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/privacy'
+    | '/reviewer'
     | '/dashboard/calendar'
     | '/dashboard/coach'
     | '/evolution/demo'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/privacy'
+    | '/reviewer'
     | '/dashboard/calendar'
     | '/dashboard/coach'
     | '/evolution/demo'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
+  ReviewerRoute: typeof ReviewerRoute
   DashboardCalendarRoute: typeof DashboardCalendarRoute
   DashboardCoachRoute: typeof DashboardCoachRoute
   EvolutionDemoRoute: typeof EvolutionDemoRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reviewer': {
+      id: '/reviewer'
+      path: '/reviewer'
+      fullPath: '/reviewer'
+      preLoaderRoute: typeof ReviewerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
+  ReviewerRoute: ReviewerRoute,
   DashboardCalendarRoute: DashboardCalendarRoute,
   DashboardCoachRoute: DashboardCoachRoute,
   EvolutionDemoRoute: EvolutionDemoRoute,
