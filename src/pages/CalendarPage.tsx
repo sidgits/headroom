@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { withReview, isReviewMode } from "@/lib/reviewAccess";
+import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 
@@ -38,6 +38,8 @@ export default function CalendarPage() {
       const { data: { session } } = await supabase.auth.getSession();
       let e = session?.user?.email ?? null;
       if (!e) { try { e = localStorage.getItem("headroom_assessment_email"); } catch { /**/ } }
+      // App-review mode: reviewers get a dedicated identity, no sign-in or payment needed.
+      if (!e && isReviewMode()) e = REVIEW_EMAIL;
       if (!e) { navigate("/login", { replace: true }); return; }
       setEmail(e);
       await refresh(e);
