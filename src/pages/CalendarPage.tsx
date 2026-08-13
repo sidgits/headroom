@@ -44,7 +44,12 @@ export default function CalendarPage() {
       setEmail(e);
       await refresh(e);
       setLoading(false);
-
+      // Auto-sync when returning from a successful Google OAuth connection.
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("calendar") === "connected") {
+        window.history.replaceState({}, "", window.location.pathname);
+        await runSync(e);
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
