@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { withReview, isReviewMode } from "@/lib/reviewAccess";
+import { withReview } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 
 interface EventRow {
@@ -219,29 +219,19 @@ export default function CalendarSection({ email }: { email: string }) {
                   onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
               </div>
             </div>
-            {isReviewMode() ? (
-              <div className="rounded-xl border border-primary/30 bg-background p-3 space-y-2">
-                <div className="font-semibold text-sm">Google Calendar</div>
-                <p className="text-xs text-muted-foreground">
-                  Connect your Google Calendar (read-only) to score your real schedule.
-                </p>
-                <button onClick={connectGoogle} disabled={!!busy}
-                  className="text-xs inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
-                  {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
-                  Connect Google Calendar
-                </button>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-border bg-background/40 p-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Calendar className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-muted-foreground">Google/Outlook Calendar Integration coming soon!</div>
-                  <p className="text-xs text-muted-foreground mt-0.5">We're building direct, secure connections for Google Calendar and Outlook.</p>
-                </div>
-              </div>
-            )}
+            <div className="rounded-xl border border-primary/30 bg-background p-3 space-y-2">
+              <div className="font-semibold text-sm">Google Calendar</div>
+              <p className="text-xs text-muted-foreground">
+                Connect your Google Calendar (read-only) to score your real schedule.
+              </p>
+              <button onClick={connectGoogle} disabled={!!busy}
+                className="text-xs inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
+                {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
+                Connect Google Calendar
+              </button>
+              <p className="text-[11px] text-muted-foreground">Outlook integration coming soon.</p>
+            </div>
+
           </div>
 
           {importMessage && (

@@ -225,22 +225,17 @@ export default function CalendarPage() {
                     onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
                 </div>
               </div>
-              {isReviewMode() ? (
-                <div className="rounded-xl border border-primary/30 bg-background p-4 space-y-2">
-                  <div className="font-semibold">Google Calendar</div>
-                  <p className="text-xs text-muted-foreground">Connect your Google Calendar (read-only) to score your real schedule.</p>
-                  <button onClick={connectGoogle} disabled={!!busy}
-                    className="text-xs inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
-                    {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
-                    Connect Google Calendar
-                  </button>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-dashed border-border bg-background/40 p-4 flex flex-col justify-center">
-                  <div className="font-semibold text-muted-foreground">Google / Outlook Calendar</div>
-                  <p className="text-xs text-muted-foreground mt-1">Direct integration coming soon!</p>
-                </div>
-              )}
+              <div className="rounded-xl border border-primary/30 bg-background p-4 space-y-2">
+                <div className="font-semibold">Google Calendar</div>
+                <p className="text-xs text-muted-foreground">Connect your Google Calendar (read-only) to score your real schedule.</p>
+                <button onClick={connectGoogle} disabled={!!busy}
+                  className="text-xs inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
+                  {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
+                  Connect Google Calendar
+                </button>
+                <p className="text-[11px] text-muted-foreground">Outlook integration coming soon.</p>
+              </div>
+
             </div>
           </div>
         ) : (
