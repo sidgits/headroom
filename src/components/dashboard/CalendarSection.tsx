@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Unplug, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { withReview, isReviewMode } from "@/lib/reviewAccess";
+import { withReview } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 
 interface EventRow {
