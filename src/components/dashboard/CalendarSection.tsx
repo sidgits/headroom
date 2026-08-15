@@ -80,7 +80,7 @@ export default function CalendarSection({ email }: { email: string }) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.url) { window.location.href = data.url; return; }
-      throw new Error("Could not start Google authorisation.");
+      throw new Error("Could not start Google authorization.");
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Google connection failed.");
