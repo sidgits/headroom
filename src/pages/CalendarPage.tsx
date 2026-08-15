@@ -96,7 +96,7 @@ export default function CalendarPage() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.url) { window.location.href = data.url; return; }
-      throw new Error("Could not start Google authorisation.");
+      throw new Error("Could not start Google authorization.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google connection failed.");
       setBusy(null);
@@ -241,7 +241,7 @@ export default function CalendarPage() {
         ) : (
           <div className="rounded-xl border border-border bg-card/40 p-3 text-xs text-muted-foreground flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-primary" />
-            Connected via ICS.
+            Connected via {connections[0]?.provider === "google" ? "Google Calendar" : connections[0]?.provider === "outlook" ? "Outlook" : "ICS"}.
             {connections[0]?.last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
           </div>
         )}

@@ -80,7 +80,7 @@ export default function CalendarSection({ email }: { email: string }) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.url) { window.location.href = data.url; return; }
-      throw new Error("Could not start Google authorisation.");
+      throw new Error("Could not start Google authorization.");
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Google connection failed.");
@@ -247,7 +247,7 @@ export default function CalendarSection({ email }: { email: string }) {
           <div className="rounded-xl border border-border bg-background/60 p-2.5 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
             <span className="flex-1 min-w-[180px]">
-              Connected via ICS.
+              Connected via {connections[0]?.provider === "google" ? "Google Calendar" : connections[0]?.provider === "outlook" ? "Outlook" : "ICS"}.
               {connections[0]?.last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
             </span>
             <button onClick={disconnect} disabled={!!busy}
