@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import type { ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +15,7 @@ interface ResultsScreenProps {
 }
 
 const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
-  const { archetype, dimensionScores, mirror, burnoutRisk } = result;
+  const { archetype, dimensionScores, mirror, burnoutRisk, shadowArchetype, recommendations } = result;
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
@@ -120,6 +121,54 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
           </div>
         </motion.div>
 
+        {/* LAYER 2.5 — FREE ARCHETYPE INSIGHTS */}
+        <motion.div
+          className="space-y-4"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+              Free insights
+            </span>
+            <span className="text-xs text-muted-foreground">Based on your {archetype.name} pattern</span>
+          </div>
+
+          {shadowArchetype && (
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground/70">
+                Where you drift under pressure
+              </h3>
+              <p className="text-[15px] font-semibold text-foreground">{shadowArchetype.name}</p>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{shadowArchetype.description}</p>
+            </div>
+          )}
+
+          {burnoutRisk && (
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-warm-red">
+                Your early warning signal
+              </h3>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{burnoutRisk.signal}</p>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{burnoutRisk.earlyIntervention}</p>
+            </div>
+          )}
+
+          {recommendations?.[0] && (
+            <div className="bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-6 space-y-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
+                One move to try this week
+              </h3>
+              <p className="text-foreground/90 leading-relaxed text-[15px]">{recommendations[0]}</p>
+              <p className="text-xs text-muted-foreground pt-1">
+                This is the single highest-leverage change for your archetype. The full plan — and whether it's
+                actually working — lives in your dashboard.
+              </p>
+            </div>
+          )}
+        </motion.div>
+
         {/* LAYER 3 — DIMENSION BARS (digital lexicon) — blurred behind upgrade gate */}
         <div className="relative">
           <motion.div
@@ -162,19 +211,52 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
 
           {/* Upgrade CTA overlay */}
           <motion.div
-            className="absolute inset-0 flex items-center justify-center p-4"
+            className="absolute inset-0 flex items-center justify-center p-2"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.4 }}
           >
-            <button
-              onClick={() => setShowUpgradeModal(true)}
-              className="px-6 py-4 rounded-2xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-base sm:text-lg shadow-xl hover:opacity-90 transition text-center"
-            >
-              Access full Headroom Profile & Deeper Insights in the Dashboard for a Nominal Fees!
-            </button>
+            <div className="w-full max-w-md rounded-2xl border border-primary/25 bg-card/95 backdrop-blur-xl shadow-xl p-5 sm:p-6 space-y-4">
+              <div className="text-center space-y-1">
+                <span className="inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-warm-red/10 text-warm-red border border-warm-red/20">
+                  Locked
+                </span>
+                <h3 className="text-lg font-bold text-foreground">Unlock your full Headroom Profile</h3>
+                <p className="text-xs text-muted-foreground">
+                  You've seen the pattern. The dashboard shows you the numbers — and what to do next.
+                </p>
+              </div>
+
+              <ul className="space-y-2.5">
+                {[
+                  { t: "Your three load scores", d: "Toxic, Core and Growth load — measured, not guessed." },
+                  { t: "Calendar load analysis", d: "Upload your calendar and see which days will break you." },
+                  { t: "Tracking over time", d: "Check in daily and watch your pattern shift." },
+                  { t: "Your AI burnout coach", d: "Grounded in your actual scores, available anytime." },
+                ].map((b) => (
+                  <li key={b.t} className="flex gap-2.5 items-start">
+                    <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <span className="text-xs leading-relaxed">
+                      <span className="font-semibold text-foreground">{b.t}</span>
+                      <span className="text-muted-foreground"> — {b.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg hover:opacity-90 transition"
+              >
+                Unlock the full profile
+              </button>
+              <p className="text-[11px] text-center text-muted-foreground">
+                Nominal monthly fee. Cancel anytime.
+              </p>
+            </div>
           </motion.div>
         </div>
+
       </div>
 
       <UpgradeModal open={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
