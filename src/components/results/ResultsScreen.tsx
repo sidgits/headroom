@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import type { ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +15,7 @@ interface ResultsScreenProps {
 }
 
 const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
-  const { archetype, dimensionScores, mirror, burnoutRisk } = result;
+  const { archetype, dimensionScores, mirror, burnoutRisk, shadowArchetype, recommendations } = result;
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
