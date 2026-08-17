@@ -9,8 +9,8 @@ export default function PatternWatch({ weeks }: { weeks: PatternWeek[] }) {
   const recent = (weeks ?? []).slice(-6);
   if (recent.length < 2) return null;
 
-  const last = recent[recent.length - 1];
-  const first = recent[0];
+  const last = recent[recent.length - 1]!;
+  const first = recent[0]!;
   const scoreDelta = last.score - first.score;
   const growthDelta = last.growth - first.growth;
   const max = Math.max(40, ...recent.map((w) => w.score));
