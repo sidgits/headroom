@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
+import LongitudinalTrend, { type Longitudinal } from "@/components/dashboard/LongitudinalTrend";
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
