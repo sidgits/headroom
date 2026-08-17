@@ -364,6 +364,3 @@ export function interventionsPrompt(list: { kind: string; title: string; evidenc
   if (!open.length) return "(no open interventions right now)";
   return open.map((i) => `- [${i.kind}] ${i.target_date ?? ""} ${i.title} — ${i.evidence}`).join("\n");
 }
-
-// tzHour is imported for parity with the CLT engine's core-hours logic.
-void tzHour;
