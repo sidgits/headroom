@@ -185,6 +185,21 @@ function hour(ev: EventRow, tz: string) {
 
 // Sweller-CLT orchestration: intrinsic = complexity of task, extraneous = fragmentation/
 // context-switching/after-hours, germane = sustained focus & learning blocks.
+//
+// Design rule: the engine is silent by default. A block only gets an instruction when
+// something is actually wrong; a calm day produces one honest line and nothing else.
+const UNTITLED = /^(busy|tentative|free|blocked?|hold|private|no title|untitled|ooo|out of office)?$/i;
+
+function isUntitled(title: string | null | undefined) {
+  return UNTITLED.test((title ?? "").trim());
+}
+
+function timeLabel(iso: string, tz: string) {
+  return new Date(iso).toLocaleTimeString("en-US", {
+    timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false,
+  });
+}
+
 function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   let intrinsic = 0, extraneous = 0, germane = 0;
   const tips: BlockTip[] = [];
@@ -192,60 +207,74 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   const COMPLEX = /(strategy|design|review|interview|planning|kickoff|architecture|deep|writing|research|presentation|board|roadmap)/i;
   const ROUTINE = /(standup|sync|catch[- ]?up|check[- ]?in|1[:-]1|status|update)/i;
 
+  const protectedBlocks: EventRow[] = [];
+  const draft: { ev: EventRow; load: number; risk: BlockTip["risk"]; tip: BlockTip | null }[] = [];
+
   for (let i = 0; i < events.length; i++) {
     const ev = events[i];
     const dur = durationMin(ev);
     const h = hour(ev, tz);
-    const complex = COMPLEX.test(ev.title);
-    const routine = ROUTINE.test(ev.title);
+    const unnamed = isUntitled(ev.title);
+    const complex = !unnamed && COMPLEX.test(ev.title);
+    const routine = !unnamed && ROUTINE.test(ev.title);
     const big = ev.attendee_count >= 6;
-    const isFocus = ev.attendee_count <= 1 && dur >= 90;
+    const solo = ev.attendee_count <= 1;
+    const isFocus = solo && dur >= 90;
 
-    // Per-block accumulators so every time slot gets its own marker.
     let evExtraneous = 0;
     let evGermane = 0;
-    const evTips: { category: BlockTip["category"]; action: BlockTip["action"]; tip: string }[] = [];
+    // Candidate instructions, most severe first — only ever one is emitted.
+    const candidates: { weight: number; category: BlockTip["category"]; action: BlockTip["action"]; tip: string }[] = [];
 
-    // Intrinsic load: complexity × duration weight
-    let evIntrinsic = (complex ? 6 : routine ? 2 : 4) * Math.min(2, dur / 60);
+    // Intrinsic load: complexity × duration weight. An unnamed block is assumed
+    // ordinary rather than complex — we don't score what we can't see.
+    let evIntrinsic = (complex ? 6 : routine ? 2 : unnamed ? 3 : 4) * Math.min(2, dur / 60);
     if (big) evIntrinsic += 2;
     intrinsic += evIntrinsic;
 
-    // Extraneous: back-to-back, after-hours, fragmentation
+    // Extraneous: only real friction counts. Two short solo holds touching each
+    // other is not a context switch worth naming.
     if (i > 0) {
-      const gap = (new Date(ev.starts_at).getTime() - new Date(events[i-1].ends_at).getTime()) / 60000;
-      if (gap >= 0 && gap < 10) {
+      const prev = events[i - 1];
+      const gap = (new Date(ev.starts_at).getTime() - new Date(prev.ends_at).getTime()) / 60000;
+      const heavyChain = (ev.attendee_count >= 2 || prev.attendee_count >= 2)
+        && dur >= 30 && durationMin(prev) >= 30;
+      if (gap >= 0 && gap < 10 && heavyChain) {
         evExtraneous += 5;
-        evTips.push({ category: "extraneous", action: "add_buffer",
-          tip: "Back-to-back with previous block — add a 10-min buffer to reset working memory." });
+        candidates.push({ weight: 5, category: "extraneous", action: "add_buffer",
+          tip: "Straight out of the previous meeting — put 10 minutes between them to reset working memory." });
       }
     }
     if (h < 8 || h >= 19) {
       evExtraneous += 4;
-      evTips.push({ category: "extraneous", action: "defer",
-        tip: "Outside core hours — defer to tomorrow if not urgent; off-hour load compounds fatigue." });
+      candidates.push({ weight: 7, category: "extraneous", action: "defer",
+        tip: "Outside core hours — defer to tomorrow if it isn't urgent; off-hour load compounds fatigue." });
     }
     if (big && complex) {
       evExtraneous += 3;
-      evTips.push({ category: "extraneous", action: "chunk",
-        tip: "Large complex meeting — split into a pre-read + decision call to lower Toxic Load." });
+      candidates.push({ weight: 8, category: "extraneous", action: "chunk",
+        tip: "Large complex meeting — split into a pre-read plus a decision call to lower Toxic Load." });
     }
     if (routine && dur > 30) {
       evExtraneous += 2;
-      evTips.push({ category: "extraneous", action: "batch",
-        tip: "Routine sync running long — cap at 25 min and batch with other status meetings." });
+      candidates.push({ weight: 4, category: "extraneous", action: "batch",
+        tip: "Routine sync running long — cap it at 25 minutes and batch it with other status meetings." });
     }
     if (dur >= 120 && ev.attendee_count >= 2) {
       evExtraneous += 3;
-      evTips.push({ category: "extraneous", action: "chunk",
-        tip: "Over two hours with others — attention decays after ~50 min; split it or add a break." });
+      candidates.push({ weight: 6, category: "extraneous", action: "chunk",
+        tip: "Over two hours with other people — attention decays after about 50 minutes; split it or add a break." });
     }
 
-    // Germane: protected long focus blocks
+    // Germane: protected long focus blocks. If the block has no title we say so
+    // rather than asserting deep work the calendar never claimed.
     if (isFocus) {
-      evGermane += 6;
-      evTips.push({ category: "germane", action: "preserve",
-        tip: "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
+      evGermane += unnamed ? 4 : 6;
+      protectedBlocks.push(ev);
+      candidates.push({ weight: 1, category: "germane", action: "preserve",
+        tip: unnamed
+          ? `${Math.round(dur)}-minute block with no title — if this is focus time, keep it clear and I'll defend it.`
+          : "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
     } else if (complex && dur >= 45 && ev.attendee_count <= 3) {
       evGermane += 3;
     }
@@ -253,72 +282,86 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
     extraneous += evExtraneous;
     germane += evGermane;
 
-    // Burnout marker for this slot (0-100): intrinsic + extraneous, offset by germane.
     const blockLoad = Math.max(0, Math.min(100, Math.round(
       (evIntrinsic * 4.5) + (evExtraneous * 6) - (evGermane * 3),
     )));
     const risk: BlockTip["risk"] = blockLoad >= 60 ? "high" : blockLoad >= 35 ? "moderate" : "low";
 
-    const primary = evTips[0] ?? {
-      category: (complex ? "intrinsic" : "extraneous") as BlockTip["category"],
-      action: "monitor" as BlockTip["action"],
-      tip: risk === "low"
-        ? "Low-load block — good place to absorb overflow or protect recovery."
-        : complex
-          ? "Complex block — prep 10 min beforehand so working memory isn't loaded cold."
-          : "Moderate load — keep it to its slot and avoid stacking another meeting after it.",
-    };
-
-    tips.push({
-      event_id: ev.id,
-      category: primary.category,
-      action: primary.action,
-      tip: evTips.length > 1 ? evTips.map((t) => t.tip).join(" ") : primary.tip,
-      load: blockLoad,
-      risk,
+    candidates.sort((a, b) => b.weight - a.weight);
+    const chosen = candidates[0] ?? null;
+    draft.push({
+      ev, load: blockLoad, risk,
+      tip: chosen
+        ? { event_id: ev.id, category: chosen.category, action: chosen.action, tip: chosen.tip, load: blockLoad, risk }
+        : null,
     });
   }
 
-
   // Fragmentation penalty: many blocks, and — more importantly — no window long
-  // enough to do real work in. A 3-hour day chopped into six pieces costs more
-  // than three hours booked in one run.
+  // enough to do real work in.
   if (events.length >= 6) extraneous += (events.length - 5) * 2;
   const longestGap = largestFreeWindow(events, tz);
+  const bookedMinutes = events.reduce((s, ev) => s + durationMin(ev), 0);
   if (events.length >= 3 && longestGap < 90) {
     extraneous += events.length >= 5 ? 14 : 9;
   } else if (events.length >= 4 && longestGap < 120) {
     extraneous += 6;
   }
+  // A genuinely light day cannot register heavy friction. Under four booked
+  // hours with a real open window, Toxic Load is damped toward the truth.
+  if (bookedMinutes < 240 && longestGap >= 90) extraneous = extraneous * 0.5;
 
-
-  // Cap each at ~100 for display
   const cap = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
   intrinsic = cap(intrinsic);
   extraneous = cap(extraneous);
   germane = cap(germane);
 
-  // Daily load = high intrinsic + extraneous, partially offset by germane.
   const raw = intrinsic * 0.5 + extraneous * 0.7 - germane * 0.25;
-  const score = cap(raw + 10); // small baseline
+  const score = cap(raw + 10);
+
+  // Speak only when it matters. On a calm day the per-block advice is dropped
+  // entirely and the day carries one honest line instead.
+  const quiet = score < 35;
+  for (const d of draft) {
+    if (!d.tip) continue;
+    if (quiet && d.risk !== "high") continue;
+    tips.push(d.tip);
+  }
 
   const recs: string[] = [];
   if (extraneous > 40) recs.push("Reduce context switching: batch similar meetings into one block.");
-  if (events.length >= 3 && largestFreeWindow(events, tz) < 90) recs.push("The day is fragmented — no 90-min window survives. Consolidate meetings to open one.");
+  if (events.length >= 3 && longestGap < 90) recs.push("The day is fragmented — no 90-min window survives. Consolidate meetings to open one.");
   if (intrinsic > 50 && germane < 15) recs.push("High-complexity day with no deep-work block — carve out 90 min.");
   if (score >= 70) recs.push("Overload risk. Move one meeting to tomorrow or convert it to async.");
-  if (germane >= 20 && score < 50) recs.push("Healthy balance — keep this pattern.");
+
+  const label = score >= 70 ? "Overload risk"
+    : score >= 50 ? "Heavy day"
+    : score >= 30 ? "Balanced day"
+    : "Light day";
+
+  let summary = label;
+  if (quiet) {
+    if (protectedBlocks.length) {
+      const times = protectedBlocks.map((b) => timeLabel(b.starts_at, tz));
+      summary = `${label}. ${times.length === 1 ? "One protected block" : `${times.length} protected blocks`} at ${times.join(" and ")} — keep them clear.`;
+      recs.length = 0;
+      recs.push(`Nothing needs fixing today. Just hold ${times.join(" and ")}.`);
+    } else {
+      summary = `${label}. Nothing here needs intervening.`;
+      recs.length = 0;
+    }
+  } else if (longestGap >= 90) {
+    summary = `${label}. Your longest clear window is ${Math.floor(longestGap / 60)}h ${longestGap % 60}m.`;
+  }
 
   return {
     date, daily_load_score: score, intrinsic_load: intrinsic, extraneous_load: extraneous, germane_load: germane,
     per_block_tips: tips, recommendations: recs,
-    summary: score >= 70 ? "Overload risk"
-      : score >= 50 ? "Heavy day"
-      : score >= 30 ? "Balanced"
-      : events.length === 0 ? "Open" : "Light",
+    summary,
     events,
   };
 }
+
 
 /** Longest stretch (minutes) inside local core hours 09:00-17:00 that is either free
  *  or already a solo focus block — i.e. time actually usable for deep work. */
