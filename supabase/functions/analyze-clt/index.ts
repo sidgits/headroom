@@ -83,7 +83,31 @@ Deno.serve(async (req) => {
         summary: a.summary,
       }, { onConflict: "email,analysis_date" } as never);
     }
-    return j({ days: analyses });
+
+    // Turn the analysis into trackable actions.
+    const { data: history } = await sb
+      .from("clt_analyses")
+      .select("analysis_date, daily_load_score, intrinsic_load, extraneous_load, germane_load")
+      .ilike("email", e).order("analysis_date").limit(5000);
+
+    const { interventions } = buildInterventions(
+      analyses.map((a) => ({
+        date: a.date,
+        daily_load_score: a.daily_load_score,
+        intrinsic_load: a.intrinsic_load,
+        extraneous_load: a.extraneous_load,
+        germane_load: a.germane_load,
+        events: a.events.map((ev) => ({
+          id: ev.id, title: ev.title, starts_at: ev.starts_at, ends_at: ev.ends_at,
+          attendee_count: ev.attendee_count, is_recurring: ev.is_recurring,
+        })),
+      })),
+      history ?? [],
+      tz,
+    );
+    await persistInterventions(sb, e, interventions);
+
+    return j({ days: analyses, interventions: interventions.length });
   } catch (err) {
     console.error("analyze-clt", err);
     return j({ error: (err as Error).message }, 500);
