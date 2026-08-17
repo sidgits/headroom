@@ -400,7 +400,7 @@ const Dashboard = () => {
             <div className="space-y-1">
               <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Go deeper</p>
               <p className="text-sm sm:text-base text-foreground leading-snug">
-                Unlock real-time cognitive load tracking from your work schedule, plus your personalized AI Productivity Coach.
+                Unlock real-time cognitive load tracking from your work schedule, plus Heady — your personalized AI Productivity Coach.
               </p>
             </div>
             <motion.button
@@ -421,7 +421,7 @@ const Dashboard = () => {
                 <span className="flex items-center gap-2 mt-1">
                   <span className="h-px w-3 bg-white/25" />
                   <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/75 group-hover:text-white/90 transition-colors">
-                    AI Coach Included
+                    Heady AI Coach Included
                   </span>
                   <span className="h-px w-3 bg-white/25" />
                 </span>

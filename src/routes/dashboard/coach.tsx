@@ -5,7 +5,7 @@ export const Route = createFileRoute("/dashboard/coach")({
   component: CoachPage,
   head: () => ({
     meta: [
-      { title: "AI Coach — Headroom" },
+      { title: "Heady — AI Coach | Headroom" },
       {
         name: "description",
         content:
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/dashboard/coach")({
       },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "AI Coach — Headroom" },
+      { property: "og:title", content: "Heady — AI Coach | Headroom" },
       {
         property: "og:description",
         content: "Personalized coaching on your workload and burnout risk.",

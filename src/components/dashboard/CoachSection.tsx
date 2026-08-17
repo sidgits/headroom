@@ -72,7 +72,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
       <header className="flex items-center gap-3 pb-3 border-b border-border">
         <img src={coachAvatar} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/40" />
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">AI Productivity Coach</p>
+          <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Heady · AI Productivity Coach</p>
           <h2 className="text-lg sm:text-xl font-bold">{firstName}'s Personalized Coach</h2>
         </div>
       </header>
@@ -82,7 +82,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
           <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="w-3 h-3 animate-spin" /> Loading coach…</div>
         ) : messages.length === 0 ? (
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm">
-            Hi {firstName} — I read your archetype, schedule, and Cognitive Load scores. Ask me anything about your week, energy, or a specific meeting.
+            Hi {firstName}, I'm Heady — I've read your archetype, schedule, and Cognitive Load scores. Ask me anything about your week, energy, or a specific meeting.
           </div>
         ) : (
           messages.map((m) => <MessageBubble key={m.id} msg={m} />)

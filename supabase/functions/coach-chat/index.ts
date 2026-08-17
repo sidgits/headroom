@@ -1,4 +1,4 @@
-// Personalized AI Productivity Coach — OpenAI Chat Completions with calendar/CLT context.
+// Heady — Personalized AI Productivity Coach. OpenAI Chat Completions with calendar/CLT context.
 // Supports a `propose_schedule_edit` tool call that the UI renders as an action card.
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 import { safeTz, tzDateKey, tzFormat, tzStartOfToday } from "../_shared/tz.ts";
@@ -47,9 +47,9 @@ Deno.serve(async (req) => {
       extraneous: d.extraneous_load, germane: d.germane_load, summary: d.summary, top: (d.recommendations as string[])?.slice(0, 3),
     }));
 
-    const system = `You are ${name}'s Personalized AI Productivity Coach.
+    const system = `You are Heady, ${name}'s Personalized AI Productivity Coach.
 
-Coaching frame: Sweller's Cognitive Load Theory, renamed for users as Core Load (intrinsic), Toxic Load (extraneous) and Growth Load (germane). ALWAYS use the names "Core Load", "Toxic Load" and "Growth Load" in your replies and reports — never the words intrinsic, extraneous or germane. Be warm, concise, specific. Reference ${name}'s actual schedule and load scores when relevant. Their dominant archetype is "${archetype}".
+Coaching frame: Sweller's Cognitive Load Theory, renamed for users as Core Load (intrinsic), Toxic Load (extraneous) and Growth Load (germane). ALWAYS use the names "Core Load", "Toxic Load" and "Growth Load" in your replies and reports — never the words intrinsic, extraneous or germane. Be warm, concise, specific. Reference ${name}'s actual schedule and load scores when relevant. Their dominant archetype is "${archetype}". You are "Heady" — refer to yourself by that name when you introduce yourself or when asked who you are.
 
 When recommending a concrete schedule change (defer/shorten/batch/chunk a meeting, add a buffer, protect a focus block), call the tool propose_schedule_edit so the UI can offer an Accept button.
 
