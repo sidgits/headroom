@@ -76,6 +76,9 @@ export default function CalendarPage() {
     setEvents(data?.events ?? []);
     setClt(data?.clt ?? []);
     setLongitudinal((data?.longitudinal as Longitudinal) ?? null);
+    setInterventions((data?.interventions as Intervention[]) ?? []);
+    setPatternWeeks((data?.patternWeeks as PatternWeek[]) ?? []);
+    setResolvedCount((data?.resolvedInterventions as number) ?? 0);
   };
 
   const runSync = async (e?: string) => {
