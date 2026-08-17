@@ -31,6 +31,9 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [clt, setClt] = useState<CltDay[]>([]);
   const [longitudinal, setLongitudinal] = useState<Longitudinal | null>(null);
+  const [interventions, setInterventions] = useState<Intervention[]>([]);
+  const [patternWeeks, setPatternWeeks] = useState<PatternWeek[]>([]);
+  const [resolvedCount, setResolvedCount] = useState(0);
   const [stripOffset, setStripOffset] = useState(0);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
