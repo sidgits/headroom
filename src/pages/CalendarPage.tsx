@@ -23,6 +23,11 @@ interface CltDay {
 }
 interface Connection { id: string; provider: string; last_synced_at: string | null }
 
+/** Calendar entries that carry no real name — we shouldn't infer what they are. */
+const UNTITLED_RE = /^(busy|tentative|free|blocked?|hold|private|no title|untitled|ooo|out of office)?$/i;
+const isUntitled = (title: string | null | undefined) => UNTITLED_RE.test((title ?? "").trim());
+
+
 export default function CalendarPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
@@ -382,12 +387,18 @@ export default function CalendarPage() {
                           </div>
                         </div>
                         {activeDay && (
-                          <div className="w-full lg:w-auto lg:min-w-[300px] grid grid-cols-3 gap-3">
-                            <LoadBar label="Core" value={activeDay.intrinsic_load} color="bg-[hsl(var(--golden))]" />
-                            <LoadBar label="Toxic" value={activeDay.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
-                            <LoadBar label="Growth" value={activeDay.germane_load} color="bg-[hsl(var(--deep-orange))]" />
+                          <div className="w-full lg:w-auto lg:min-w-[300px] space-y-2">
+                            <div className="grid grid-cols-3 gap-3">
+                              <LoadBar label="Core" value={activeDay.intrinsic_load} color="bg-[hsl(var(--golden))]" />
+                              <LoadBar label="Toxic" value={activeDay.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
+                              <LoadBar label="Growth" value={activeDay.germane_load} color="bg-[hsl(var(--deep-orange))]" />
+                            </div>
+                            <p className="text-[10px] text-muted-foreground leading-relaxed">
+                              Each is its own 0–100 marker — they don't sum to the daily load.
+                            </p>
                           </div>
                         )}
+
                       </div>
                     </section>
 
@@ -398,12 +409,38 @@ export default function CalendarPage() {
                       </div>
                     ) : (
                       <div className="grid md:grid-cols-2 2xl:grid-cols-3 gap-3">
-                        {activeEvents.map((ev) => {
+                        {activeEvents.flatMap((ev, idx) => {
                           const tip = activeDay?.per_block_tips.find((t) => t.event_id === ev.id);
                           const start = new Date(ev.starts_at);
                           const end = new Date(ev.ends_at);
                           const mins = Math.round((end.getTime() - start.getTime()) / 60000);
-                          return (
+                          const unnamed = isUntitled(ev.title);
+                          const nodes: React.ReactNode[] = [];
+
+                          // The open stretch before this block is often the most useful
+                          // thing on the day — show it instead of hiding it.
+                          const prev = activeEvents[idx - 1];
+                          if (prev) {
+                            const gapMins = Math.round((start.getTime() - new Date(prev.ends_at).getTime()) / 60000);
+                            if (gapMins >= 30) {
+                              nodes.push(
+                                <div key={`gap-${ev.id}`}
+                                  className="rounded-xl border border-dashed border-primary/30 bg-primary/[0.04] p-4 flex flex-col justify-center gap-1">
+                                  <div className="text-[11px] font-mono text-muted-foreground">
+                                    {new Date(prev.ends_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                  </div>
+                                  <div className="text-sm font-semibold text-primary">
+                                    {gapMins >= 60 ? `${Math.floor(gapMins / 60)}h ${gapMins % 60}m` : `${gapMins}m`} open
+                                  </div>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    {gapMins >= 90 ? "Long enough for real focus work — the best slot to defend today." : "Recovery gap — worth keeping unbooked."}
+                                  </p>
+                                </div>,
+                              );
+                            }
+                          }
+
+                          nodes.push(
                             <article key={ev.id} className="rounded-xl border border-border bg-card/40 p-4 flex flex-col gap-2 hover:border-primary/40 transition-colors">
                               <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground font-mono">
                                 <span>
@@ -411,7 +448,10 @@ export default function CalendarPage() {
                                 </span>
                                 <span>{mins}m</span>
                               </div>
-                              <h4 className="text-sm font-semibold leading-snug">{ev.title}</h4>
+                              <h4 className="text-sm font-semibold leading-snug">
+                                {unnamed ? `${mins}-minute block` : ev.title}
+                                {unnamed && <span className="ml-2 text-[10px] font-normal text-muted-foreground">no title</span>}
+                              </h4>
                               <div className="flex flex-wrap items-center gap-2">
                                 {tip && typeof tip.load === "number" && tip.risk && <BlockRisk load={tip.load} risk={tip.risk} />}
                                 {ev.attendee_count > 0 && (
@@ -426,11 +466,13 @@ export default function CalendarPage() {
                                   {tip.tip}
                                 </div>
                               )}
-                            </article>
+                            </article>,
                           );
+                          return nodes;
                         })}
                       </div>
                     )}
+
                   </motion.div>
                 ) : (
                   <div className="text-sm text-muted-foreground italic">No analyzed days yet — run a sync to score your schedule.</div>
@@ -502,11 +544,14 @@ function ScoreDial({ score }: { score: number }) {
       style={{ background: `conic-gradient(${tone} ${pct * 3.6}deg, hsl(var(--secondary)) 0deg)` }}>
       <div className="w-[76px] h-[76px] rounded-full bg-card grid place-items-center">
         <div className="text-xl font-bold leading-none" style={{ color: tone }}>{score}</div>
-        <div className="text-[9px] uppercase tracking-widest text-muted-foreground mt-1">Load</div>
+        <div className="text-[8px] uppercase tracking-widest text-muted-foreground mt-1 text-center leading-tight">
+          Load<br />lower is better
+        </div>
       </div>
     </div>
   );
 }
+
 
 function LoadBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
