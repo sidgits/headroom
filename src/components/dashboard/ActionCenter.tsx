@@ -145,8 +145,8 @@ export default function ActionCenter({
 
                 <h4 className="text-sm font-semibold leading-snug">{item.title}</h4>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">{item.evidence}</p>
-                {typeof item.payload?.local_time === "string" && (
-                  <p className="text-[11px] font-mono text-foreground">{item.payload.local_time as string}</p>
+                {typeof item.payload?.["local_time"] === "string" && (
+                  <p className="text-[11px] font-mono text-foreground">{item.payload["local_time"] as string}</p>
                 )}
 
                 <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
