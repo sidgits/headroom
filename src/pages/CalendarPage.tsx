@@ -398,12 +398,38 @@ export default function CalendarPage() {
                       </div>
                     ) : (
                       <div className="grid md:grid-cols-2 2xl:grid-cols-3 gap-3">
-                        {activeEvents.map((ev) => {
+                        {activeEvents.flatMap((ev, idx) => {
                           const tip = activeDay?.per_block_tips.find((t) => t.event_id === ev.id);
                           const start = new Date(ev.starts_at);
                           const end = new Date(ev.ends_at);
                           const mins = Math.round((end.getTime() - start.getTime()) / 60000);
-                          return (
+                          const unnamed = isUntitled(ev.title);
+                          const nodes: React.ReactNode[] = [];
+
+                          // The open stretch before this block is often the most useful
+                          // thing on the day — show it instead of hiding it.
+                          const prev = activeEvents[idx - 1];
+                          if (prev) {
+                            const gapMins = Math.round((start.getTime() - new Date(prev.ends_at).getTime()) / 60000);
+                            if (gapMins >= 30) {
+                              nodes.push(
+                                <div key={`gap-${ev.id}`}
+                                  className="rounded-xl border border-dashed border-primary/30 bg-primary/[0.04] p-4 flex flex-col justify-center gap-1">
+                                  <div className="text-[11px] font-mono text-muted-foreground">
+                                    {new Date(prev.ends_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                  </div>
+                                  <div className="text-sm font-semibold text-primary">
+                                    {gapMins >= 60 ? `${Math.floor(gapMins / 60)}h ${gapMins % 60}m` : `${gapMins}m`} open
+                                  </div>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    {gapMins >= 90 ? "Long enough for real focus work — the best slot to defend today." : "Recovery gap — worth keeping unbooked."}
+                                  </p>
+                                </div>,
+                              );
+                            }
+                          }
+
+                          nodes.push(
                             <article key={ev.id} className="rounded-xl border border-border bg-card/40 p-4 flex flex-col gap-2 hover:border-primary/40 transition-colors">
                               <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground font-mono">
                                 <span>
@@ -411,7 +437,10 @@ export default function CalendarPage() {
                                 </span>
                                 <span>{mins}m</span>
                               </div>
-                              <h4 className="text-sm font-semibold leading-snug">{ev.title}</h4>
+                              <h4 className="text-sm font-semibold leading-snug">
+                                {unnamed ? `${mins}-minute block` : ev.title}
+                                {unnamed && <span className="ml-2 text-[10px] font-normal text-muted-foreground">no title</span>}
+                              </h4>
                               <div className="flex flex-wrap items-center gap-2">
                                 {tip && typeof tip.load === "number" && tip.risk && <BlockRisk load={tip.load} risk={tip.risk} />}
                                 {ev.attendee_count > 0 && (
@@ -426,11 +455,13 @@ export default function CalendarPage() {
                                   {tip.tip}
                                 </div>
                               )}
-                            </article>
+                            </article>,
                           );
+                          return nodes;
                         })}
                       </div>
                     )}
+
                   </motion.div>
                 ) : (
                   <div className="text-sm text-muted-foreground italic">No analyzed days yet — run a sync to score your schedule.</div>
