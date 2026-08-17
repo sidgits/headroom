@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
-import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, Loader2, RefreshCw, Upload, Users } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, FileDown, Loader2, RefreshCw, Upload, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 import LongitudinalTrend, { type Longitudinal } from "@/components/dashboard/LongitudinalTrend";
+import ActionCenter, { type Intervention } from "@/components/dashboard/ActionCenter";
+import PatternWatch, { type PatternWeek } from "@/components/dashboard/PatternWatch";
+import { generateCoachPDF, type CoachReport } from "@/lib/generateCoachPDF";
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
