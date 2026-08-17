@@ -264,10 +264,16 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
     return 0;
   }
 
-  // Start 60 days before local midnight today so past workload can be analyzed too.
-  const from = windowStartFrom(tz);
-  const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
+  // No fixed window for ICS — keep whatever range the person actually uploaded.
   const parsed = parseIcs(text);
+  const starts = parsed.map((e) => e.start.getTime()).filter((n) => Number.isFinite(n));
+  const ends = parsed.map((e) => e.end.getTime()).filter((n) => Number.isFinite(n));
+  const now = Date.now();
+  const from = new Date(starts.length ? Math.min(...starts) : now);
+  // Open-ended recurrences have no natural end, so expand them a year out.
+  const hasOpenRecurrence = parsed.some((e) => e.rrule && !/UNTIL=|COUNT=/i.test(e.rrule));
+  const lastEnd = ends.length ? Math.max(...ends) : now;
+  const max = new Date(hasOpenRecurrence ? Math.max(lastEnd, now + 365 * 24 * 3600 * 1000) : lastEnd);
   const occurrences = expandOccurrences(parsed, from, max);
 
   const seen = new Set<string>();
