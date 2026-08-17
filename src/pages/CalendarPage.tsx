@@ -87,7 +87,9 @@ export default function CalendarPage() {
   };
 
   const downloadWeekPlan = async () => {
-    const week = clt.slice(0, 7);
+    // clt is sorted ascending from up to 60 days ago, so slice from today's
+    // position (baseStart) to get the coming week — not the oldest on file.
+    const week = clt.slice(baseStart, baseStart + 7);
     const avg = week.length ? Math.round(week.reduce((s, d) => s + d.daily_load_score, 0) / week.length) : 0;
     const heaviest = week.reduce<typeof week[number] | null>((a, b) => (!a || b.daily_load_score > a.daily_load_score ? b : a), null);
     const report: CoachReport = {
