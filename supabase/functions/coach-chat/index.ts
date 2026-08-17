@@ -2,6 +2,7 @@
 // Supports a `propose_schedule_edit` tool call that the UI renders as an action card.
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 import { safeTz, tzDateKey, tzFormat, tzStartOfToday } from "../_shared/tz.ts";
+import { buildLongitudinal, longitudinalPrompt } from "../_shared/longitudinal.ts";
 
 interface ChatMessage { role: "user" | "assistant" | "system" | "tool"; content: string; tool_calls?: unknown; tool_call_id?: string }
 
