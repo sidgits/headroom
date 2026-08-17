@@ -68,12 +68,12 @@ export default function ActionCenter({
   const primary = async (item: Intervention) => {
     const p = item.payload ?? {};
     if (item.kind === "defend_focus" || item.kind === "add_buffer") {
-      const start = p.start_iso as string | undefined;
-      const end = p.end_iso as string | undefined;
+      const start = p["start_iso"] as string | undefined;
+      const end = p["end_iso"] as string | undefined;
       if (!start || !end) { toast.error("This block has no time attached."); return; }
       downloadIcsBlock(
         {
-          title: (p.suggested_title as string) ?? "Headroom block",
+          title: (p["suggested_title"] as string) ?? "Headroom block",
           startIso: start, endIso: end,
           description: `${item.title}\n\n${item.evidence}\n\nCreated by Headroom.`,
         },
