@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
-import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Upload } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, Loader2, RefreshCw, Upload, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ export default function CalendarPage() {
   const [clt, setClt] = useState<CltDay[]>([]);
   const [longitudinal, setLongitudinal] = useState<Longitudinal | null>(null);
   const [stripOffset, setStripOffset] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -156,18 +157,18 @@ export default function CalendarPage() {
     }
   };
 
-  const groupedByDay = (() => {
+  const eventsByDay = useMemo(() => {
     const map = new Map<string, EventRow[]>();
     for (const ev of events) {
       const d = localDateKey(ev.starts_at);
       if (!map.has(d)) map.set(d, []);
       map.get(d)!.push(ev);
     }
-    return Array.from(map.entries());
-  })();
+    for (const list of map.values()) list.sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+    return map;
+  }, [events]);
 
-  const cltByDay = new Map(clt.map((d) => [d.analysis_date, d]));
-  // Strip opens on today and can be paged back through history / forward.
+  const cltByDay = useMemo(() => new Map(clt.map((d) => [d.analysis_date, d])), [clt]);
   const todayKey = new Date().toLocaleDateString("en-CA");
   const todayIdx = clt.findIndex((d) => d.analysis_date >= todayKey);
   const baseStart = todayIdx === -1 ? Math.max(0, clt.length - 7) : todayIdx;
@@ -176,82 +177,53 @@ export default function CalendarPage() {
   const visibleClt = clt.slice(stripStart, stripStart + 7);
   const canPageBack = stripStart > 0;
   const canPageForward = stripStart < maxStart;
-  // The strip pages week by week, but the cascade below always lists every
-  // analyzed day so users can just scroll through the whole window.
-  const visibleDays = groupedByDay;
-  const dayAnchorId = (date: string) => `pg-day-${date}`;
-  const scrollToDay = (date: string) =>
-    document.getElementById(dayAnchorId(date))?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // Default the focused day to today (or the nearest analyzed day).
+  const activeDate = selectedDate ?? clt[baseStart]?.analysis_date ?? clt[clt.length - 1]?.analysis_date ?? null;
+  const activeDay = activeDate ? cltByDay.get(activeDate) ?? null : null;
+  const activeEvents = activeDate ? eventsByDay.get(activeDate) ?? [] : [];
+  const busyMinutes = activeEvents.reduce(
+    (acc, ev) => acc + Math.max(0, Math.round((new Date(ev.ends_at).getTime() - new Date(ev.starts_at).getTime()) / 60000)),
+    0,
+  );
+  const peopleCount = activeEvents.reduce((acc, ev) => acc + (ev.attendee_count || 0), 0);
+  const weekAvg = visibleClt.length
+    ? Math.round(visibleClt.reduce((a, d) => a + d.daily_load_score, 0) / visibleClt.length)
+    : 0;
 
   if (loading) return <div className="h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
 
   return (
     <div className="min-h-screen bg-background">
       <ProfileBadge />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-3 pb-12 space-y-6">
-        <div className="flex items-center justify-between">
+
+      {/* Full-bleed sticky command bar */}
+      <div className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-8 py-3 flex flex-wrap items-center gap-3">
           <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4" /> Dashboard
           </Link>
-          <button onClick={() => runSync()} disabled={!!busy} className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-lg border border-border hover:bg-secondary">
-            {busy === "sync" ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />} Re-sync
-          </button>
+          <div className="hidden sm:block h-5 w-px bg-border" />
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-base font-bold leading-tight truncate">Your Schedule in Load</h1>
+            <p className="hidden sm:block text-[11px] text-muted-foreground">Real-time cognitive load, block by block.</p>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            {connections.length > 0 && (
+              <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted-foreground px-2.5 py-1.5 rounded-full border border-border bg-card/50">
+                <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                {providerLabel(connections[0]?.provider)}
+                {connections[0]?.last_synced_at && <> · {new Date(connections[0].last_synced_at).toLocaleDateString()}</>}
+              </span>
+            )}
+            <button onClick={() => runSync()} disabled={!!busy} className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-lg border border-border hover:bg-secondary disabled:opacity-60">
+              {busy === "sync" ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />} Re-sync
+            </button>
+          </div>
         </div>
+      </div>
 
-        <header className="space-y-1">
-          <p className="text-xs uppercase tracking-widest text-primary font-semibold">Real-time Cognitive Load</p>
-          <h1 className="text-2xl sm:text-3xl font-bold">Your Week in Load</h1>
-          <p className="text-sm text-muted-foreground">Daily scores and per-block tips, orchestrated through Sweller's Cognitive Load Theory.</p>
-        </header>
-
-        {connections.length > 0 && <LongitudinalTrend data={longitudinal} />}
-
-
-        {connections.length === 0 ? (
-          <div className="rounded-2xl border border-primary/30 bg-card/60 p-5 sm:p-6 space-y-5">
-            <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-primary mt-1" />
-              <div>
-                <h2 className="text-lg font-semibold">Connect your calendar</h2>
-                <p className="text-sm text-muted-foreground">Upload an .ics file or paste a calendar URL.</p>
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-border bg-background p-4 space-y-3">
-                <div className="font-semibold">ICS file or URL</div>
-                <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
-                  className="w-full text-sm px-3 py-2 rounded-lg border border-border bg-background" />
-                <div className="flex gap-2">
-                  <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
-                  <button onClick={() => fileRef.current?.click()} disabled={!!busy}
-                    className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border">
-                    {busy === "ics" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />} Upload .ics
-                  </button>
-                  <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
-                    onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
-                </div>
-              </div>
-              <div className="rounded-xl border border-primary/30 bg-background p-4 space-y-2">
-                <div className="font-semibold">Google Calendar</div>
-                <p className="text-xs text-muted-foreground">Connect your Google Calendar (read-only) to score your real schedule.</p>
-                <button onClick={connectGoogle} disabled={!!busy}
-                  className="text-xs inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
-                  {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
-                  Connect Google Calendar
-                </button>
-                <p className="text-[11px] text-muted-foreground">Outlook integration coming soon.</p>
-              </div>
-
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border bg-card/40 p-3 text-xs text-muted-foreground flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-primary" />
-            Connected via {connections[0]?.provider === "google" ? "Google Calendar" : connections[0]?.provider === "outlook" ? "Outlook" : "ICS"}.
-            {connections[0]?.last_synced_at && <> Last synced {new Date(connections[0].last_synced_at).toLocaleString()}.</>}
-          </div>
-        )}
-
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-8 py-6 space-y-6">
         {importMessage && (
           <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm flex items-center gap-2">
             {busy ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <CheckCircle2 className="w-4 h-4 text-primary" />}
@@ -265,129 +237,222 @@ export default function CalendarPage() {
           </div>
         )}
 
-        {/* 7-day strip */}
-        {clt.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => setStripOffset((o) => o - 1)}
-                disabled={!canPageBack}
-                aria-label="Earlier dates"
-                className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30 disabled:hover:bg-transparent"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">
-                {rangeLabel(visibleClt)}
-              </span>
-              <button
-                type="button"
-                onClick={() => setStripOffset((o) => o + 1)}
-                disabled={!canPageForward}
-                aria-label="Later dates"
-                className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30 disabled:hover:bg-transparent"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+        {connections.length === 0 ? (
+          <div className="rounded-2xl border border-primary/30 bg-card/60 p-5 sm:p-8 space-y-6">
+            <div className="flex items-start gap-3">
+              <Calendar className="w-5 h-5 text-primary mt-1" />
+              <div>
+                <h2 className="text-xl font-semibold">Connect your calendar</h2>
+                <p className="text-sm text-muted-foreground">Score your real schedule — upload an .ics file, paste a calendar URL, or link Google.</p>
+              </div>
             </div>
-            <div className="grid grid-cols-7 gap-2">
-              {visibleClt.map((d) => (
-                <DayChip key={d.analysis_date} day={d} onSelect={scrollToDay} />
-              ))}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-border bg-background p-5 space-y-3">
+                <div className="font-semibold">ICS file or URL</div>
+                <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
+                  className="w-full text-sm px-3 py-2 rounded-lg border border-border bg-background" />
+                <div className="flex gap-2">
+                  <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
+                  <button onClick={() => fileRef.current?.click()} disabled={!!busy}
+                    className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border">
+                    {busy === "ics" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />} Upload .ics
+                  </button>
+                  <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
+                    onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
+                </div>
+              </div>
+              <div className="rounded-xl border border-primary/30 bg-background p-5 space-y-2">
+                <div className="font-semibold">Google Calendar</div>
+                <p className="text-xs text-muted-foreground">Connect your Google Calendar (read-only) to score your real schedule.</p>
+                <button onClick={connectGoogle} disabled={!!busy}
+                  className="text-xs inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
+                  {busy === "google" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
+                  Connect Google Calendar
+                </button>
+                <p className="text-[11px] text-muted-foreground">Outlook integration coming soon.</p>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Per-day timelines */}
-        {groupedByDay.length === 0 && connections.length > 0 && (
-          <div className="text-sm text-muted-foreground italic">No events found for today or the week ahead.</div>
-        )}
-        {visibleDays.map(([date, evs]) => {
-          const day = cltByDay.get(date);
-          return (
-            <motion.section key={date} id={dayAnchorId(date)} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-              className="scroll-mt-4 rounded-2xl border border-border bg-card/40 p-4 sm:p-5 space-y-3">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="font-semibold">
-                  {dayLabel(date)}
-                </h3>
-                {day && <LoadBadge score={day.daily_load_score} label={day.summary} />}
-              </div>
-
-              {day && (
-                <div className="grid grid-cols-3 gap-2 text-[11px]">
-                  <LoadBar label="Core" value={day.intrinsic_load} color="bg-[hsl(var(--golden))]" />
-                  <LoadBar label="Toxic" value={day.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
-                  <LoadBar label="Growth" value={day.germane_load} color="bg-[hsl(var(--deep-orange))]" />
+        ) : (
+          <>
+            {/* Week strip — full width */}
+            {clt.length > 0 && (
+              <div className="rounded-2xl border border-border bg-card/40 p-3 sm:p-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <button type="button" onClick={() => setStripOffset((o) => o - 1)} disabled={!canPageBack}
+                    aria-label="Earlier dates"
+                    className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30">
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <div className="text-center">
+                    <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">{rangeLabel(visibleClt)}</div>
+                    <div className="text-[11px] text-muted-foreground">Week average load · <span className="font-semibold text-foreground">{weekAvg}/100</span></div>
+                  </div>
+                  <button type="button" onClick={() => setStripOffset((o) => o + 1)} disabled={!canPageForward}
+                    aria-label="Later dates"
+                    className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30">
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
-              )}
+                <div className="grid grid-cols-7 gap-2">
+                  {visibleClt.map((d) => (
+                    <DayChip key={d.analysis_date} day={d}
+                      active={d.analysis_date === activeDate}
+                      count={(eventsByDay.get(d.analysis_date) ?? []).length}
+                      onSelect={setSelectedDate} />
+                  ))}
+                </div>
+              </div>
+            )}
 
-              <div className="divide-y divide-border/40">
-                {evs.map((ev) => {
-                  const tip = day?.per_block_tips.find((t) => t.event_id === ev.id);
-                  const start = new Date(ev.starts_at);
-                  const end = new Date(ev.ends_at);
-                  const mins = Math.round((end.getTime() - start.getTime()) / 60000);
-                  return (
-                    <div key={ev.id} className="py-2.5 flex flex-col sm:flex-row sm:items-start gap-2">
-                      <div className="text-xs text-muted-foreground font-mono w-28 shrink-0">
-                        {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        <span className="text-muted-foreground/60"> · {mins}m</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-sm font-medium truncate">{ev.title}</span>
-                              {tip && typeof tip.load === "number" && tip.risk && <BlockRisk load={tip.load} risk={tip.risk} />}
-                            </div>
-                        {ev.attendee_count > 0 && <div className="text-[11px] text-muted-foreground">{ev.attendee_count} attendees</div>}
-                        {tip && (
-                          <div className="mt-1.5 text-[11px] px-2 py-1 rounded-md bg-primary/10 border border-primary/20 text-foreground inline-block max-w-full">
-                            <span className="font-semibold text-primary uppercase tracking-wider mr-1">{tip.action.replace(/_/g, " ")}:</span>
-                            {tip.tip}
+            {/* Two-pane workspace */}
+            <div className="grid xl:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
+              <div className="space-y-5 min-w-0">
+                {activeDate ? (
+                  <motion.div key={activeDate} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                    {/* Day hero */}
+                    <section className="rounded-2xl border border-border bg-card/50 p-5 sm:p-7">
+                      <div className="flex flex-wrap items-center gap-6">
+                        <ScoreDial score={activeDay?.daily_load_score ?? 0} />
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-xl sm:text-2xl font-bold">{dayLabel(activeDate)}</h2>
+                          <p className="text-sm text-muted-foreground mt-1">{activeDay?.summary ?? "No analysis for this day yet."}</p>
+                          <div className="flex flex-wrap gap-2 mt-3 text-[11px]">
+                            <Stat icon={<Calendar className="w-3 h-3" />} label={`${activeEvents.length} blocks`} />
+                            <Stat icon={<Clock className="w-3 h-3" />} label={`${Math.round(busyMinutes / 6) / 10}h booked`} />
+                            <Stat icon={<Users className="w-3 h-3" />} label={`${peopleCount} attendees`} />
+                          </div>
+                        </div>
+                        {activeDay && (
+                          <div className="w-full lg:w-auto lg:min-w-[300px] grid grid-cols-3 gap-3">
+                            <LoadBar label="Core" value={activeDay.intrinsic_load} color="bg-[hsl(var(--golden))]" />
+                            <LoadBar label="Toxic" value={activeDay.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
+                            <LoadBar label="Growth" value={activeDay.germane_load} color="bg-[hsl(var(--deep-orange))]" />
                           </div>
                         )}
                       </div>
-                    </div>
-                  );
-                })}
+                    </section>
+
+                    {/* Timeline as cards, wide grid */}
+                    {activeEvents.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+                        Nothing scheduled on this day.
+                      </div>
+                    ) : (
+                      <div className="grid md:grid-cols-2 2xl:grid-cols-3 gap-3">
+                        {activeEvents.map((ev) => {
+                          const tip = activeDay?.per_block_tips.find((t) => t.event_id === ev.id);
+                          const start = new Date(ev.starts_at);
+                          const end = new Date(ev.ends_at);
+                          const mins = Math.round((end.getTime() - start.getTime()) / 60000);
+                          return (
+                            <article key={ev.id} className="rounded-xl border border-border bg-card/40 p-4 flex flex-col gap-2 hover:border-primary/40 transition-colors">
+                              <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground font-mono">
+                                <span>
+                                  {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                </span>
+                                <span>{mins}m</span>
+                              </div>
+                              <h4 className="text-sm font-semibold leading-snug">{ev.title}</h4>
+                              <div className="flex flex-wrap items-center gap-2">
+                                {tip && typeof tip.load === "number" && tip.risk && <BlockRisk load={tip.load} risk={tip.risk} />}
+                                {ev.attendee_count > 0 && (
+                                  <span className="text-[10px] text-muted-foreground inline-flex items-center gap-1">
+                                    <Users className="w-3 h-3" />{ev.attendee_count}
+                                  </span>
+                                )}
+                              </div>
+                              {tip && (
+                                <div className="mt-auto text-[11px] px-2.5 py-2 rounded-lg bg-primary/10 border border-primary/20">
+                                  <span className="font-semibold text-primary uppercase tracking-wider mr-1">{tip.action.replace(/_/g, " ")}:</span>
+                                  {tip.tip}
+                                </div>
+                              )}
+                            </article>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </motion.div>
+                ) : (
+                  <div className="text-sm text-muted-foreground italic">No analyzed days yet — run a sync to score your schedule.</div>
+                )}
               </div>
 
-              {day && day.recommendations.length > 0 && (
-                <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-xs space-y-1">
-                  <div className="font-semibold uppercase tracking-wider text-primary">Top recommendations</div>
-                  <ul className="space-y-0.5 list-disc list-inside text-foreground">
-                    {day.recommendations.map((r) => <li key={r}>{r}</li>)}
-                  </ul>
+              {/* Right rail */}
+              <aside className="space-y-4 xl:sticky xl:top-24">
+                {activeDay && activeDay.recommendations.length > 0 && (
+                  <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-2">
+                    <div className="text-[11px] font-semibold uppercase tracking-widest text-primary">Today's moves</div>
+                    <ul className="space-y-1.5 text-xs text-foreground">
+                      {activeDay.recommendations.map((r) => (
+                        <li key={r} className="flex gap-2"><span className="text-primary">•</span><span>{r}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <LongitudinalTrend data={longitudinal} />
+
+                <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-2">
+                  <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Upcoming days</div>
+                  <div className="space-y-1.5 max-h-[320px] overflow-y-auto pr-1">
+                    {clt.slice(baseStart, baseStart + 21).map((d) => (
+                      <button key={d.analysis_date} type="button" onClick={() => setSelectedDate(d.analysis_date)}
+                        className={`w-full flex items-center justify-between gap-2 text-xs px-2.5 py-2 rounded-lg border transition-colors ${
+                          d.analysis_date === activeDate ? "border-primary/50 bg-primary/10" : "border-transparent hover:bg-secondary"
+                        }`}>
+                        <span className="truncate">{shortDay(d.analysis_date)}</span>
+                        <span className="font-semibold shrink-0">{d.daily_load_score}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </motion.section>
-          );
-        })}
+              </aside>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-function LoadBadge({ score, label }: { score: number; label: string }) {
-  const color =
-    score >= 70 ? "bg-[hsl(var(--warm-red)/0.2)] text-[hsl(var(--warm-red))] border-[hsl(var(--warm-red)/0.4)]"
-    : score >= 50 ? "bg-[hsl(var(--deep-orange)/0.2)] text-[hsl(var(--deep-orange))] border-[hsl(var(--deep-orange)/0.4)]"
-    : score >= 30 ? "bg-[hsl(var(--golden)/0.2)] text-[hsl(var(--golden))] border-[hsl(var(--golden)/0.4)]"
-    : "bg-muted text-muted-foreground border-border";
-  return <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${color}`}>{label} · {score}/100</span>;
+function Stat({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-background/60 text-muted-foreground">
+      {icon}{label}
+    </span>
+  );
+}
+
+function ScoreDial({ score }: { score: number }) {
+  const tone =
+    score >= 70 ? "hsl(var(--warm-red))"
+    : score >= 50 ? "hsl(var(--deep-orange))"
+    : score >= 30 ? "hsl(var(--golden))"
+    : "hsl(var(--muted-foreground))";
+  const pct = Math.min(100, Math.max(0, score));
+  return (
+    <div className="relative w-24 h-24 shrink-0 rounded-full grid place-items-center"
+      style={{ background: `conic-gradient(${tone} ${pct * 3.6}deg, hsl(var(--secondary)) 0deg)` }}>
+      <div className="w-[76px] h-[76px] rounded-full bg-card grid place-items-center">
+        <div className="text-xl font-bold leading-none" style={{ color: tone }}>{score}</div>
+        <div className="text-[9px] uppercase tracking-widest text-muted-foreground mt-1">Load</div>
+      </div>
+    </div>
+  );
 }
 
 function LoadBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div>
-      <div className="flex justify-between text-muted-foreground"><span>{label}</span><span>{value}</span></div>
+    <div className="text-[11px]">
+      <div className="flex justify-between text-muted-foreground"><span>{label}</span><span className="font-semibold text-foreground">{value}</span></div>
       <div className="h-1.5 rounded-full bg-secondary overflow-hidden mt-1"><div className={`h-full ${color}`} style={{ width: `${Math.min(100, value)}%` }} /></div>
     </div>
   );
 }
 
-function DayChip({ day, onSelect }: { day: CltDay; onSelect?: (date: string) => void }) {
+function DayChip({ day, active, count, onSelect }: { day: CltDay; active?: boolean; count?: number; onSelect?: (date: string) => void }) {
   const d = new Date(day.analysis_date + "T00:00:00");
   const color =
     day.daily_load_score >= 70 ? "border-[hsl(var(--warm-red)/0.5)] bg-[hsl(var(--warm-red)/0.1)]"
@@ -396,10 +461,11 @@ function DayChip({ day, onSelect }: { day: CltDay; onSelect?: (date: string) => 
     : "border-border bg-card/40";
   return (
     <button type="button" onClick={() => onSelect?.(day.analysis_date)}
-      className={`w-full rounded-xl border p-2 text-center transition-colors hover:border-primary/60 ${color}`}>
+      className={`w-full rounded-xl border p-2 text-center transition-all hover:border-primary/60 ${color} ${active ? "ring-2 ring-primary/60 scale-[1.02]" : ""}`}>
       <div className="text-[10px] uppercase text-muted-foreground">{d.toLocaleDateString(undefined, { weekday: "short" })}</div>
       <div className="text-sm font-bold">{d.getDate()}</div>
       <div className="text-[11px] font-semibold mt-0.5">{day.daily_load_score}</div>
+      {typeof count === "number" && <div className="text-[9px] text-muted-foreground">{count} blk</div>}
     </button>
   );
 }
@@ -417,12 +483,24 @@ function BlockRisk({ load, risk }: { load: number; risk: "low" | "moderate" | "h
   );
 }
 
+function providerLabel(provider?: string) {
+  return provider === "google" ? "Google Calendar" : provider === "outlook" ? "Outlook" : "ICS";
+}
+
 function dayLabel(date: string) {
   const d = new Date(date + "T00:00:00");
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
   const base = d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
   return diff === 0 ? `Today · ${base}` : diff === 1 ? `Tomorrow · ${base}` : base;
+}
+
+function shortDay(date: string) {
+  const d = new Date(date + "T00:00:00");
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
+  const base = d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+  return diff === 0 ? `Today · ${base}` : base;
 }
 
 /** Local calendar date (YYYY-MM-DD) for an instant — never bucket on the UTC date. */
