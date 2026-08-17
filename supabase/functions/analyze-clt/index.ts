@@ -288,13 +288,23 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
     const risk: BlockTip["risk"] = blockLoad >= 60 ? "high" : blockLoad >= 35 ? "moderate" : "low";
 
     candidates.sort((a, b) => b.weight - a.weight);
-    const chosen = candidates[0] ?? null;
+    // Every block carries a load reading and one instruction. When nothing is
+    // wrong the instruction is an honest "monitor" rather than silence.
+    const chosen = candidates[0] ?? {
+      category: (isFocus ? "germane" : "intrinsic") as BlockTip["category"],
+      action: (isFocus ? "preserve" : "monitor") as BlockTip["action"],
+      tip: isFocus
+        ? "Protected block — keep it clear."
+        : unnamed
+          ? `${Math.round(dur)}-minute block with no title — nothing to fix; I'm watching it.`
+          : "Nothing wrong here — normal load, no action needed.",
+      weight: 0,
+    };
     draft.push({
       ev, load: blockLoad, risk,
-      tip: chosen
-        ? { event_id: ev.id, category: chosen.category, action: chosen.action, tip: chosen.tip, load: blockLoad, risk }
-        : null,
+      tip: { event_id: ev.id, category: chosen.category, action: chosen.action, tip: chosen.tip, load: blockLoad, risk },
     });
+
   }
 
   // Fragmentation penalty: many blocks, and — more importantly — no window long
