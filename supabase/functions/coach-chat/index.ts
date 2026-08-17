@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     await sb.from("coach_messages").insert({ email: e, role: "user", content: message });
 
     // Build context
-    const [profileRes, todayClt, eventsRes, histRes] = await Promise.all([
+    const [profileRes, todayClt, eventsRes, histRes, allCltRes] = await Promise.all([
       sb.from("assessment_completions").select("name, archetype_name, result_data").ilike("email", e).order("created_at", { ascending: false }).limit(1).maybeSingle(),
       sb.from("clt_analyses").select("*").ilike("email", e).gte("analysis_date", tzDateKey(new Date(), tz)).order("analysis_date", { ascending: true }).limit(7),
       sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count").ilike("email", e).gte("starts_at", tzStartOfToday(tz).toISOString()).order("starts_at").limit(40),
