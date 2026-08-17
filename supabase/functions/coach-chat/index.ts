@@ -60,7 +60,8 @@ Otherwise respond in plain text.
 Today: ${tzDateKey(new Date(), tz)} (all times below are in ${tz}, the user's local timezone — always answer in that timezone and never convert to UTC).
 
 Upcoming events (id, title, when, mins, people):\n${upcoming.map((e) => `- ${e.id} | ${e.title} | ${e.when} | ${e.mins}m | ${e.people}p`).join("\n") || "(none)"}\n
-Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.score}/100 (${d.summary}); Core=${d.intrinsic} Toxic=${d.extraneous} Growth=${d.germane}; top: ${(d.top || []).join("; ")}`).join("\n") || "(none yet — ask user to connect calendar)"}\n`;
+Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.score}/100 (${d.summary}); Core=${d.intrinsic} Toxic=${d.extraneous} Growth=${d.germane}; top: ${(d.top || []).join("; ")}`).join("\n") || "(none yet — ask user to connect calendar)"}\n
+Longitudinal progress since their first Headroom check (lower load score is healthier — use this whenever the user asks whether things have improved or gone south since they started):\n${longitudinalPrompt(buildLongitudinal(allCltRes.data ?? []))}\n`;
 
     const history = (histRes.data ?? []).reverse().map((m) => ({ role: m.role, content: m.content })) as ChatMessage[];
 
