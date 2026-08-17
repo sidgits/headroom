@@ -27,6 +27,7 @@ export default function CalendarPage() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [clt, setClt] = useState<CltDay[]>([]);
+  const [longitudinal, setLongitudinal] = useState<Longitudinal | null>(null);
   const [stripOffset, setStripOffset] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
