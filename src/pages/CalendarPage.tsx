@@ -77,8 +77,8 @@ export default function CalendarPage() {
     setClt(data?.clt ?? []);
     setLongitudinal((data?.longitudinal as Longitudinal) ?? null);
     setInterventions((data?.interventions as Intervention[]) ?? []);
-    setPatternWeeks((data?.patternWeeks as PatternWeek[]) ?? []);
-    setResolvedCount((data?.resolvedInterventions as number) ?? 0);
+    setPatternWeeks((data?.patterns as PatternWeek[]) ?? []);
+    setResolvedCount((data?.resolvedCount as number) ?? 0);
   };
 
   const runSync = async (e?: string) => {
