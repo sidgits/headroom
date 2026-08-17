@@ -81,6 +81,42 @@ export default function CalendarPage() {
     setResolvedCount((data?.resolvedCount as number) ?? 0);
   };
 
+  const downloadWeekPlan = async () => {
+    const week = clt.slice(0, 7);
+    const avg = week.length ? Math.round(week.reduce((s, d) => s + d.daily_load_score, 0) / week.length) : 0;
+    const heaviest = week.reduce<typeof week[number] | null>((a, b) => (!a || b.daily_load_score > a.daily_load_score ? b : a), null);
+    const report: CoachReport = {
+      title: "Your Week of Action",
+      summary: week.length
+        ? `Average load across the next ${week.length} days is ${avg}/100${heaviest ? `, peaking on ${dayLabel(heaviest.analysis_date)} at ${heaviest.daily_load_score}` : ""}. ${interventions.length} intervention${interventions.length === 1 ? "" : "s"} are open — each one is a specific change to your calendar, not a general tip.`
+        : "No analyzed days yet — run a sync to score your schedule.",
+      sections: [
+        {
+          heading: "Actions to take",
+          body: interventions.length
+            ? interventions.map((i, n) => `${n + 1}. ${i.title}\n   Why: ${i.evidence}\n   Do: ${i.action_label}`).join("\n\n")
+            : "Nothing needs intervening this week — your schedule is defensible as it stands.",
+        },
+        {
+          heading: "Day by day",
+          body: week.length
+            ? week.map((d) => `${dayLabel(d.analysis_date)} — load ${d.daily_load_score}/100 (Core ${d.intrinsic_load}, Toxic ${d.extraneous_load}, Growth ${d.germane_load}). ${d.summary ?? ""}`).join("\n\n")
+            : "No data.",
+        },
+        {
+          heading: "Pattern watch",
+          body: patternWeeks.length >= 2
+            ? patternWeeks.slice(-6).map((w) => `Week of ${w.label}: load ${w.score}, Toxic ${w.toxic}, Growth ${w.growth}`).join("\n")
+            : "Not enough history yet — patterns appear after about three weeks of tracking.",
+        },
+      ],
+    };
+    await generateCoachPDF(report);
+    toast.success("Action plan downloaded.");
+  };
+
+
+
   const runSync = async (e?: string) => {
     const em = e ?? email; if (!em) return;
     setBusy("sync");
