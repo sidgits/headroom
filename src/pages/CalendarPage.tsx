@@ -68,6 +68,7 @@ export default function CalendarPage() {
     setConnections(data?.connections ?? []);
     setEvents(data?.events ?? []);
     setClt(data?.clt ?? []);
+    setLongitudinal((data?.longitudinal as Longitudinal) ?? null);
   };
 
   const runSync = async (e?: string) => {
