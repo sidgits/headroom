@@ -414,7 +414,14 @@ export default function CalendarPage() {
                   </div>
                 )}
 
+                <PatternWatch weeks={patternWeeks} />
+
                 <LongitudinalTrend data={longitudinal} />
+
+                <button type="button" onClick={downloadWeekPlan}
+                  className="w-full inline-flex items-center justify-center gap-2 text-xs font-semibold px-3 py-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/15">
+                  <FileDown className="w-3.5 h-3.5" /> Download this week's action plan
+                </button>
 
                 <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-2">
                   <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Upcoming days</div>
