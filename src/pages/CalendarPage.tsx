@@ -365,6 +365,10 @@ export default function CalendarPage() {
                       onSelect={setSelectedDate} />
                   ))}
                 </div>
+                <p className="mt-2 text-[10px] text-muted-foreground text-center">
+                  Each tile shows that day's cognitive load out of 100 — lower is better. Light 0–29 · Balanced 30–49 · Busy 50–69 · Heavy 70+
+                </p>
+
               </div>
             )}
 
