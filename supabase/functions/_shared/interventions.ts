@@ -1,7 +1,7 @@
 // Intervention engine — turns the CLT day analysis into a small set of concrete,
 // trackable actions ("defend this focus window", "this is the meeting to decline",
 // "this pattern has run two weeks"). Pure functions; no IO.
-import { tzDateKey, tzFormat, tzHour, tzStartOfDay } from "./tz.ts";
+import { tzDateKey, tzFormat, tzStartOfDay } from "./tz.ts";
 
 export interface EvIn {
   id: string; title: string; starts_at: string; ends_at: string;
