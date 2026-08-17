@@ -329,14 +329,12 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   const raw = intrinsic * 0.5 + extraneous * 0.7 - germane * 0.25;
   const score = cap(raw + 10);
 
-  // Speak only when it matters. On a calm day the per-block advice is dropped
-  // entirely and the day carries one honest line instead.
+  // Every block keeps its load reading and instruction, including calm days.
   const quiet = score < 35;
   for (const d of draft) {
-    if (!d.tip) continue;
-    if (quiet && d.risk !== "high") continue;
-    tips.push(d.tip);
+    if (d.tip) tips.push(d.tip);
   }
+
 
   const recs: string[] = [];
   if (extraneous > 40) recs.push("Reduce context switching: batch similar meetings into one block.");
