@@ -84,7 +84,7 @@ export default function ActionCenter({
       return;
     }
     if (item.kind === "decline" || item.kind === "shorten") {
-      const note = (p.decline_note as string) ?? (p.message as string) ?? item.title;
+      const note = (p["decline_note"] as string) ?? (p["message"] as string) ?? item.title;
       const ok = await copyText(note);
       toast[ok ? "success" : "error"](ok ? "Message copied — paste it to the organizer." : "Copy failed.");
       if (ok) await resolve(item, "done");
