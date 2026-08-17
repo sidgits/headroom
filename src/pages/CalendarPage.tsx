@@ -347,7 +347,7 @@ export default function CalendarPage() {
                     className="p-1.5 rounded-lg border border-border hover:bg-secondary disabled:opacity-30">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <div className="text-center">
+                  <div className="text-center min-w-0">
                     <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">{rangeLabel(visibleClt)}</div>
                     <div className="text-[11px] text-muted-foreground">Week average load · <span className="font-semibold text-foreground">{weekAvg}/100</span></div>
                   </div>
@@ -357,6 +357,15 @@ export default function CalendarPage() {
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
+                {/* Load legend right above the date row — explains the colour + band on each tile */}
+                <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mb-3 text-[10px] text-muted-foreground">
+                  <span className="font-semibold uppercase tracking-widest">Load bands:</span>
+                  <LegendChip label="Light" range="0–29" color="border-border bg-card/60" />
+                  <LegendChip label="Balanced" range="30–49" color="border-[hsl(var(--golden)/0.5)] bg-[hsl(var(--golden)/0.1)]" />
+                  <LegendChip label="Busy" range="50–69" color="border-[hsl(var(--deep-orange)/0.5)] bg-[hsl(var(--deep-orange)/0.1)]" />
+                  <LegendChip label="Heavy" range="70+" color="border-[hsl(var(--warm-red)/0.5)] bg-[hsl(var(--warm-red)/0.1)]" />
+                  <span className="text-muted-foreground/80">· lower is better</span>
+                </div>
                 <div className="grid grid-cols-7 gap-2">
                   {visibleClt.map((d) => (
                     <DayChip key={d.analysis_date} day={d}
@@ -365,9 +374,6 @@ export default function CalendarPage() {
                       onSelect={setSelectedDate} />
                   ))}
                 </div>
-                <p className="mt-2 text-[10px] text-muted-foreground text-center">
-                  Each tile shows that day's cognitive load out of 100 — lower is better. Light 0–29 · Balanced 30–49 · Busy 50–69 · Heavy 70+
-                </p>
 
               </div>
             )}
@@ -563,6 +569,15 @@ function LoadBar({ label, value, color }: { label: string; value: number; color:
       <div className="flex justify-between text-muted-foreground"><span>{label}</span><span className="font-semibold text-foreground">{value}</span></div>
       <div className="h-1.5 rounded-full bg-secondary overflow-hidden mt-1"><div className={`h-full ${color}`} style={{ width: `${Math.min(100, value)}%` }} /></div>
     </div>
+  );
+}
+
+function LegendChip({ label, range, color }: { label: string; range: string; color: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border ${color}`}>
+      <span className="font-semibold text-foreground">{label}</span>
+      <span className="text-muted-foreground">{range}</span>
+    </span>
   );
 }
 
