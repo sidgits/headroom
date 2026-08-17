@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, Building2, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { verifyCorporateDomain } from "@/lib/verify-corporate-domain.functions";
 
 interface PreAssessmentCheckProps {
   onIndividual: () => void;
