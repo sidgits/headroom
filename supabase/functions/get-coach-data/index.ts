@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     const from = new Date(tzStartOfToday(tz).getTime() - 60 * 24 * 3600 * 1000);
     const until = new Date(tzStartOfToday(tz).getTime() + 31 * 24 * 3600 * 1000);
 
-    const [conn, events, clt, msgs, profile, allClt] = await Promise.all([
+    const [conn, events, clt, msgs, profile, allClt, actions] = await Promise.all([
       sb.from("calendar_connections").select("id, provider, last_synced_at, created_at").ilike("email", e).order("created_at", { ascending: false }),
       sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count, is_recurring, location, source")
         .ilike("email", e).gte("starts_at", from.toISOString()).lte("starts_at", until.toISOString()).order("starts_at").limit(2000),
@@ -26,7 +26,13 @@ Deno.serve(async (req) => {
       // Unwindowed history powers the baseline-vs-now longitudinal view.
       sb.from("clt_analyses").select("analysis_date, daily_load_score, intrinsic_load, extraneous_load, germane_load")
         .ilike("email", e).order("analysis_date").limit(5000),
+      sb.from("interventions").select("*").ilike("email", e).neq("status", "dismissed").order("created_at").limit(50),
     ]);
+
+    const now = Date.now();
+    const interventions = (actions.data ?? []).filter((i: { status: string; snoozed_until: string | null }) =>
+      i.status === "open" || (i.status === "snoozed" && (!i.snoozed_until || Date.parse(i.snoozed_until) <= now)));
+    const resolved = (actions.data ?? []).filter((i: { status: string }) => i.status === "done");
 
     return j({
       connections: conn.data ?? [],
@@ -35,6 +41,9 @@ Deno.serve(async (req) => {
       messages: msgs.data ?? [],
       profile: profile.data ?? null,
       longitudinal: buildLongitudinal(allClt.data ?? []),
+      interventions,
+      resolvedCount: resolved.length,
+      patterns: patterns(allClt.data ?? [], tzDateKey(new Date(), tz)).weeks,
       timeZone: tz,
     });
   } catch (err) {
