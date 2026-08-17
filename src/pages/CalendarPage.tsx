@@ -564,21 +564,27 @@ function LoadBar({ label, value, color }: { label: string; value: number; color:
 
 function DayChip({ day, active, count, onSelect }: { day: CltDay; active?: boolean; count?: number; onSelect?: (date: string) => void }) {
   const d = new Date(day.analysis_date + "T00:00:00");
+  const score = day.daily_load_score;
   const color =
-    day.daily_load_score >= 70 ? "border-[hsl(var(--warm-red)/0.5)] bg-[hsl(var(--warm-red)/0.1)]"
-    : day.daily_load_score >= 50 ? "border-[hsl(var(--deep-orange)/0.5)] bg-[hsl(var(--deep-orange)/0.1)]"
-    : day.daily_load_score >= 30 ? "border-[hsl(var(--golden)/0.5)] bg-[hsl(var(--golden)/0.1)]"
+    score >= 70 ? "border-[hsl(var(--warm-red)/0.5)] bg-[hsl(var(--warm-red)/0.1)]"
+    : score >= 50 ? "border-[hsl(var(--deep-orange)/0.5)] bg-[hsl(var(--deep-orange)/0.1)]"
+    : score >= 30 ? "border-[hsl(var(--golden)/0.5)] bg-[hsl(var(--golden)/0.1)]"
     : "border-border bg-card/40";
+  const band = score >= 70 ? "Heavy" : score >= 50 ? "Busy" : score >= 30 ? "Balanced" : "Light";
   return (
     <button type="button" onClick={() => onSelect?.(day.analysis_date)}
+      title={`Cognitive load ${score}/100 (${band}) — lower is better`}
       className={`w-full rounded-xl border p-2 text-center transition-all hover:border-primary/60 ${color} ${active ? "ring-2 ring-primary/60 scale-[1.02]" : ""}`}>
       <div className="text-[10px] uppercase text-muted-foreground">{d.toLocaleDateString(undefined, { weekday: "short" })}</div>
       <div className="text-sm font-bold">{d.getDate()}</div>
-      <div className="text-[11px] font-semibold mt-0.5">{day.daily_load_score}</div>
-      {typeof count === "number" && <div className="text-[9px] text-muted-foreground">{count} blk</div>}
+      <div className="text-[9px] uppercase tracking-wider text-muted-foreground mt-1">Load</div>
+      <div className="text-[11px] font-semibold leading-tight">{score}<span className="text-[9px] font-normal text-muted-foreground">/100</span></div>
+      <div className="text-[9px] text-muted-foreground">{band}</div>
+      {typeof count === "number" && <div className="text-[9px] text-muted-foreground">{count} block{count === 1 ? "" : "s"}</div>}
     </button>
   );
 }
+
 
 function BlockRisk({ load, risk }: { load: number; risk: "low" | "moderate" | "high" }) {
   const style =
