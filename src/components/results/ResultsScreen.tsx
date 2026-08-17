@@ -248,10 +248,10 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 onClick={() => setShowUpgradeModal(true)}
                 className="w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg hover:opacity-90 transition"
               >
-                Unlock the full profile
+                Track real-time schedule for $9/month
               </button>
               <p className="text-[11px] text-center text-muted-foreground">
-                Nominal monthly fee. Cancel anytime.
+                $9/month · Cancel anytime.
               </p>
             </div>
           </motion.div>
