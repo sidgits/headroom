@@ -30,6 +30,8 @@ Deno.serve(async (req) => {
       sb.from("clt_analyses").select("*").ilike("email", e).gte("analysis_date", tzDateKey(new Date(), tz)).order("analysis_date", { ascending: true }).limit(7),
       sb.from("calendar_events").select("id, title, starts_at, ends_at, attendee_count").ilike("email", e).gte("starts_at", tzStartOfToday(tz).toISOString()).order("starts_at").limit(40),
       sb.from("coach_messages").select("role, content").ilike("email", e).order("created_at", { ascending: false }).limit(20),
+      sb.from("clt_analyses").select("analysis_date, daily_load_score, intrinsic_load, extraneous_load, germane_load")
+        .ilike("email", e).order("analysis_date").limit(5000),
     ]);
 
     const name = (profileRes.data?.name as string)?.split(" ")[0] ?? "there";
