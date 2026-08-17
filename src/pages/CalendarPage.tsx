@@ -204,6 +204,9 @@ export default function CalendarPage() {
           <p className="text-sm text-muted-foreground">Daily scores and per-block tips, orchestrated through Sweller's Cognitive Load Theory.</p>
         </header>
 
+        {connections.length > 0 && <LongitudinalTrend data={longitudinal} />}
+
+
         {connections.length === 0 ? (
           <div className="rounded-2xl border border-primary/30 bg-card/60 p-5 sm:p-6 space-y-5">
             <div className="flex items-start gap-3">
