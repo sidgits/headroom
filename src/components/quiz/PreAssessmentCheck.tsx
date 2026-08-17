@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, Building2, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { verifyCorporateDomain } from "@/lib/verify-corporate-domain.functions";
 
 interface PreAssessmentCheckProps {
   onIndividual: () => void;
@@ -27,23 +27,16 @@ const PreAssessmentCheck = ({ onIndividual, onCorporateVerified, onBack }: PreAs
     if (trimmedName.length > 80) return setError("Name is too long");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) return setError("Please enter a valid email");
 
-    const domain = trimmedEmail.split("@")[1] ?? "";
     setChecking(true);
     try {
-      const { data, error: queryError } = await supabase
-        .from("corporate_domains")
-        .select("domain")
-        .ilike("domain", domain)
-        .maybeSingle();
-      if (queryError) {
-        setError("Could not verify your domain. Please try again.");
-        return;
-      }
-      if (!data) {
+      const { allowed } = await verifyCorporateDomain({ data: { email: trimmedEmail } });
+      if (!allowed) {
         setError("Unrecognized Domain");
         return;
       }
       onCorporateVerified({ name: trimmedName, email: trimmedEmail });
+    } catch {
+      setError("Could not verify your domain. Please try again.");
     } finally {
       setChecking(false);
     }
