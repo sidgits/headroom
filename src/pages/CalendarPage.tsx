@@ -284,6 +284,19 @@ export default function CalendarPage() {
           </div>
         ) : (
           <>
+            {/* Interventions first — what to actually do */}
+            {email && (
+              <ActionCenter
+                items={interventions}
+                email={email}
+                resolvedCount={resolvedCount}
+                onResolved={(id, status) => {
+                  setInterventions((list) => (status === "open" ? list : list.filter((i) => i.id !== id)));
+                  if (status === "done") setResolvedCount((c) => c + 1);
+                }}
+              />
+            )}
+
             {/* Week strip — full width */}
             {clt.length > 0 && (
               <div className="rounded-2xl border border-border bg-card/40 p-3 sm:p-4">
