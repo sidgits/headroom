@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
+import LongitudinalTrend, { type Longitudinal } from "@/components/dashboard/LongitudinalTrend";
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
@@ -26,6 +27,7 @@ export default function CalendarPage() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [clt, setClt] = useState<CltDay[]>([]);
+  const [longitudinal, setLongitudinal] = useState<Longitudinal | null>(null);
   const [stripOffset, setStripOffset] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [icsUrl, setIcsUrl] = useState("");
@@ -66,6 +68,7 @@ export default function CalendarPage() {
     setConnections(data?.connections ?? []);
     setEvents(data?.events ?? []);
     setClt(data?.clt ?? []);
+    setLongitudinal((data?.longitudinal as Longitudinal) ?? null);
   };
 
   const runSync = async (e?: string) => {
@@ -200,6 +203,9 @@ export default function CalendarPage() {
           <h1 className="text-2xl sm:text-3xl font-bold">Your Week in Load</h1>
           <p className="text-sm text-muted-foreground">Daily scores and per-block tips, orchestrated through Sweller's Cognitive Load Theory.</p>
         </header>
+
+        {connections.length > 0 && <LongitudinalTrend data={longitudinal} />}
+
 
         {connections.length === 0 ? (
           <div className="rounded-2xl border border-primary/30 bg-card/60 p-5 sm:p-6 space-y-5">
