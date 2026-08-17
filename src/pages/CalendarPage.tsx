@@ -387,12 +387,18 @@ export default function CalendarPage() {
                           </div>
                         </div>
                         {activeDay && (
-                          <div className="w-full lg:w-auto lg:min-w-[300px] grid grid-cols-3 gap-3">
-                            <LoadBar label="Core" value={activeDay.intrinsic_load} color="bg-[hsl(var(--golden))]" />
-                            <LoadBar label="Toxic" value={activeDay.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
-                            <LoadBar label="Growth" value={activeDay.germane_load} color="bg-[hsl(var(--deep-orange))]" />
+                          <div className="w-full lg:w-auto lg:min-w-[300px] space-y-2">
+                            <div className="grid grid-cols-3 gap-3">
+                              <LoadBar label="Core" value={activeDay.intrinsic_load} color="bg-[hsl(var(--golden))]" />
+                              <LoadBar label="Toxic" value={activeDay.extraneous_load} color="bg-[hsl(var(--warm-red))]" />
+                              <LoadBar label="Growth" value={activeDay.germane_load} color="bg-[hsl(var(--deep-orange))]" />
+                            </div>
+                            <p className="text-[10px] text-muted-foreground leading-relaxed">
+                              Each is its own 0–100 marker — they don't sum to the daily load.
+                            </p>
                           </div>
                         )}
+
                       </div>
                     </section>
 
