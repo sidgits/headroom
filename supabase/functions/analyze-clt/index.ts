@@ -2,6 +2,57 @@
 // Produces a daily load score (0-100) and per-block tips for the next 7 days.
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 import { safeTz, tzDateKey, tzHour, tzStartOfDay, tzStartOfToday } from "../_shared/tz.ts";
+import { buildInterventions, type Intervention } from "../_shared/interventions.ts";
+
+/** Upsert the freshly computed actions, preserving anything the user already
+ *  resolved, and retire open rows that no longer apply. */
+async function persistInterventions(
+  // deno-lint-ignore no-explicit-any
+  sb: any,
+  email: string,
+  list: Intervention[],
+) {
+  const keyOf = (i: { kind: string; target_event_id: string | null; target_date: string | null }) =>
+    `${i.kind}|${i.target_event_id ?? ""}|${i.target_date ?? ""}`;
+
+  const { data: existing } = await sb
+    .from("interventions")
+    .select("id, kind, target_event_id, target_date, status, snoozed_until")
+    .ilike("email", email);
+
+  const byKey = new Map<string, { id: string; status: string; snoozed_until: string | null }>(
+    (existing ?? []).map((r: { id: string; kind: string; target_event_id: string | null; target_date: string | null; status: string; snoozed_until: string | null }) =>
+      [keyOf(r), { id: r.id, status: r.status, snoozed_until: r.snoozed_until }]),
+  );
+
+  const liveIds: string[] = [];
+  for (const i of list) {
+    const prev = byKey.get(keyOf(i));
+    if (prev) {
+      liveIds.push(prev.id);
+      // Never resurrect something the user handled or dismissed.
+      if (prev.status !== "open") continue;
+      await sb.from("interventions").update({
+        severity: i.severity, title: i.title, evidence: i.evidence,
+        action_label: i.action_label, payload: i.payload, expected_delta: i.expected_delta,
+      }).eq("id", prev.id);
+      continue;
+    }
+    const { data: inserted } = await sb.from("interventions").insert({
+      email,
+      kind: i.kind, severity: i.severity,
+      target_event_id: i.target_event_id, target_date: i.target_date,
+      title: i.title, evidence: i.evidence, action_label: i.action_label,
+      payload: i.payload, expected_delta: i.expected_delta, status: "open",
+    }).select("id").maybeSingle();
+    if (inserted?.id) liveIds.push(inserted.id);
+  }
+
+  // Open rows whose event or condition no longer exists are removed.
+  let stale = sb.from("interventions").delete().ilike("email", email).eq("status", "open");
+  if (liveIds.length) stale = stale.not("id", "in", `(${liveIds.join(",")})`);
+  await stale;
+}
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
@@ -83,7 +134,31 @@ Deno.serve(async (req) => {
         summary: a.summary,
       }, { onConflict: "email,analysis_date" } as never);
     }
-    return j({ days: analyses });
+
+    // Turn the analysis into trackable actions.
+    const { data: history } = await sb
+      .from("clt_analyses")
+      .select("analysis_date, daily_load_score, intrinsic_load, extraneous_load, germane_load")
+      .ilike("email", e).order("analysis_date").limit(5000);
+
+    const { interventions } = buildInterventions(
+      analyses.map((a) => ({
+        date: a.date,
+        daily_load_score: a.daily_load_score,
+        intrinsic_load: a.intrinsic_load,
+        extraneous_load: a.extraneous_load,
+        germane_load: a.germane_load,
+        events: a.events.map((ev) => ({
+          id: ev.id, title: ev.title, starts_at: ev.starts_at, ends_at: ev.ends_at,
+          attendee_count: ev.attendee_count, is_recurring: ev.is_recurring,
+        })),
+      })),
+      history ?? [],
+      tz,
+    );
+    await persistInterventions(sb, e, interventions);
+
+    return j({ days: analyses, interventions: interventions.length });
   } catch (err) {
     console.error("analyze-clt", err);
     return j({ error: (err as Error).message }, 500);

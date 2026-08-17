@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { motion } from "framer-motion";
-import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, Loader2, RefreshCw, Upload, Users } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, FileDown, Loader2, RefreshCw, Upload, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withReview, isReviewMode, REVIEW_EMAIL } from "@/lib/reviewAccess";
 import { toast } from "sonner";
 import ProfileBadge from "@/components/auth/ProfileBadge";
 import LongitudinalTrend, { type Longitudinal } from "@/components/dashboard/LongitudinalTrend";
+import ActionCenter, { type Intervention } from "@/components/dashboard/ActionCenter";
+import PatternWatch, { type PatternWeek } from "@/components/dashboard/PatternWatch";
+import { generateCoachPDF, type CoachReport } from "@/lib/generateCoachPDF";
 
 interface EventRow {
   id: string; title: string; starts_at: string; ends_at: string;
@@ -28,6 +31,9 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [clt, setClt] = useState<CltDay[]>([]);
   const [longitudinal, setLongitudinal] = useState<Longitudinal | null>(null);
+  const [interventions, setInterventions] = useState<Intervention[]>([]);
+  const [patternWeeks, setPatternWeeks] = useState<PatternWeek[]>([]);
+  const [resolvedCount, setResolvedCount] = useState(0);
   const [stripOffset, setStripOffset] = useState(0);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -70,7 +76,46 @@ export default function CalendarPage() {
     setEvents(data?.events ?? []);
     setClt(data?.clt ?? []);
     setLongitudinal((data?.longitudinal as Longitudinal) ?? null);
+    setInterventions((data?.interventions as Intervention[]) ?? []);
+    setPatternWeeks((data?.patterns as PatternWeek[]) ?? []);
+    setResolvedCount((data?.resolvedCount as number) ?? 0);
   };
+
+  const downloadWeekPlan = async () => {
+    const week = clt.slice(0, 7);
+    const avg = week.length ? Math.round(week.reduce((s, d) => s + d.daily_load_score, 0) / week.length) : 0;
+    const heaviest = week.reduce<typeof week[number] | null>((a, b) => (!a || b.daily_load_score > a.daily_load_score ? b : a), null);
+    const report: CoachReport = {
+      title: "Your Week of Action",
+      summary: week.length
+        ? `Average load across the next ${week.length} days is ${avg}/100${heaviest ? `, peaking on ${dayLabel(heaviest.analysis_date)} at ${heaviest.daily_load_score}` : ""}. ${interventions.length} intervention${interventions.length === 1 ? "" : "s"} are open — each one is a specific change to your calendar, not a general tip.`
+        : "No analyzed days yet — run a sync to score your schedule.",
+      sections: [
+        {
+          heading: "Actions to take",
+          body: interventions.length
+            ? interventions.map((i, n) => `${n + 1}. ${i.title}\n   Why: ${i.evidence}\n   Do: ${i.action_label}`).join("\n\n")
+            : "Nothing needs intervening this week — your schedule is defensible as it stands.",
+        },
+        {
+          heading: "Day by day",
+          body: week.length
+            ? week.map((d) => `${dayLabel(d.analysis_date)} — load ${d.daily_load_score}/100 (Core ${d.intrinsic_load}, Toxic ${d.extraneous_load}, Growth ${d.germane_load}). ${d.summary ?? ""}`).join("\n\n")
+            : "No data.",
+        },
+        {
+          heading: "Pattern watch",
+          body: patternWeeks.length >= 2
+            ? patternWeeks.slice(-6).map((w) => `Week of ${w.label}: load ${w.score}, Toxic ${w.toxic}, Growth ${w.growth}`).join("\n")
+            : "Not enough history yet — patterns appear after about three weeks of tracking.",
+        },
+      ],
+    };
+    await generateCoachPDF(report);
+    toast.success("Action plan downloaded.");
+  };
+
+
 
   const runSync = async (e?: string) => {
     const em = e ?? email; if (!em) return;
@@ -275,6 +320,19 @@ export default function CalendarPage() {
           </div>
         ) : (
           <>
+            {/* Interventions first — what to actually do */}
+            {email && (
+              <ActionCenter
+                items={interventions}
+                email={email}
+                resolvedCount={resolvedCount}
+                onResolved={(id, status) => {
+                  setInterventions((list) => (status === "open" ? list : list.filter((i) => i.id !== id)));
+                  if (status === "done") setResolvedCount((c) => c + 1);
+                }}
+              />
+            )}
+
             {/* Week strip — full width */}
             {clt.length > 0 && (
               <div className="rounded-2xl border border-border bg-card/40 p-3 sm:p-4">
@@ -392,7 +450,14 @@ export default function CalendarPage() {
                   </div>
                 )}
 
+                <PatternWatch weeks={patternWeeks} />
+
                 <LongitudinalTrend data={longitudinal} />
+
+                <button type="button" onClick={downloadWeekPlan}
+                  className="w-full inline-flex items-center justify-center gap-2 text-xs font-semibold px-3 py-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/15">
+                  <FileDown className="w-3.5 h-3.5" /> Download this week's action plan
+                </button>
 
                 <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-2">
                   <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Upcoming days</div>
