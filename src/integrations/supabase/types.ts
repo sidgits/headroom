@@ -394,6 +394,66 @@ export type Database = {
         }
         Relationships: []
       }
+      interventions: {
+        Row: {
+          action_label: string
+          created_at: string
+          email: string
+          evidence: string
+          expected_delta: number
+          id: string
+          kind: string
+          payload: Json
+          resolved_at: string | null
+          severity: string
+          snoozed_until: string | null
+          status: string
+          target_date: string | null
+          target_event_id: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          action_label?: string
+          created_at?: string
+          email: string
+          evidence?: string
+          expected_delta?: number
+          id?: string
+          kind: string
+          payload?: Json
+          resolved_at?: string | null
+          severity?: string
+          snoozed_until?: string | null
+          status?: string
+          target_date?: string | null
+          target_event_id?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          action_label?: string
+          created_at?: string
+          email?: string
+          evidence?: string
+          expected_delta?: number
+          id?: string
+          kind?: string
+          payload?: Json
+          resolved_at?: string | null
+          severity?: string
+          snoozed_until?: string | null
+          status?: string
+          target_date?: string | null
+          target_event_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       rate_limit_events: {
         Row: {
           action: string
