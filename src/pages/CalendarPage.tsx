@@ -544,11 +544,14 @@ function ScoreDial({ score }: { score: number }) {
       style={{ background: `conic-gradient(${tone} ${pct * 3.6}deg, hsl(var(--secondary)) 0deg)` }}>
       <div className="w-[76px] h-[76px] rounded-full bg-card grid place-items-center">
         <div className="text-xl font-bold leading-none" style={{ color: tone }}>{score}</div>
-        <div className="text-[9px] uppercase tracking-widest text-muted-foreground mt-1">Load</div>
+        <div className="text-[8px] uppercase tracking-widest text-muted-foreground mt-1 text-center leading-tight">
+          Load<br />lower is better
+        </div>
       </div>
     </div>
   );
 }
+
 
 function LoadBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
