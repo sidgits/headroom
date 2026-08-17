@@ -23,6 +23,11 @@ interface CltDay {
 }
 interface Connection { id: string; provider: string; last_synced_at: string | null }
 
+/** Calendar entries that carry no real name — we shouldn't infer what they are. */
+const UNTITLED_RE = /^(busy|tentative|free|blocked?|hold|private|no title|untitled|ooo|out of office)?$/i;
+const isUntitled = (title: string | null | undefined) => UNTITLED_RE.test((title ?? "").trim());
+
+
 export default function CalendarPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
