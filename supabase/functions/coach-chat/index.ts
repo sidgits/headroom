@@ -62,7 +62,8 @@ Today: ${tzDateKey(new Date(), tz)} (all times below are in ${tz}, the user's lo
 
 Upcoming events (id, title, when, mins, people):\n${upcoming.map((e) => `- ${e.id} | ${e.title} | ${e.when} | ${e.mins}m | ${e.people}p`).join("\n") || "(none)"}\n
 Daily CLT analysis (next 7 days):\n${clt.map((d) => `- ${d.date}: score ${d.score}/100 (${d.summary}); Core=${d.intrinsic} Toxic=${d.extraneous} Growth=${d.germane}; top: ${(d.top || []).join("; ")}`).join("\n") || "(none yet — ask user to connect calendar)"}\n
-Longitudinal progress since their first Headroom check (lower load score is healthier — use this whenever the user asks whether things have improved or gone south since they started):\n${longitudinalPrompt(buildLongitudinal(allCltRes.data ?? []))}\n`;
+Longitudinal progress since their first Headroom check (lower load score is healthier — use this whenever the user asks whether things have improved or gone south since they started):\n${longitudinalPrompt(buildLongitudinal(allCltRes.data ?? []))}\n
+Open interventions already on ${name}'s dashboard Action Center — when they ask what to do, reference THESE exact actions rather than inventing new ones, and never contradict them:\n${interventionsPrompt(actionsRes.data ?? [])}\n`;
 
     const history = (histRes.data ?? []).reverse().map((m) => ({ role: m.role, content: m.content })) as ChatMessage[];
 
