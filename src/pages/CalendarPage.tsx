@@ -572,6 +572,15 @@ function LoadBar({ label, value, color }: { label: string; value: number; color:
   );
 }
 
+function LegendChip({ label, range, color }: { label: string; range: string; color: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border ${color}`}>
+      <span className="font-semibold text-foreground">{label}</span>
+      <span className="text-muted-foreground">{range}</span>
+    </span>
+  );
+}
+
 function DayChip({ day, active, count, onSelect }: { day: CltDay; active?: boolean; count?: number; onSelect?: (date: string) => void }) {
   const d = new Date(day.analysis_date + "T00:00:00");
   const score = day.daily_load_score;
