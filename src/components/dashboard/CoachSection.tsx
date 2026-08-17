@@ -72,7 +72,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
       <header className="flex items-center gap-3 pb-3 border-b border-border">
         <img src={coachAvatar} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/40" />
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">AI Productivity Coach</p>
+          <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Heady · AI Productivity Coach</p>
           <h2 className="text-lg sm:text-xl font-bold">{firstName}'s Personalized Coach</h2>
         </div>
       </header>

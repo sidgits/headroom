@@ -87,7 +87,7 @@ export default function CoachPage() {
 
   if (loading) return <div className="h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
 
-  const title = `${firstName}'s Personalized AI Productivity Coach`;
+  const title = `Heady · ${firstName}'s Personalized AI Productivity Coach`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -102,7 +102,7 @@ export default function CoachPage() {
         <header className="flex items-center gap-3 pb-4 border-b border-border">
           <img src={coachAvatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/40" />
           <div>
-            <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">AI Productivity Coach</p>
+            <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">Heady · AI Productivity Coach</p>
             <h1 className="text-lg sm:text-xl font-bold">{title}</h1>
           </div>
         </header>
