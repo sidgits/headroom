@@ -67,3 +67,12 @@ export function tzFormat(d: Date | string, tz: string): string {
     hour: "numeric", minute: "2-digit",
   }).format(date);
 }
+
+/** The UTC instant of 00:00 local Monday of the week containing `now`. */
+export function tzStartOfWeek(tz: string, now = new Date()): Date {
+  const start = tzStartOfToday(tz, now);
+  const weekday = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short" }).format(start);
+  const order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const idx = Math.max(0, order.indexOf(weekday));
+  return new Date(start.getTime() - idx * 24 * 3600 * 1000);
+}
