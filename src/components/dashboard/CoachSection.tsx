@@ -82,7 +82,7 @@ export default function CoachSection({ email, firstName }: { email: string; firs
           <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="w-3 h-3 animate-spin" /> Loading coach…</div>
         ) : messages.length === 0 ? (
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm">
-            Hi {firstName} — I read your archetype, schedule, and Cognitive Load scores. Ask me anything about your week, energy, or a specific meeting.
+            Hi {firstName}, I'm Heady — I've read your archetype, schedule, and Cognitive Load scores. Ask me anything about your week, energy, or a specific meeting.
           </div>
         ) : (
           messages.map((m) => <MessageBubble key={m.id} msg={m} />)

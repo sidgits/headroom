@@ -110,7 +110,7 @@ export default function CoachPage() {
         <div className="flex-1 overflow-y-auto py-5 space-y-4">
           {messages.length === 0 && (
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
-              Hi {firstName} — I read your archetype, schedule, and Cognitive Load scores. Ask me anything about your week, energy, or a specific meeting.
+              Hi {firstName}, I'm Heady — I've read your archetype, schedule, and Cognitive Load scores. Ask me anything about your week, energy, or a specific meeting.
             </div>
           )}
           {messages.map((m) => <MessageBubble key={m.id} msg={m} />)}
