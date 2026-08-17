@@ -31,8 +31,12 @@ export default function CalendarSection({ email }: { email: string }) {
 
   useEffect(() => {
     (async () => {
-      await refresh();
+      const loaded = await refresh();
       setLoading(false);
+      // Keep a connected Google calendar fresh on every visit (quietly).
+      if ((loaded?.connections ?? []).some((c: Connection) => c.provider === "google")) {
+        await runSync(true);
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -43,31 +47,33 @@ export default function CalendarSection({ email }: { email: string }) {
     if (error) {
       console.error("get-coach-data failed", error);
       setSyncError("We couldn't load your calendar data just now. Please refresh the page.");
-      return;
+      return null;
     }
     setConnections(data?.connections ?? []);
     setEvents(data?.events ?? []);
     setClt(data?.clt ?? []);
+    return data as { connections?: Connection[] };
   };
 
 
-  const runSync = async () => {
-    setBusy("sync");
+  const runSync = async (quiet = false) => {
+    setBusy(quiet ? "autosync" : "sync");
     setSyncError(null);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     try {
-      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: withReview({ email }) });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: withReview({ email, timeZone }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const errs: string[] = data?.errors ?? [];
       if (errs.length) setSyncError(errs[0] ?? null);
-      await supabase.functions.invoke("analyze-clt", { body: withReview({ email }) });
+      await supabase.functions.invoke("analyze-clt", { body: withReview({ email, timeZone }) });
       await refresh();
-      if (errs.length) toast.error(errs[0]);
-      else toast.success(`Calendar synced — ${data?.events ?? 0} events.`);
+      if (errs.length) { if (!quiet) toast.error(errs[0]); }
+      else if (!quiet) toast.success(`Calendar synced — ${data?.events ?? 0} events.`);
     } catch (err) {
       console.error(err);
       setSyncError("Sync failed. Please try disconnecting and reconnecting.");
-      toast.error("Sync failed.");
+      if (!quiet) toast.error("Sync failed.");
     } finally { setBusy(null); }
   };
 

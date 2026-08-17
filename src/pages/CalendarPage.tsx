@@ -56,14 +56,18 @@ export default function CalendarPage() {
       if (!e && isReviewMode()) e = REVIEW_EMAIL;
       if (!e) { navigate("/login", { replace: true }); return; }
       setEmail(e);
-      await refresh(e);
+      const loaded = await refresh(e);
       setLoading(false);
       // Auto-sync when returning from a successful Google OAuth connection.
       const params = new URLSearchParams(window.location.search);
       if (params.get("calendar") === "connected") {
         window.history.replaceState({}, "", window.location.pathname);
         await runSync(e);
+        return;
       }
+      // Otherwise keep a live Google calendar fresh on every visit (quietly).
+      const hasGoogle = (loaded?.connections ?? []).some((c: Connection) => c.provider === "google");
+      if (hasGoogle) await runSync(e, true);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -75,7 +79,7 @@ export default function CalendarPage() {
         toast.error("Subscription required.");
         navigate("/dashboard");
       }
-      return;
+      return null;
     }
     setConnections(data?.connections ?? []);
     setEvents(data?.events ?? []);
@@ -84,6 +88,7 @@ export default function CalendarPage() {
     setInterventions((data?.interventions as Intervention[]) ?? []);
     setPatternWeeks((data?.patterns as PatternWeek[]) ?? []);
     setResolvedCount((data?.resolvedCount as number) ?? 0);
+    return data as { connections?: Connection[] };
   };
 
   const downloadWeekPlan = async () => {
@@ -124,21 +129,23 @@ export default function CalendarPage() {
 
 
 
-  const runSync = async (e?: string) => {
+  const runSync = async (e?: string, quiet = false) => {
     const em = e ?? email; if (!em) return;
-    setBusy("sync");
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setBusy(quiet ? "autosync" : "sync");
     try {
-      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: withReview({ email: em }) });
+      const { data, error } = await supabase.functions.invoke("sync-calendar", { body: withReview({ email: em, timeZone }) });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const errors: string[] = data?.errors ?? [];
       if (errors.length) throw new Error(errors[0]);
-      await supabase.functions.invoke("analyze-clt", { body: withReview({ email: em }) });
+      await supabase.functions.invoke("analyze-clt", { body: withReview({ email: em, timeZone }) });
       await refresh(em);
-      toast.success("Calendar synced.");
+      if (!quiet) toast.success("Calendar synced.");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Sync failed.";
-      console.error(err); setSyncError(message); toast.error(message);
+      console.error(err); setSyncError(message);
+      if (!quiet) toast.error(message);
     } finally { setBusy(null); }
   };
 
