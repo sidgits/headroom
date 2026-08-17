@@ -1,11 +1,18 @@
 // Sync upcoming events for the user's connected calendar (Google or ICS).
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
-import { safeTz, tzStartOfToday } from "../_shared/tz.ts";
+import { safeTz, tzStartOfToday, tzStartOfWeek } from "../_shared/tz.ts";
 
 const DAYS_AHEAD = 30;
 const DAYS_BACK = 60;
 const windowStartFrom = (tz: string) =>
   new Date(tzStartOfToday(tz).getTime() - DAYS_BACK * 24 * 3600 * 1000);
+
+// Live provider syncs (Google) cover this week + next week only — the window a
+// person can still act on, and small enough to refresh on every visit.
+const liveWindow = (tz: string) => {
+  const start = tzStartOfWeek(tz);
+  return { start, end: new Date(start.getTime() + 14 * 24 * 3600 * 1000) };
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
