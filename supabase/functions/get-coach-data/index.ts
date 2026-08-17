@@ -2,6 +2,7 @@
 import { corsHeaders, normalizeEmail, serviceClient, hasPaidAccess } from "../_shared/subscription.ts";
 import { safeTz, tzDateKey, tzStartOfToday } from "../_shared/tz.ts";
 import { buildLongitudinal } from "../_shared/longitudinal.ts";
+import { patterns } from "../_shared/interventions.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
