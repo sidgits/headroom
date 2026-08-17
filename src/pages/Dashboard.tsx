@@ -421,7 +421,7 @@ const Dashboard = () => {
                 <span className="flex items-center gap-2 mt-1">
                   <span className="h-px w-3 bg-white/25" />
                   <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-white/75 group-hover:text-white/90 transition-colors">
-                    AI Coach Included
+                    Heady AI Coach Included
                   </span>
                   <span className="h-px w-3 bg-white/25" />
                 </span>
