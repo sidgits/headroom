@@ -67,8 +67,7 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
   }
   if (!access) { errors.push("Google access expired. Please disconnect and reconnect your calendar."); return 0; }
 
-  const now = windowStartFrom(tz);
-  const max = new Date(Date.now() + DAYS_AHEAD * 24 * 3600 * 1000);
+  const { start: now, end: max } = liveWindow(tz);
 
   // Collect the calendars the user actually looks at (primary + any selected ones).
   let calendarIds: string[] = ["primary"];
