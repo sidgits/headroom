@@ -38,6 +38,17 @@ Deno.serve(async (req) => {
 
     const name = (profileRes.data?.name as string)?.split(" ")[0] ?? "there";
     const archetype = profileRes.data?.archetype_name ?? "your archetype";
+    const aiLoad = (profileRes.data?.result_data as { aiLoad?: { mode?: string; band?: string; meaning?: string } } | null)?.aiLoad;
+    const aiLoadLine = aiLoad?.mode
+      ? `AI Load (fourth dimension, from their assessment): ${aiLoad.band} — ${aiLoad.meaning} Mode: "${aiLoad.mode}". ${
+          aiLoad.mode === "judge" || aiLoad.mode === "both"
+            ? "Frame coaching around verification overhead and judgment fatigue: batching review work, deciding what not to double-check, and defending unverified thinking time."
+            : aiLoad.mode === "think"
+              ? "Frame coaching around a widened decision surface: narrowing what deserves attention before doing it."
+              : "Frame coaching around delivery volume and scope creep rather than judgment fatigue."
+        }`
+      : "AI Load: not captured for this user — don't invent one.";
+
     const upcoming = (eventsRes.data ?? []).slice(0, 20).map((ev) => ({
       id: ev.id, title: ev.title,
       when: tzFormat(ev.starts_at, tz),
