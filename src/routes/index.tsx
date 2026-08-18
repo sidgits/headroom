@@ -63,24 +63,6 @@ export const Route = createFileRoute("/")({
             { name: "twitter:image", content: "https://headroomapp.co/og-image.png" },
           ],
           links: [{ rel: "canonical", href: "https://headroomapp.co/" }],
-          scripts: [
-            {
-              type: "application/ld+json",
-              children: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "SoftwareApplication",
-                name: "Headroom App",
-                alternateName: "Headroom",
-                url: "https://headroomapp.co/",
-                applicationCategory: "BusinessApplication",
-                operatingSystem: "Web browser (any device)",
-                description:
-                  "Headroom App measures cognitive load and burnout risk. A short assessment reveals your Work Pattern archetype, then calendar analysis tracks Core Load, Toxic Load and Growth Load with AI coaching.",
-                offers: { "@type": "Offer", price: "9", priceCurrency: "USD" },
-                publisher: { "@id": "https://headroomapp.co/#organization" },
-              }),
-            },
-          ],
         },
   component: HomeRoute,
 });

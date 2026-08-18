@@ -163,6 +163,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "Maker of Headroom App, a web app for measuring cognitive load and burnout risk from assessments and calendar data. Unrelated to any macOS utility of a similar name.",
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Headroom App",
+          alternateName: "Headroom",
+          url: "https://headroomapp.co/",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web browser (any device)",
+          description:
+            "Headroom App measures cognitive load and burnout risk. A short assessment reveals your Work Pattern archetype, then calendar analysis tracks Core, Toxic and Growth Load with AI coaching.",
+          offers: { "@type": "Offer", price: "9", priceCurrency: "USD" },
+          publisher: { "@id": "https://headroomapp.co/#organization" },
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
