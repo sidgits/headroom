@@ -212,15 +212,31 @@ function timeLabel(iso: string, tz: string) {
   });
 }
 
-function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
+type AiMode = "think" | "judge" | "both" | "execute" | null;
+
+/** Reads the AI Load answer (Q7) out of a stored assessment result. */
+function readAiMode(resultData: unknown): AiMode {
+  const rd = resultData as { aiLoad?: { mode?: string } } | null | undefined;
+  const m = rd?.aiLoad?.mode;
+  return m === "think" || m === "judge" || m === "both" || m === "execute" ? m : null;
+}
+
+function analyzeDay(date: string, events: EventRow[], tz: string, aiMode: AiMode = null): DayAnalysis {
   let intrinsic = 0, extraneous = 0, germane = 0;
   const tips: BlockTip[] = [];
 
+  // High AI Load = constant verification and interpretation. Fragmented, back-to-back
+  // and review-type blocks cost more for these people, and defending focus matters more.
+  const aiHeavy = aiMode === "judge" || aiMode === "both";
+  const aiFactor = aiMode === "both" ? 1.2 : aiMode === "judge" ? 1.12 : 1;
+
   const COMPLEX = /(strategy|design|review|interview|planning|kickoff|architecture|deep|writing|research|presentation|board|roadmap)/i;
   const ROUTINE = /(standup|sync|catch[- ]?up|check[- ]?in|1[:-]1|status|update)/i;
+  const REVIEW = /(review|feedback|approval|qa|audit|proofread|edit|sign[- ]?off)/i;
 
   const protectedBlocks: EventRow[] = [];
   const draft: { ev: EventRow; load: number; risk: BlockTip["risk"]; tip: BlockTip | null }[] = [];
+
 
   for (let i = 0; i < events.length; i++) {
     const ev = events[i];
