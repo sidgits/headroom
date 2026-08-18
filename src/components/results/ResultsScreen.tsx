@@ -248,7 +248,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
 
               <ul className="space-y-2.5">
                 {[
-                  { t: "Your three load scores", d: "Toxic, Core and Growth load — measured, not guessed." },
+                  { t: "Your four load scores", d: "Toxic, Core, Growth and AI Load — measured, not guessed." },
                   { t: "Calendar load analysis", d: "Upload your calendar and see which days will break you." },
                   { t: "Tracking over time", d: "Check in daily and watch your pattern shift." },
                   { t: "Your AI burnout coach", d: "Grounded in your actual scores, available anytime." },
