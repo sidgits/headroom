@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
-import Footer from "@/components/Footer";
+
 import { AnimatePresence, motion } from "framer-motion";
 import LandingHero from "@/components/landing/LandingHero";
 import ReturningUserHome, { useReturningUserProfile } from "@/components/landing/ReturningUserHome";
@@ -367,7 +367,6 @@ const Index = () => {
           )}
         </AnimatePresence>
       </div>
-      <Footer />
     </div>
   );
 };

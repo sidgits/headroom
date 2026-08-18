@@ -1,5 +1,5 @@
 import { Link } from "@/lib/router-compat";
-import Footer from "@/components/Footer";
+
 
 const Privacy = () => {
   return (
@@ -460,7 +460,6 @@ const Privacy = () => {
           </section>
         </article>
       </main>
-      <Footer />
     </div>
   );
 };
