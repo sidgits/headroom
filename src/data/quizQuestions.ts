@@ -69,7 +69,9 @@ export const quizQuestions: QuizQuestionData[] = [
       { id: "C", text: "I know what good looks like but I can't seem to find it" },
       { id: "D", text: "I'm not sure what would make work feel genuinely fulfilling" },
     ],
+  },
   {
+
     id: 7,
     question: "How does AI impact your work?",
     answers: [
