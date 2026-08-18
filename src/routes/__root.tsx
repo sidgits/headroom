@@ -118,8 +118,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Headroom App — Cognitive Load & Burnout Assessment" },
-      { name: "description", content: "Headroom App (headroomapp.co) is a web app that measures cognitive load and burnout risk from a short assessment and your calendar. Not a macOS utility." },
       { name: "author", content: "Headroom App" },
       { name: "application-name", content: "Headroom App" },
       { property: "og:site_name", content: "Headroom App" },
