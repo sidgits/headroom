@@ -479,6 +479,81 @@ function aiInterpretation(archetypeName: string, band: string, score: number, mo
   return `${band} — ${score}/10: ${perArchetype[mode]}`;
 }
 
+function answerText(questionNumber: number, answerId: string | undefined): { question: string; answer: string } | null {
+  if (!answerId) return null;
+  const q = quizQuestions.find((item) => item.id === questionNumber);
+  const a = q?.answers.find((item) => item.id === answerId);
+  if (!q || !a) return null;
+  return { question: q.question, answer: a.text };
+}
+
+// Which quiz answers actually moved the AI Load reading, and how.
+function buildAiDrivers(
+  answers: Record<number, string>,
+  mode: AiMode,
+  archetypeName: string,
+  G: number
+): AiLoadDriver[] {
+  const drivers: AiLoadDriver[] = [];
+
+  const primaryEffect: Record<AiMode, string> = {
+    think: `Sets the base AI Load at moderate and pushes most of it into Core: the ${archetypeName} is framing more, producing less.`,
+    judge: `Sets the base AI Load high and pushes most of it into Toxic: verification is the heaviest AI pattern we track for the ${archetypeName}.`,
+    both: `Sets the base AI Load at the highest band: framing and verification stack, so the ${archetypeName} pays both costs at once.`,
+    execute: `Sets the base AI Load low and Growth-weighted: AI absorbs production for the ${archetypeName}, leaving volume creep as the real risk.`,
+  };
+  const q7 = answerText(7, answers[7]);
+  if (q7) {
+    drivers.push({ questionNumber: 7, question: q7.question, answer: q7.answer, weight: "primary", effect: primaryEffect[mode] });
+  }
+
+  // Q1 — interruption recovery decides how expensive AI context switching is.
+  const q1 = answerText(1, answers[1]);
+  if (q1) {
+    const a1 = answers[1];
+    const amplifies = a1 === "C" || a1 === "D";
+    drivers.push({
+      questionNumber: 1,
+      question: q1.question,
+      answer: q1.answer,
+      weight: amplifies ? "amplifier" : "buffer",
+      effect: amplifies
+        ? "Every hop between your own thinking and an AI thread costs recovery time, so more of your AI Load lands in Toxic."
+        : "You re-enter deep work cleanly, which keeps AI context switching from inflating the Toxic share.",
+    });
+  }
+
+  // Q5 — how you define a productive week decides whether AI gains become capability or volume.
+  const q5 = answerText(5, answers[5]);
+  if (q5) {
+    const a5 = answers[5];
+    const buffers = a5 === "A" || a5 === "C";
+    drivers.push({
+      questionNumber: 5,
+      question: q5.question,
+      answer: q5.answer,
+      weight: buffers ? "buffer" : "amplifier",
+      effect: buffers
+        ? "You judge a week by progress or learning, so AI-freed hours convert into Growth Load rather than more throughput."
+        : "You judge a week by volume cleared, so AI speed tends to refill the calendar instead of releasing capacity.",
+    });
+  }
+
+  // Growth interaction — the escalation rule, stated plainly.
+  if ((mode === "judge" || mode === "both") && G <= 4) {
+    drivers.push({
+      questionNumber: 0,
+      question: "Your combined answers across Questions 3-6",
+      answer: `Growth Load scored ${G}/10`,
+      weight: "amplifier",
+      effect: "High verification with low capability payoff is the fastest-moving depletion pattern we track — it raised your burnout risk, not just your AI Load.",
+    });
+  }
+
+  return drivers;
+}
+
+
 export function calculateResults(
   answers: Record<number, string>,
   sprinterAnswer: string | null
