@@ -192,7 +192,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                     </span>
                   </div>
                   <p className="text-xs italic text-muted-foreground -mt-1">
-                    {dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : "Growth Cognitive Load"}
+                    {dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : dim.code === "A" ? "AI Cognitive Load" : "Growth Cognitive Load"}
                   </p>
                   <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
                     <motion.div
