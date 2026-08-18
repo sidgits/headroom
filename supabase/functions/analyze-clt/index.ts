@@ -104,12 +104,24 @@ Deno.serve(async (req) => {
       .lte("starts_at", end.toISOString())
       .order("starts_at");
 
+    // AI Load from the person's assessment (Q7) — high verification overhead makes
+    // fragmented / review-heavy days cost more and makes focus defense a priority.
+    const { data: profile } = await sb
+      .from("assessment_completions")
+      .select("result_data")
+      .ilike("email", e)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const aiMode = readAiMode(profile?.result_data);
+
     const days = groupByDay(events ?? [], tz);
     // Only days that actually have events get a score — an empty day must never
     // synthesise a load number.
     const analyses: DayAnalysis[] = days
       .filter((d) => d.events.length > 0)
-      .map((d) => analyzeDay(d.date, d.events, tz));
+      .map((d) => analyzeDay(d.date, d.events, tz, aiMode));
+
 
     // Clear stale rows in the window (e.g. a day whose events were removed) so
     // an empty day never keeps an old score.
