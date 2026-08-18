@@ -45,14 +45,14 @@ export const Route = createFileRoute("/")({
         }
       : {
           meta: [
-            { title: "Headroom — Cognitive Load Assessment" },
+            { title: "Headroom App — Cognitive Load & Burnout Assessment" },
             {
               name: "description",
               content:
-                "Find out what's really filling your head. Take the free Headroom cognitive load assessment and get your personal work profile.",
+                "Headroom App is a web app that measures cognitive load and burnout risk. Take the free assessment, get your Work Pattern archetype, then track Core, Toxic and Growth Load from your calendar.",
             },
             { property: "og:type", content: "website" },
-            { property: "og:title", content: "Headroom — Cognitive Load Assessment" },
+            { property: "og:title", content: "Headroom App — Cognitive Load & Burnout Assessment" },
             {
               property: "og:description",
               content: "Your brain has a capacity. Nobody told you what's filling it.",
