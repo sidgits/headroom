@@ -23,10 +23,12 @@ A fourth dimension shown next to Core Load, Toxic Load and Growth Load, scored 0
 | Both | Highest | Thinking and judging stack; the most exposed profile. |
 | Execute more | Low | AI absorbs production work; load stays in delivery volume, not judgment. |
 
-AI Load is reported as its own dimension only. It does **not** rewrite the existing archetype rules or burnout thresholds — those stay exactly as they are, so nobody's archetype changes. What it does add:
+**No new archetypes.** The existing eight stay exactly as they are — same classification rules, same names, same burnout thresholds. AI Load is blended into each existing archetype's narrative rather than sitting apart from it:
 
-- A one-line AI overlay on the archetype (e.g. an Accumulator with highest AI Load reads differently from one with low AI Load).
-- A burnout-risk nudge: when AI Load is high/highest **and** Growth Load is low, the results page adds an explicit "verification overhead with no capability payoff" warning line. Risk level itself is unchanged unless that combination fires, in which case moderate can escalate to high.
+- Each archetype gets AI-mode-specific lines woven into its mirror copy and dimension interpretations, so an Architect who mostly judges and interprets reads differently from an Architect who mostly executes — but both remain Architects.
+- The shadow archetype and "pattern you haven't noticed" paragraphs pick up the AI angle where relevant.
+- A burnout-risk nudge: when AI Load is high/highest **and** Growth Load is low, the results page adds an explicit "verification overhead with no capability payoff" warning line inside the existing risk block. Risk level is unchanged unless that combination fires, in which case moderate escalates to high.
+
 
 ## Free vs paid
 
