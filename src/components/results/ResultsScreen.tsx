@@ -185,10 +185,53 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 </div>
               )}
 
+              {result.aiLoad.drivers && result.aiLoad.drivers.length > 0 && (
+                <div className="pt-4 space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+                    What drove this — answer by answer
+                  </p>
+                  <ul className="space-y-3">
+                    {result.aiLoad.drivers.map((driver, index) => (
+                      <li
+                        key={`${driver.questionNumber}-${index}`}
+                        className="rounded-xl border border-border/50 bg-background/40 p-4 space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                            {driver.questionNumber > 0 ? `Question ${driver.questionNumber}` : "Combined answers"}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                              driver.weight === "primary"
+                                ? "bg-accent/10 text-accent border-accent/20"
+                                : driver.weight === "amplifier"
+                                  ? "bg-warm-red/10 text-warm-red border-warm-red/20"
+                                  : "bg-primary/10 text-primary border-primary/20"
+                            }`}
+                          >
+                            {driver.weight === "primary"
+                              ? "Sets your score"
+                              : driver.weight === "amplifier"
+                                ? "Raises your load"
+                                : "Protects you"}
+                          </span>
+                        </div>
+                        <p className="text-[13px] text-muted-foreground leading-snug">{driver.question}</p>
+                        <p className="text-[14px] font-semibold text-foreground leading-snug">
+                          &ldquo;{driver.answer}&rdquo;
+                        </p>
+                        <p className="text-[14px] text-muted-foreground leading-relaxed">{driver.effect}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <p className="text-xs text-muted-foreground pt-1">
                 AI Load is the fourth dimension in your profile. The exact score — and how it changes the way your
                 calendar should be defended — sits in your dashboard.
               </p>
+
 
             </div>
           )}
