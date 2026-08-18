@@ -1,3 +1,5 @@
+import { quizQuestions } from "@/data/quizQuestions";
+
 // Headroom Scoring Engine — deterministic, no AI
 // Based on Sweller's Cognitive Load Theory
 // Three dimensions: Friction (E), Complexity (I), Growth (G)
