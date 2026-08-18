@@ -12,7 +12,7 @@ export interface ScoringResult {
   recommendations: string[];
   mirror: MirrorContent;
   shadowArchetype: ShadowArchetype;
-  aiLoad?: { mode: "think" | "judge" | "both" | "execute"; score: number; band: string; meaning: string };
+  aiLoad?: { mode: "think" | "judge" | "both" | "execute"; score: number; band: string; meaning: string; split?: AiLoadSplit };
 }
 
 export interface Archetype {
@@ -373,13 +373,32 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
 // archetypes — AI Load blends into the existing archetype narrative.
 export type AiMode = "think" | "judge" | "both" | "execute";
 
-const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; meaning: string; overlay: string }> = {
+export interface AiLoadSplit {
+  toxic: number;
+  core: number;
+  growth: number;
+  toxicWhy: string;
+  coreWhy: string;
+  growthWhy: string;
+  summary: string;
+}
+
+const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; meaning: string; overlay: string; split: AiLoadSplit }> = {
   A: {
     mode: "think",
     score: 6,
     band: "Moderate",
     meaning: "AI expands the problem space. Your load shifts from producing to framing and choosing.",
     overlay: "AI has widened what you consider possible in a day — which means more of your energy now goes into deciding what deserves attention, not doing it.",
+    split: {
+      toxic: 25,
+      core: 45,
+      growth: 30,
+      toxicWhy: "Context switching between prompting and your own train of thought.",
+      coreWhy: "A wider option space means the problem itself is genuinely harder to hold.",
+      growthWhy: "Framing better questions is a durable skill — this part pays you back.",
+      summary: "Your AI Load is mostly Core: the work got deeper, not just noisier.",
+    },
   },
   B: {
     mode: "judge",
@@ -387,6 +406,15 @@ const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; mean
     band: "High",
     meaning: "Verification and trust overhead. Checking AI output is the heaviest AI pattern for depletion.",
     overlay: "Most of your AI time is spent verifying, correcting and deciding whether to trust output. That is invisible work, and it is the AI pattern most strongly linked to depletion.",
+    split: {
+      toxic: 60,
+      core: 30,
+      growth: 10,
+      toxicWhy: "Re-reading, fact-checking and correcting output adds effort that produces nothing new.",
+      coreWhy: "Some judgment is the real work — deciding what 'good' looks like here.",
+      growthWhy: "Little capability accrues from checking someone else's draft over and over.",
+      summary: "Your AI Load is mostly Toxic: verification overhead is why your score rose.",
+    },
   },
   C: {
     mode: "both",
@@ -394,6 +422,15 @@ const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; mean
     band: "Highest",
     meaning: "Thinking and judging stack. This is the most exposed AI pattern in the Headroom system.",
     overlay: "You carry both AI costs at once: a wider problem space to think through and constant verification of what comes back. Nothing about that shows up on your calendar.",
+    split: {
+      toxic: 50,
+      core: 35,
+      growth: 15,
+      toxicWhy: "Verification stacks on top of constant reframing — two overheads at once.",
+      coreWhy: "The problems you take on are genuinely larger than before.",
+      growthWhy: "Real learning happens, but it's crowded out by the checking cycle.",
+      summary: "Your AI Load stacks Toxic on Core, which is why it's the highest band.",
+    },
   },
   D: {
     mode: "execute",
@@ -401,8 +438,18 @@ const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; mean
     band: "Low",
     meaning: "AI absorbs production work. Your load sits in delivery volume, not judgment.",
     overlay: "AI is mostly taking work off your hands rather than adding judgment. Your risk is volume creep — more shipped, with the same hours.",
+    split: {
+      toxic: 30,
+      core: 20,
+      growth: 50,
+      toxicWhy: "Volume creep: more output to shepherd, review and ship.",
+      coreWhy: "The underlying thinking is largely unchanged.",
+      growthWhy: "Offloaded production frees capacity you can spend on capability.",
+      summary: "Your AI Load is low and mostly Growth-flavored — the gain is real, protect it.",
+    },
   },
 };
+
 
 const DEFAULT_AI = AI_MODES["A"]!;
 
@@ -516,7 +563,7 @@ export function calculateResults(
     archetype,
     burnoutRisk,
     dimensionScores,
-    aiLoad: { mode: ai.mode, score: ai.score, band: ai.band, meaning: ai.meaning },
+    aiLoad: { mode: ai.mode, score: ai.score, band: ai.band, meaning: ai.meaning, split: ai.split },
     recommendations: [archetypeData.unlock],
     mirror,
     shadowArchetype: archetypeData.shadow,
