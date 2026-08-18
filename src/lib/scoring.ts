@@ -390,6 +390,15 @@ export interface AiLoadSplit {
   summary: string;
 }
 
+export interface AiLoadDriver {
+  questionNumber: number;
+  question: string;
+  answer: string;
+  weight: "primary" | "amplifier" | "buffer";
+  effect: string;
+}
+
+
 const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; meaning: string; overlay: string; split: AiLoadSplit }> = {
   A: {
     mode: "think",
