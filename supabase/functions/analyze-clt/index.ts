@@ -293,19 +293,30 @@ function analyzeDay(date: string, events: EventRow[], tz: string, aiMode: AiMode
       candidates.push({ weight: 6, category: "extraneous", action: "chunk",
         tip: "Over two hours with other people — attention decays after about 50 minutes; split it or add a break." });
     }
+    // Review / verification blocks land harder when AI already has you judging all day.
+    if (aiHeavy && !unnamed && REVIEW.test(ev.title) && dur >= 30) {
+      evExtraneous += 3;
+      candidates.push({ weight: 7, category: "extraneous", action: "chunk",
+        tip: "Another judgment block on top of your AI verification load — batch reviews into one window instead of spreading them." });
+    }
 
     // Germane: protected long focus blocks. If the block has no title we say so
     // rather than asserting deep work the calendar never claimed.
     if (isFocus) {
       evGermane += unnamed ? 4 : 6;
       protectedBlocks.push(ev);
-      candidates.push({ weight: 1, category: "germane", action: "preserve",
+      candidates.push({ weight: aiHeavy ? 9 : 1, category: "germane", action: "preserve",
         tip: unnamed
           ? `${Math.round(dur)}-minute block with no title — if this is focus time, keep it clear and I'll defend it.`
-          : "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
+          : aiHeavy
+            ? "Deep-work block — this is your only unverified thinking time today. Protect it hard: no notifications, no overlaps."
+            : "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
     } else if (complex && dur >= 45 && ev.attendee_count <= 3) {
       evGermane += 3;
     }
+
+    evExtraneous *= aiFactor;
+
 
     extraneous += evExtraneous;
     germane += evGermane;
