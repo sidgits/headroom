@@ -23,6 +23,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import NotFound from "@/pages/NotFound";
+import Footer from "@/components/Footer";
 import appCss from "../styles.css?url";
 
 const SIGNIN_LOG_KEY = "signin_logged_session";
