@@ -45,14 +45,14 @@ export const Route = createFileRoute("/")({
         }
       : {
           meta: [
-            { title: "Headroom — Cognitive Load Assessment" },
+            { title: "Headroom App — Cognitive Load & Burnout Assessment" },
             {
               name: "description",
               content:
-                "Find out what's really filling your head. Take the free Headroom cognitive load assessment and get your personal work profile.",
+                "Headroom App is a web app that measures cognitive load and burnout risk. Take the free assessment, get your Work Pattern archetype, then track Core, Toxic and Growth Load from your calendar.",
             },
             { property: "og:type", content: "website" },
-            { property: "og:title", content: "Headroom — Cognitive Load Assessment" },
+            { property: "og:title", content: "Headroom App — Cognitive Load & Burnout Assessment" },
             {
               property: "og:description",
               content: "Your brain has a capacity. Nobody told you what's filling it.",
@@ -63,6 +63,24 @@ export const Route = createFileRoute("/")({
             { name: "twitter:image", content: "https://headroomapp.co/og-image.png" },
           ],
           links: [{ rel: "canonical", href: "https://headroomapp.co/" }],
+          scripts: [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                name: "Headroom App",
+                alternateName: "Headroom",
+                url: "https://headroomapp.co/",
+                applicationCategory: "BusinessApplication",
+                operatingSystem: "Web browser (any device)",
+                description:
+                  "Headroom App measures cognitive load and burnout risk. A short assessment reveals your Work Pattern archetype, then calendar analysis tracks Core Load, Toxic Load and Growth Load with AI coaching.",
+                offers: { "@type": "Offer", price: "9", priceCurrency: "USD" },
+                publisher: { "@id": "https://headroomapp.co/#organization" },
+              }),
+            },
+          ],
         },
   component: HomeRoute,
 });

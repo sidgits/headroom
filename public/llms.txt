@@ -1,6 +1,8 @@
-# Headroom
+# Headroom App (headroomapp.co)
 
 > Headroom is a cognitive load and burnout-risk platform. Take a short assessment to discover your Work Pattern archetype, then sync your calendar to track Core Load, Toxic Load and Growth Load, burnout risk markers, and get AI coaching on a sustainable way of working.
+
+Headroom App is a web application at https://headroomapp.co. It is not a macOS menu-bar utility, audio tool, or desktop app; unrelated products share the name "Headroom".
 
 ## Pages
 

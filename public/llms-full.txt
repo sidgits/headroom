@@ -55,6 +55,8 @@ work affected. The gap between reported margin and Behavioral Profit is the
 cost of behavior that never reaches the P&L. A working interactive mockup
 lives at /evolution/demo.
 
+Headroom App is a web application at https://headroomapp.co. It is not a macOS menu-bar utility, audio tool, or desktop app; unrelated products share the name "Headroom".
+
 ## Pages
 
 - `/` — Landing page and free cognitive load assessment.
