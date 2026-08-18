@@ -22,26 +22,37 @@ export const Route = createFileRoute("/")({
     loaderData?.behavos
       ? {
           meta: [
-            { title: "The Behavioral Equation of Profit — Margin and Burnout Are One Problem" },
+            { title: "Behavioral OS by Headroom — Early Warning for Delivery Margin" },
             {
               name: "description",
               content:
-                "In services firms, margin erosion and people burnout are managed as two problems by two functions. One causes the other. The Behavioral OS turns that lagging indicator into a 90-day early warning.",
+                "Behavioral OS is Headroom's organizational layer: it reads delivery behavior — fragmentation, shadow labor, drag — and turns margin erosion into a 90-day early warning instead of a quarter-end surprise.",
             },
             { property: "og:type", content: "website" },
             {
               property: "og:title",
-              content: "The Behavioral Equation of Profit — why margin and burnout are one problem",
+              content: "Behavioral OS by Headroom — early warning for delivery margin",
             },
             {
               property: "og:description",
               content:
-                "Profit doesn't erode randomly — it erodes behaviorally. The thesis, the equation and the worked example behind a 90-day early warning for services delivery.",
+                "The organizational layer of Headroom: read delivery behavior and see margin risk 90 days before it lands in the P&L.",
             },
+            { property: "og:url", content: "https://headroomapp.co/evolution" },
             { property: "og:image", content: "https://headroomapp.co/og-image.png" },
             { name: "twitter:card", content: "summary_large_image" },
+            {
+              name: "twitter:title",
+              content: "Behavioral OS by Headroom — early warning for delivery margin",
+            },
+            {
+              name: "twitter:description",
+              content:
+                "Read delivery behavior and see margin risk 90 days before it lands in the P&L.",
+            },
             { name: "twitter:image", content: "https://headroomapp.co/og-image.png" },
           ],
+          links: [{ rel: "canonical", href: "https://headroomapp.co/evolution" }],
         }
       : {
           meta: [
