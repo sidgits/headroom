@@ -12,7 +12,14 @@ export interface ScoringResult {
   recommendations: string[];
   mirror: MirrorContent;
   shadowArchetype: ShadowArchetype;
-  aiLoad?: { mode: "think" | "judge" | "both" | "execute"; score: number; band: string; meaning: string; split?: AiLoadSplit };
+  aiLoad?: {
+    mode: "think" | "judge" | "both" | "execute";
+    score: number;
+    band: string;
+    meaning: string;
+    split?: AiLoadSplit;
+    drivers?: AiLoadDriver[];
+  };
 }
 
 export interface Archetype {
