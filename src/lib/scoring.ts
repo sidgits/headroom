@@ -563,7 +563,7 @@ export function calculateResults(
     archetype,
     burnoutRisk,
     dimensionScores,
-    aiLoad: { mode: ai.mode, score: ai.score, band: ai.band, meaning: ai.meaning },
+    aiLoad: { mode: ai.mode, score: ai.score, band: ai.band, meaning: ai.meaning, split: ai.split },
     recommendations: [archetypeData.unlock],
     mirror,
     shadowArchetype: archetypeData.shadow,
