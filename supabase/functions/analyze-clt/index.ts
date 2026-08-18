@@ -381,6 +381,8 @@ function analyzeDay(date: string, events: EventRow[], tz: string, aiMode: AiMode
   if (events.length >= 3 && longestGap < 90) recs.push("The day is fragmented — no 90-min window survives. Consolidate meetings to open one.");
   if (intrinsic > 50 && germane < 15) recs.push("High-complexity day with no deep-work block — carve out 90 min.");
   if (score >= 70) recs.push("Overload risk. Move one meeting to tomorrow or convert it to async.");
+  if (aiHeavy && germane < 15) recs.push("Your AI Load is high — verification all day with no protected thinking block. Claim 90 minutes with AI closed.");
+
 
   const label = score >= 70 ? "Overload risk"
     : score >= 50 ? "Heavy day"
