@@ -70,7 +70,19 @@ export const quizQuestions: QuizQuestionData[] = [
       { id: "D", text: "I'm not sure what would make work feel genuinely fulfilling" },
     ],
   },
+  {
+
+    id: 7,
+    question: "How does AI impact your work?",
+    answers: [
+      { id: "A", text: "Makes me think more" },
+      { id: "B", text: "Makes me judge and interpret more" },
+      { id: "C", text: "Both of the above" },
+      { id: "D", text: "Makes me execute more" },
+    ],
+  },
 ];
+
 
 export const roles = [
   { id: "builder", label: "Builder / Maker", description: "Code, design, craft" },

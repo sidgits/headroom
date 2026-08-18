@@ -104,12 +104,24 @@ Deno.serve(async (req) => {
       .lte("starts_at", end.toISOString())
       .order("starts_at");
 
+    // AI Load from the person's assessment (Q7) — high verification overhead makes
+    // fragmented / review-heavy days cost more and makes focus defense a priority.
+    const { data: profile } = await sb
+      .from("assessment_completions")
+      .select("result_data")
+      .ilike("email", e)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const aiMode = readAiMode(profile?.result_data);
+
     const days = groupByDay(events ?? [], tz);
     // Only days that actually have events get a score — an empty day must never
     // synthesise a load number.
     const analyses: DayAnalysis[] = days
       .filter((d) => d.events.length > 0)
-      .map((d) => analyzeDay(d.date, d.events, tz));
+      .map((d) => analyzeDay(d.date, d.events, tz, aiMode));
+
 
     // Clear stale rows in the window (e.g. a day whose events were removed) so
     // an empty day never keeps an old score.
@@ -200,15 +212,31 @@ function timeLabel(iso: string, tz: string) {
   });
 }
 
-function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
+type AiMode = "think" | "judge" | "both" | "execute" | null;
+
+/** Reads the AI Load answer (Q7) out of a stored assessment result. */
+function readAiMode(resultData: unknown): AiMode {
+  const rd = resultData as { aiLoad?: { mode?: string } } | null | undefined;
+  const m = rd?.aiLoad?.mode;
+  return m === "think" || m === "judge" || m === "both" || m === "execute" ? m : null;
+}
+
+function analyzeDay(date: string, events: EventRow[], tz: string, aiMode: AiMode = null): DayAnalysis {
   let intrinsic = 0, extraneous = 0, germane = 0;
   const tips: BlockTip[] = [];
 
+  // High AI Load = constant verification and interpretation. Fragmented, back-to-back
+  // and review-type blocks cost more for these people, and defending focus matters more.
+  const aiHeavy = aiMode === "judge" || aiMode === "both";
+  const aiFactor = aiMode === "both" ? 1.2 : aiMode === "judge" ? 1.12 : 1;
+
   const COMPLEX = /(strategy|design|review|interview|planning|kickoff|architecture|deep|writing|research|presentation|board|roadmap)/i;
   const ROUTINE = /(standup|sync|catch[- ]?up|check[- ]?in|1[:-]1|status|update)/i;
+  const REVIEW = /(review|feedback|approval|qa|audit|proofread|edit|sign[- ]?off)/i;
 
   const protectedBlocks: EventRow[] = [];
   const draft: { ev: EventRow; load: number; risk: BlockTip["risk"]; tip: BlockTip | null }[] = [];
+
 
   for (let i = 0; i < events.length; i++) {
     const ev = events[i];
@@ -265,19 +293,30 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
       candidates.push({ weight: 6, category: "extraneous", action: "chunk",
         tip: "Over two hours with other people — attention decays after about 50 minutes; split it or add a break." });
     }
+    // Review / verification blocks land harder when AI already has you judging all day.
+    if (aiHeavy && !unnamed && REVIEW.test(ev.title) && dur >= 30) {
+      evExtraneous += 3;
+      candidates.push({ weight: 7, category: "extraneous", action: "chunk",
+        tip: "Another judgment block on top of your AI verification load — batch reviews into one window instead of spreading them." });
+    }
 
     // Germane: protected long focus blocks. If the block has no title we say so
     // rather than asserting deep work the calendar never claimed.
     if (isFocus) {
       evGermane += unnamed ? 4 : 6;
       protectedBlocks.push(ev);
-      candidates.push({ weight: 1, category: "germane", action: "preserve",
+      candidates.push({ weight: aiHeavy ? 9 : 1, category: "germane", action: "preserve",
         tip: unnamed
           ? `${Math.round(dur)}-minute block with no title — if this is focus time, keep it clear and I'll defend it.`
-          : "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
+          : aiHeavy
+            ? "Deep-work block — this is your only unverified thinking time today. Protect it hard: no notifications, no overlaps."
+            : "Deep-work block — protect it; turn off notifications and don't accept overlaps." });
     } else if (complex && dur >= 45 && ev.attendee_count <= 3) {
       evGermane += 3;
     }
+
+    evExtraneous *= aiFactor;
+
 
     extraneous += evExtraneous;
     germane += evGermane;
@@ -313,10 +352,11 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   const longestGap = largestFreeWindow(events, tz);
   const bookedMinutes = events.reduce((s, ev) => s + durationMin(ev), 0);
   if (events.length >= 3 && longestGap < 90) {
-    extraneous += events.length >= 5 ? 14 : 9;
+    extraneous += (events.length >= 5 ? 14 : 9) * aiFactor;
   } else if (events.length >= 4 && longestGap < 120) {
-    extraneous += 6;
+    extraneous += 6 * aiFactor;
   }
+
   // A genuinely light day cannot register heavy friction. Under four booked
   // hours with a real open window, Toxic Load is damped toward the truth.
   if (bookedMinutes < 240 && longestGap >= 90) extraneous = extraneous * 0.5;
@@ -341,6 +381,8 @@ function analyzeDay(date: string, events: EventRow[], tz: string): DayAnalysis {
   if (events.length >= 3 && longestGap < 90) recs.push("The day is fragmented — no 90-min window survives. Consolidate meetings to open one.");
   if (intrinsic > 50 && germane < 15) recs.push("High-complexity day with no deep-work block — carve out 90 min.");
   if (score >= 70) recs.push("Overload risk. Move one meeting to tomorrow or convert it to async.");
+  if (aiHeavy && germane < 15) recs.push("Your AI Load is high — verification all day with no protected thinking block. Claim 90 minutes with AI closed.");
+
 
   const label = score >= 70 ? "Overload risk"
     : score >= 50 ? "Heavy day"

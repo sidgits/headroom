@@ -141,7 +141,7 @@ export async function generateResultsPDF(result: ScoringResult, role: string): P
       const pct = (dim.score / dim.maxScore) * 100;
 
       doc.setFont("helvetica", "bold");
-      const cogLoadLabel = dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : "Growth Cognitive Load";
+      const cogLoadLabel = dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : dim.code === "A" ? "AI Cognitive Load" : "Growth Cognitive Load";
       doc.setFontSize(10);
       doc.setTextColor(...dark);
       doc.setFont("helvetica", "bold");

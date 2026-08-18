@@ -145,6 +145,25 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
             </div>
           )}
 
+          {result.aiLoad && (
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-accent">
+                  Your AI Load
+                </h3>
+                <span className="text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-accent/10 text-accent border border-accent/20">
+                  {result.aiLoad.band}
+                </span>
+              </div>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{result.aiLoad.meaning}</p>
+              <p className="text-xs text-muted-foreground pt-1">
+                AI Load is the fourth dimension in your profile. The exact score — and how it changes the way your
+                calendar should be defended — sits in your dashboard.
+              </p>
+            </div>
+          )}
+
+
           {burnoutRisk && (
             <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
               <h3 className="text-sm font-bold uppercase tracking-wider text-warm-red">
@@ -192,7 +211,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                     </span>
                   </div>
                   <p className="text-xs italic text-muted-foreground -mt-1">
-                    {dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : "Growth Cognitive Load"}
+                    {dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : dim.code === "A" ? "AI Cognitive Load" : "Growth Cognitive Load"}
                   </p>
                   <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
                     <motion.div
@@ -229,7 +248,7 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
 
               <ul className="space-y-2.5">
                 {[
-                  { t: "Your three load scores", d: "Toxic, Core and Growth load — measured, not guessed." },
+                  { t: "Your four load scores", d: "Toxic, Core, Growth and AI Load — measured, not guessed." },
                   { t: "Calendar load analysis", d: "Upload your calendar and see which days will break you." },
                   { t: "Tracking over time", d: "Check in daily and watch your pattern shift." },
                   { t: "Your AI burnout coach", d: "Grounded in your actual scores, available anytime." },
