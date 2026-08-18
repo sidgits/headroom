@@ -126,8 +126,13 @@ Deno.serve(async (req) => {
     // Clear stale rows in the window (e.g. a day whose events were removed) so
     // an empty day never keeps an old score.
     const keep = analyses.map((a) => a.date);
+    // Only clean up the span the current event set actually covers. Days older
+    // than the earliest event we hold were scored from calendars we no longer
+    // re-fetch (live syncs cover this week + next), so their history stays.
+    const earliest = (events ?? [])[0]?.starts_at;
+    const delFrom = earliest ? tzDateKey(earliest, tz) : tzDateKey(from, tz);
     let del = sb.from("clt_analyses").delete().ilike("email", e)
-      .gte("analysis_date", tzDateKey(from, tz))
+      .gte("analysis_date", delFrom)
       .lte("analysis_date", tzDateKey(end, tz));
     if (keep.length) del = del.not("analysis_date", "in", `(${keep.join(",")})`);
     await del;
