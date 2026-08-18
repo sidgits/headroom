@@ -145,6 +145,25 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
             </div>
           )}
 
+          {result.aiLoad && (
+            <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-accent">
+                  Your AI Load
+                </h3>
+                <span className="text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-accent/10 text-accent border border-accent/20">
+                  {result.aiLoad.band}
+                </span>
+              </div>
+              <p className="text-muted-foreground leading-relaxed text-[15px]">{result.aiLoad.meaning}</p>
+              <p className="text-xs text-muted-foreground pt-1">
+                AI Load is the fourth dimension in your profile. The exact score — and how it changes the way your
+                calendar should be defended — sits in your dashboard.
+              </p>
+            </div>
+          )}
+
+
           {burnoutRisk && (
             <div className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-2">
               <h3 className="text-sm font-bold uppercase tracking-wider text-warm-red">
