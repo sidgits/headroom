@@ -448,7 +448,27 @@ export function calculateResults(
     description: "", // Not used — mirror paragraphs replace this
   };
 
-  const burnoutRisk = getBurnoutRiskFromScores(archetypeId, E, I, G, sprinterAnswer);
+  const ai = (answers[7] && AI_MODES[answers[7]]) || DEFAULT_AI;
+
+  let burnoutRisk = getBurnoutRiskFromScores(archetypeId, E, I, G, sprinterAnswer);
+
+  // AI Load nudge — high verification overhead with no capability payoff.
+  const aiHeavy = ai.mode === "judge" || ai.mode === "both";
+  if (aiHeavy && G <= 4) {
+    burnoutRisk = {
+      ...burnoutRisk,
+      level: burnoutRisk.level === "high" ? "high" : "high",
+      label: burnoutRisk.level === "high" ? burnoutRisk.label : "High — Verification Overhead",
+      description: `${burnoutRisk.description} On top of that: your AI Load is ${ai.band.toLowerCase()} while your Growth Load is low. That combination — constant judgment and verification with no capability payoff — is the fastest-moving depletion pattern we track.`,
+      earlyIntervention: `${burnoutRisk.earlyIntervention} Add one rule this week: pick a single category of AI output you stop double-checking, and one block where you don't use AI at all.`,
+    };
+  }
+
+  // Blend the AI reading into the existing archetype narrative — no new archetypes.
+  const mirror: MirrorContent = {
+    ...archetypeData.mirror,
+    patternNotNoticed: `${archetypeData.mirror.patternNotNoticed} ${ai.overlay}`,
+  };
 
   const dimensionScores: DimensionScore[] = [
     {
@@ -475,6 +495,14 @@ export function calculateResults(
       maxScore: 10,
       interpretation: archetypeData.dimensionInterpretations["G"]!(G),
     },
+    {
+      name: "AI Load",
+      code: "A",
+      plainLanguage: "How much AI is adding to your thinking and judgment",
+      score: ai.score,
+      maxScore: 10,
+      interpretation: aiInterpretation(archetypeData.name, ai.band, ai.score, ai.mode),
+    },
   ];
 
   const totalScore = rawE + rawI + rawG;
@@ -487,8 +515,10 @@ export function calculateResults(
     archetype,
     burnoutRisk,
     dimensionScores,
+    aiLoad: { mode: ai.mode, score: ai.score, band: ai.band, meaning: ai.meaning },
     recommendations: [archetypeData.unlock],
-    mirror: archetypeData.mirror,
+    mirror,
     shadowArchetype: archetypeData.shadow,
+
   };
 }
