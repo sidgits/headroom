@@ -156,10 +156,40 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
                 </span>
               </div>
               <p className="text-muted-foreground leading-relaxed text-[15px]">{result.aiLoad.meaning}</p>
+
+              {result.aiLoad.split && (
+                <div className="pt-3 space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+                    Where this load actually lands
+                  </p>
+                  <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="bg-warm-red" style={{ width: `${result.aiLoad.split.toxic}%` }} />
+                    <div className="bg-primary" style={{ width: `${result.aiLoad.split.core}%` }} />
+                    <div className="bg-accent" style={{ width: `${result.aiLoad.split.growth}%` }} />
+                  </div>
+                  <ul className="space-y-2">
+                    <li className="text-[14px] leading-relaxed">
+                      <span className="font-semibold text-warm-red">Toxic Load · {result.aiLoad.split.toxic}%</span>
+                      <span className="text-muted-foreground"> — {result.aiLoad.split.toxicWhy}</span>
+                    </li>
+                    <li className="text-[14px] leading-relaxed">
+                      <span className="font-semibold text-primary">Core Load · {result.aiLoad.split.core}%</span>
+                      <span className="text-muted-foreground"> — {result.aiLoad.split.coreWhy}</span>
+                    </li>
+                    <li className="text-[14px] leading-relaxed">
+                      <span className="font-semibold text-accent">Growth Load · {result.aiLoad.split.growth}%</span>
+                      <span className="text-muted-foreground"> — {result.aiLoad.split.growthWhy}</span>
+                    </li>
+                  </ul>
+                  <p className="text-[14px] text-foreground/80 leading-relaxed">{result.aiLoad.split.summary}</p>
+                </div>
+              )}
+
               <p className="text-xs text-muted-foreground pt-1">
                 AI Load is the fourth dimension in your profile. The exact score — and how it changes the way your
                 calendar should be defended — sits in your dashboard.
               </p>
+
             </div>
           )}
 
