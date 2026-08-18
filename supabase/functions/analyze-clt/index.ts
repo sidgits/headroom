@@ -352,10 +352,11 @@ function analyzeDay(date: string, events: EventRow[], tz: string, aiMode: AiMode
   const longestGap = largestFreeWindow(events, tz);
   const bookedMinutes = events.reduce((s, ev) => s + durationMin(ev), 0);
   if (events.length >= 3 && longestGap < 90) {
-    extraneous += events.length >= 5 ? 14 : 9;
+    extraneous += (events.length >= 5 ? 14 : 9) * aiFactor;
   } else if (events.length >= 4 && longestGap < 120) {
-    extraneous += 6;
+    extraneous += 6 * aiFactor;
   }
+
   // A genuinely light day cannot register heavy friction. Under four booked
   // hours with a real open window, Toxic Load is damped toward the truth.
   if (bookedMinutes < 240 && longestGap >= 90) extraneous = extraneous * 0.5;
