@@ -141,9 +141,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Headroom",
+          name: "Headroom App",
+          alternateName: ["Headroom", "headroomapp.co"],
           url: "https://headroomapp.co/",
-          description: "Your brain has a capacity. Nobody told you what's filling it!",
+          description:
+            "Headroom App is a web-based cognitive load and burnout-risk platform: a short assessment reveals your Work Pattern archetype, then calendar analysis tracks Core, Toxic and Growth Load.",
+          publisher: { "@id": "https://headroomapp.co/#organization" },
         }),
       },
       {
@@ -151,9 +154,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Headroom",
+          "@id": "https://headroomapp.co/#organization",
+          name: "Headroom App",
+          alternateName: "Headroom",
           url: "https://headroomapp.co/",
           logo: "https://headroomapp.co/headroom-logo.png",
+          description:
+            "Maker of Headroom App, a web app for measuring cognitive load and burnout risk from assessments and calendar data. Unrelated to any macOS utility of a similar name.",
         }),
       },
     ],
