@@ -34,8 +34,15 @@ Deno.serve(async (req) => {
     let totalEvents = 0;
     const errors: string[] = [];
     for (const conn of conns) {
-      // Clear existing future events
-      const { error: deleteError } = await sb.from("calendar_events").delete().eq("connection_id", conn.id);
+      // Clear only the events this sync will actually re-fetch. Live provider
+      // syncs cover this week + next week, so anything older must be kept —
+      // it is the person's longitudinal history.
+      let del = sb.from("calendar_events").delete().eq("connection_id", conn.id);
+      if (conn.provider === "google") {
+        const { start, end } = liveWindow(tz);
+        del = del.gte("starts_at", start.toISOString()).lt("starts_at", end.toISOString());
+      }
+      const { error: deleteError } = await del;
       if (deleteError) throw deleteError;
       let events = 0;
       if (conn.provider === "google") events = await syncGoogle(sb, conn, errors, tz);
