@@ -492,7 +492,6 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
-      <Footer />
 
       <AnimatePresence>
         {showCheckoutSuccess && (
@@ -556,7 +555,6 @@ function NoAssessmentGate() {
           </Link>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

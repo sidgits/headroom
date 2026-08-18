@@ -77,6 +77,7 @@ function RootComponent() {
           <main>
             <Outlet />
           </main>
+          <Footer />
         </TooltipProvider>
     </QueryClientProvider>
   );
