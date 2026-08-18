@@ -366,10 +366,60 @@ const ARCHETYPES: Record<string, ArchetypeData> = {
   },
 };
 
+// ── AI Load (fourth dimension) ────────────────────────────────────────────────
+// Scored from Q7 alone, deliberately OUTSIDE the E/I/G scoring matrix so the
+// existing archetype classification and burnout rules are untouched. No new
+// archetypes — AI Load blends into the existing archetype narrative.
+export type AiMode = "think" | "judge" | "both" | "execute";
+
+const AI_MODES: Record<string, { mode: AiMode; score: number; band: string; meaning: string; overlay: string }> = {
+  A: {
+    mode: "think",
+    score: 6,
+    band: "Moderate",
+    meaning: "AI expands the problem space. Your load shifts from producing to framing and choosing.",
+    overlay: "AI has widened what you consider possible in a day — which means more of your energy now goes into deciding what deserves attention, not doing it.",
+  },
+  B: {
+    mode: "judge",
+    score: 8,
+    band: "High",
+    meaning: "Verification and trust overhead. Checking AI output is the heaviest AI pattern for depletion.",
+    overlay: "Most of your AI time is spent verifying, correcting and deciding whether to trust output. That is invisible work, and it is the AI pattern most strongly linked to depletion.",
+  },
+  C: {
+    mode: "both",
+    score: 9.5,
+    band: "Highest",
+    meaning: "Thinking and judging stack. This is the most exposed AI pattern in the Headroom system.",
+    overlay: "You carry both AI costs at once: a wider problem space to think through and constant verification of what comes back. Nothing about that shows up on your calendar.",
+  },
+  D: {
+    mode: "execute",
+    score: 3.5,
+    band: "Low",
+    meaning: "AI absorbs production work. Your load sits in delivery volume, not judgment.",
+    overlay: "AI is mostly taking work off your hands rather than adding judgment. Your risk is volume creep — more shipped, with the same hours.",
+  },
+};
+
+const DEFAULT_AI = AI_MODES["A"]!;
+
+function aiInterpretation(archetypeName: string, band: string, score: number, mode: AiMode): string {
+  const perArchetype: Record<AiMode, string> = {
+    think: `AI is enlarging the ${archetypeName}'s decision surface faster than it shrinks the workload.`,
+    judge: `For the ${archetypeName}, verification overhead lands squarely on the attention you need most.`,
+    both: `The ${archetypeName} is carrying both AI costs at once — framing and verifying — with no calendar trace.`,
+    execute: `AI mostly speeds up delivery for the ${archetypeName}. Watch for scope quietly expanding to fill the gain.`,
+  };
+  return `${band} — ${score}/10: ${perArchetype[mode]}`;
+}
+
 export function calculateResults(
   answers: Record<number, string>,
   sprinterAnswer: string | null
 ): ScoringResult {
+
   // Calculate raw E, I, G scores
   let rawE = 0, rawI = 0, rawG = 0;
   for (let q = 1; q <= 6; q++) {
