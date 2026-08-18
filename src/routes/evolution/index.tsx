@@ -5,33 +5,33 @@ export const Route = createFileRoute("/evolution/")({
   component: Evolution,
   head: () => ({
     meta: [
-      { title: "The Behavioral Equation of Profit — Margin and Burnout Are One Problem" },
+      { title: "Headroom - How your work is impacting your brain - find out" },
       {
         name: "description",
         content:
-          "In services firms, margin erosion and people burnout are managed as two problems by two functions. One causes the other. The Behavioral OS turns that lagging indicator into a 90-day early warning.",
+          "Check your cognitive load and burnout risk by integrating your calendar",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://headroomapp.co/evolution" },
       {
         property: "og:title",
-        content: "The Behavioral Equation of Profit — why margin and burnout are one problem",
+        content: "Headroom - How your work is impacting your brain - find out",
       },
       {
         property: "og:description",
         content:
-          "Profit doesn't erode randomly — it erodes behaviorally. The thesis, the equation and the worked example behind a 90-day early warning for services delivery.",
+          "Check your cognitive load and burnout risk by integrating your calendar",
       },
       { property: "og:image", content: "https://headroomapp.co/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "The Behavioral Equation of Profit — why margin and burnout are one problem",
+        content: "Headroom - How your work is impacting your brain - find out",
       },
       {
         name: "twitter:description",
         content:
-          "Profit doesn't erode randomly — it erodes behaviorally. The thesis behind a 90-day early warning for services delivery.",
+          "Check your cognitive load and burnout risk by integrating your calendar",
       },
       { name: "twitter:image", content: "https://headroomapp.co/og-image.png" },
     ],
