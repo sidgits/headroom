@@ -8,7 +8,7 @@ import ShareButtons from "@/components/dashboard/ShareButtons";
 import CalendarSection from "@/components/dashboard/CalendarSection";
 import CoachSection from "@/components/dashboard/CoachSection";
 import DashboardLoading from "@/components/dashboard/DashboardLoading";
-import Footer from "@/components/Footer";
+
 import { burnoutLevelStyles, getArchetypeMeta } from "@/lib/archetypeProfile";
 import { buildResultFromMeta } from "@/lib/buildResultFromMeta";
 import { generateResultsPDF } from "@/lib/generatePDF";
