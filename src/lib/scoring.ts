@@ -458,7 +458,7 @@ export function calculateResults(
   if (aiHeavy && G <= 4) {
     burnoutRisk = {
       ...burnoutRisk,
-      level: burnoutRisk.level === "high" ? "high" : "high",
+      level: "high",
       label: burnoutRisk.level === "high" ? burnoutRisk.label : "High — Verification Overhead",
       description: `${burnoutRisk.description} On top of that: your AI Load is ${ai.band.toLowerCase()} while your Growth Load is low. That combination — constant judgment and verification with no capability payoff — is the fastest-moving depletion pattern we track.`,
       earlyIntervention: `${burnoutRisk.earlyIntervention} Add one rule this week: pick a single category of AI output you stop double-checking, and one block where you don't use AI at all.`,
