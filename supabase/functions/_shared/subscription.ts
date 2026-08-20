@@ -52,6 +52,8 @@ export async function hasPaidAccess(
   email: string,
   reviewCode?: unknown,
 ): Promise<boolean> {
+  // TEMPORARY: paywall disabled — all visitors get calendar insights + coach.
+  if (PAYWALL_DISABLED) return true;
   if (isReviewAccess(reviewCode)) return true;
   return await isActiveSubscriber(supabase, email);
 }
