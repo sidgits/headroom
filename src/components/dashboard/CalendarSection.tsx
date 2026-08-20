@@ -24,7 +24,6 @@ export default function CalendarSection({ email }: { email: string }) {
   const [clt, setClt] = useState<CltDay[]>([]);
   const [stripOffset, setStripOffset] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
-  const [icsUrl, setIcsUrl] = useState("");
   const [syncError, setSyncError] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
