@@ -107,26 +107,6 @@ export default function CalendarSection({ email }: { email: string }) {
   };
 
 
-  const submitIcs = async () => {
-    if (!icsUrl) { toast.error("Paste an .ics URL or upload a file."); return; }
-    setBusy("ics");
-    setSyncError(null);
-    setImportMessage("Importing calendar…");
-    try {
-      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: withReview({ email, icsUrl }) });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setIcsUrl("");
-      await runSync();
-      setImportMessage("Calendar imported.");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "ICS import failed.";
-      setImportMessage(null);
-      setSyncError(message);
-      toast.error(message);
-    }
-    finally { setBusy(null); }
-  };
 
   const uploadIcsFile = async (file: File) => {
     setBusy("ics");
