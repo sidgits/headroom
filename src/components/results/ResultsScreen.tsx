@@ -261,100 +261,57 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
           )}
         </motion.div>
 
-        {/* LAYER 3 — DIMENSION BARS (digital lexicon) — blurred behind upgrade gate */}
-        <div className="relative">
-          <motion.div
-            className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-5 blur-md pointer-events-none select-none"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            aria-hidden="true"
-          >
-            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Your Headroom Dimensions
-            </h3>
-            {dimensionScores.map((dim, i) => {
-              const pct = (dim.score / dim.maxScore) * 100;
-              return (
-                <div key={dim.name} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium text-foreground">{dim.name} ({dim.code})</span>
-                    <span className="text-muted-foreground">
-                      {dim.score}/{dim.maxScore}
-                    </span>
-                  </div>
-                  <p className="text-xs italic text-muted-foreground -mt-1">
-                    {dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : dim.code === "A" ? "AI Cognitive Load" : "Growth Cognitive Load"}
-                  </p>
-                  <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ delay: 0.7 + i * 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">{dim.plainLanguage}</p>
-                  <p className="text-sm text-foreground/80">{dim.interpretation}</p>
+        {/* LAYER 3 — DIMENSION BARS */}
+        <motion.div
+          className="bg-card/50 border border-border/50 rounded-2xl p-6 space-y-5"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+            Your Headroom Dimensions
+          </h3>
+          {dimensionScores.map((dim, i) => {
+            const pct = (dim.score / dim.maxScore) * 100;
+            return (
+              <div key={dim.name} className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium text-foreground">{dim.name} ({dim.code})</span>
+                  <span className="text-muted-foreground">
+                    {dim.score}/{dim.maxScore}
+                  </span>
                 </div>
-              );
-            })}
-          </motion.div>
-
-          {/* Upgrade CTA overlay */}
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center p-2"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.4 }}
-          >
-            <div className="w-full max-w-md rounded-2xl border border-primary/25 bg-card/95 backdrop-blur-xl shadow-xl p-5 sm:p-6 space-y-4">
-              <div className="text-center space-y-1">
-                <span className="inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-warm-red/10 text-warm-red border border-warm-red/20">
-                  Locked
-                </span>
-                <h3 className="text-lg font-bold text-foreground">Unlock your full Headroom Profile</h3>
-                <p className="text-xs text-muted-foreground">
-                  You've seen the pattern. The dashboard shows you the numbers — and what to do next.
+                <p className="text-xs italic text-muted-foreground -mt-1">
+                  {dim.code === "E" ? "Toxic Cognitive Load" : dim.code === "I" ? "Core Cognitive Load" : dim.code === "A" ? "AI Cognitive Load" : "Growth Cognitive Load"}
                 </p>
+                <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ delay: 0.7 + i * 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">{dim.plainLanguage}</p>
+                <p className="text-sm text-foreground/80">{dim.interpretation}</p>
               </div>
-
-              <ul className="space-y-2.5">
-                {[
-                  { t: "Your four load scores", d: "Toxic, Core, Growth and AI Load — measured, not guessed." },
-                  { t: "Calendar load analysis", d: "Upload your calendar and see which days will break you." },
-                  { t: "Tracking over time", d: "Check in daily and watch your pattern shift." },
-                  { t: "Your AI burnout coach", d: "Grounded in your actual scores, available anytime." },
-                ].map((b) => (
-                  <li key={b.t} className="flex gap-2.5 items-start">
-                    <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <span className="text-xs leading-relaxed">
-                      <span className="font-semibold text-foreground">{b.t}</span>
-                      <span className="text-muted-foreground"> — {b.d}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => { window.location.href = "/dashboard"; }}
-                className="w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg hover:opacity-90 transition"
-              >
-                Click here for Calendar Insights &amp; Access personalized AI coach
-              </button>
-              <p className="text-[11px] text-center text-muted-foreground">
-                Free for a limited time.
-              </p>
-            </div>
-          </motion.div>
-        </div>
+            );
+          })}
+        </motion.div>
 
       </div>
 
-      <UpgradeModal open={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      {/* FULL DASHBOARD — calendar analysis + Heady */}
+      {email && (
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pb-16 space-y-8">
+          <CalendarSection email={email} />
+          <CoachSection email={email} firstName={firstName} />
+        </div>
+      )}
     </div>
   );
 };
+
 
 
 export default ResultsScreen;
