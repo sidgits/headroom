@@ -286,13 +286,10 @@ export default function CalendarSection({ email }: { email: string }) {
             <div className="rounded-xl border border-border bg-background/40 p-4 space-y-3">
               <p className="text-sm text-muted-foreground italic">No events found for today or the week ahead.</p>
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">Wrong calendar? Switch to an ICS link:</p>
+                <p className="text-xs text-muted-foreground">Wrong calendar? Upload a different .ics file:</p>
                 <div className="flex flex-wrap gap-2">
-                  <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
-                    className="flex-1 min-w-[200px] text-xs px-2 py-1.5 rounded-lg border border-border bg-background" />
-                  <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
                   <button onClick={() => fileRef.current?.click()} disabled={!!busy}
-                    className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border">
+                    className="text-xs inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">
                     {busy === "ics" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />} Upload .ics
                   </button>
                   <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
