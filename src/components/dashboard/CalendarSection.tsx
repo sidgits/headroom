@@ -246,7 +246,7 @@ export default function CalendarSection({ email }: { email: string }) {
               <div className="space-y-1">
                 <p className="font-semibold text-foreground">We couldn't pull your events</p>
                 <p className="text-muted-foreground">{syncError}</p>
-                <p className="text-muted-foreground">You can disconnect above and switch to an ICS link instead.</p>
+                <p className="text-muted-foreground">You can disconnect above and upload a different .ics file.</p>
               </div>
             </div>
           )}
