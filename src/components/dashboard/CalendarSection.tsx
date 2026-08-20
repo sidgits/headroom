@@ -24,7 +24,6 @@ export default function CalendarSection({ email }: { email: string }) {
   const [clt, setClt] = useState<CltDay[]>([]);
   const [stripOffset, setStripOffset] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
-  const [icsUrl, setIcsUrl] = useState("");
   const [syncError, setSyncError] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -108,26 +107,6 @@ export default function CalendarSection({ email }: { email: string }) {
   };
 
 
-  const submitIcs = async () => {
-    if (!icsUrl) { toast.error("Paste an .ics URL or upload a file."); return; }
-    setBusy("ics");
-    setSyncError(null);
-    setImportMessage("Importing calendar…");
-    try {
-      const { data, error } = await supabase.functions.invoke("ingest-ics", { body: withReview({ email, icsUrl }) });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setIcsUrl("");
-      await runSync();
-      setImportMessage("Calendar imported.");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "ICS import failed.";
-      setImportMessage(null);
-      setSyncError(message);
-      toast.error(message);
-    }
-    finally { setBusy(null); }
-  };
 
   const uploadIcsFile = async (file: File) => {
     setBusy("ics");
@@ -207,28 +186,27 @@ export default function CalendarSection({ email }: { email: string }) {
             <Calendar className="w-5 h-5 text-primary mt-0.5" />
             <div>
               <h3 className="font-semibold">Connect your calendar</h3>
-              <p className="text-xs text-muted-foreground">Upload an .ics file or paste a calendar URL.</p>
+              <p className="text-xs text-muted-foreground">Upload an .ics export of your calendar to score your real schedule.</p>
             </div>
           </div>
           <div className="space-y-3">
             <div className="rounded-xl border border-border bg-background p-3 space-y-2">
-              <div className="font-semibold text-sm">ICS file or URL</div>
-              <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
-                className="w-full text-xs px-2 py-1.5 rounded-lg border border-border bg-background" />
-              <div className="flex gap-2">
-                <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
-                <button onClick={() => fileRef.current?.click()} disabled={!!busy}
-                  className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border">
-                  {busy === "ics" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />} Upload .ics
-                </button>
-                <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
-                  onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
-              </div>
+              <div className="font-semibold text-sm">ICS file</div>
+              <button onClick={() => fileRef.current?.click()} disabled={!!busy}
+                className="w-full text-xs inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
+                {busy === "ics" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />} Upload .ics file
+              </button>
+              <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
+                onChange={(e) => e.target.files?.[0] && uploadIcsFile(e.target.files[0])} />
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Export your calendar as <span className="font-medium">.ics</span> from Google, Outlook, or Apple Calendar and upload it here.
+                Longitudinal analysis across visits isn't available for ICS uploads yet.
+              </p>
             </div>
             <div className="rounded-xl border border-primary/30 bg-background p-3 space-y-2">
               <div className="font-semibold text-sm">Google Calendar</div>
               <p className="text-xs text-muted-foreground">
-                Connect your Google Calendar (read-only) to score your real schedule.
+                Connect your Google Calendar (read-only) to score your real schedule and track load over time.
               </p>
               <button onClick={connectGoogle} disabled={!!busy}
                 className="text-xs inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold disabled:opacity-60">
@@ -268,7 +246,7 @@ export default function CalendarSection({ email }: { email: string }) {
               <div className="space-y-1">
                 <p className="font-semibold text-foreground">We couldn't pull your events</p>
                 <p className="text-muted-foreground">{syncError}</p>
-                <p className="text-muted-foreground">You can disconnect above and switch to an ICS link instead.</p>
+                <p className="text-muted-foreground">You can disconnect above and upload a different .ics file.</p>
               </div>
             </div>
           )}
@@ -308,13 +286,10 @@ export default function CalendarSection({ email }: { email: string }) {
             <div className="rounded-xl border border-border bg-background/40 p-4 space-y-3">
               <p className="text-sm text-muted-foreground italic">No events found for today or the week ahead.</p>
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">Wrong calendar? Switch to an ICS link:</p>
+                <p className="text-xs text-muted-foreground">Wrong calendar? Upload a different .ics file:</p>
                 <div className="flex flex-wrap gap-2">
-                  <input type="url" placeholder="https://…/calendar.ics" value={icsUrl} onChange={(e) => setIcsUrl(e.target.value)}
-                    className="flex-1 min-w-[200px] text-xs px-2 py-1.5 rounded-lg border border-border bg-background" />
-                  <button onClick={submitIcs} disabled={!!busy} className="text-xs px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">Use URL</button>
                   <button onClick={() => fileRef.current?.click()} disabled={!!busy}
-                    className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border">
+                    className="text-xs inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold">
                     {busy === "ics" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />} Upload .ics
                   </button>
                   <input ref={fileRef} type="file" accept=".ics,text/calendar" className="hidden"
