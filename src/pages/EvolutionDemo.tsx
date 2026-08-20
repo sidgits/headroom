@@ -585,7 +585,7 @@ export default function EvolutionDemo() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.45 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+            className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50"
           >
             <button
               onClick={start}
