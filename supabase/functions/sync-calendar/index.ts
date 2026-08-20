@@ -153,12 +153,15 @@ async function syncGoogle(sb: ReturnType<typeof serviceClient>, conn: Record<str
 async function refreshAccess(sb: ReturnType<typeof serviceClient>, conn: Record<string, unknown>): Promise<string | null> {
   const refresh = conn.google_refresh_token as string | null;
   if (!refresh) return null;
+  const clientId = (Deno.env.get("GOOGLE_CLIENT_ID") ?? "").trim();
+  const clientSecret = (Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") ?? Deno.env.get("GOOGLE_CLIENT_SECRET") ?? "").trim();
+  console.log("refreshAccess client_id_prefix=", clientId.split("-")[0], "id_len=", clientId.length, "secret_len=", clientSecret.length);
   const r = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: Deno.env.get("GOOGLE_CLIENT_ID")!,
-      client_secret: (Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") ?? Deno.env.get("GOOGLE_CLIENT_SECRET"))!,
+      client_id: clientId,
+      client_secret: clientSecret,
       refresh_token: refresh,
       grant_type: "refresh_token",
     }),
