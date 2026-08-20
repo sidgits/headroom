@@ -122,7 +122,7 @@ export default function CoachPage() {
           <div ref={endRef} />
         </div>
 
-        <div className="pt-3 border-t border-border">
+        <div className="pt-3 pb-12 border-t border-border">
           <div className="flex items-end gap-2">
             <textarea
               ref={taRef} value={input} onChange={(e) => setInput(e.target.value)}
