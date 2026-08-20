@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import type { ScoringResult } from "@/lib/scoring";
 import { supabase } from "@/integrations/supabase/client";
-import UpgradeModal from "./UpgradeModal";
+import CalendarSection from "@/components/dashboard/CalendarSection";
+import CoachSection from "@/components/dashboard/CoachSection";
 
 
 interface ResultsScreenProps {
@@ -14,12 +14,14 @@ interface ResultsScreenProps {
   onRetake: () => void;
 }
 
-const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenProps) => {
+const ResultsScreen = ({ result, role, email, name }: ResultsScreenProps) => {
   const { archetype, dimensionScores, mirror, burnoutRisk, shadowArchetype, recommendations } = result;
 
   const logged = useRef(false);
   const archetypeRef = useRef<HTMLDivElement>(null);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const firstName = (name ?? "").trim().split(" ")[0] || "there";
+
+
 
 
   useEffect(() => {
