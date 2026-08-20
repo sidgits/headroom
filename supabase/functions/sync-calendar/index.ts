@@ -158,7 +158,7 @@ async function refreshAccess(sb: ReturnType<typeof serviceClient>, conn: Record<
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       client_id: Deno.env.get("GOOGLE_CLIENT_ID")!,
-      client_secret: Deno.env.get("GOOGLE_CLIENT_SECRET")!,
+      client_secret: (Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") ?? Deno.env.get("GOOGLE_CLIENT_SECRET"))!,
       refresh_token: refresh,
       grant_type: "refresh_token",
     }),

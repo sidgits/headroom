@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
 
   try {
     const clientId = (Deno.env.get("GOOGLE_CLIENT_ID") ?? "").trim();
-    const clientSecret = (Deno.env.get("GOOGLE_CLIENT_SECRET") ?? "").trim();
+    const clientSecret = (Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") ?? Deno.env.get("GOOGLE_CLIENT_SECRET") ?? "").trim();
     const redirectUri = `${Deno.env.get("SUPABASE_URL")}/functions/v1/google-oauth-callback`;
 
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
