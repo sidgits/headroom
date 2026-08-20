@@ -277,10 +277,11 @@ async function syncIcs(sb: ReturnType<typeof serviceClient>, conn: Record<string
   const ends = parsed.map((e) => e.end.getTime()).filter((n) => Number.isFinite(n));
   const now = Date.now();
   const from = new Date(starts.length ? Math.min(...starts) : now);
-  // Open-ended recurrences have no natural end, so expand them a year out.
-  const hasOpenRecurrence = parsed.some((e) => e.rrule && !/UNTIL=|COUNT=/i.test(e.rrule));
+  // Recurring events (UNTIL/COUNT or open-ended) run past the last DTEND in the
+  // file, so widen the expansion window whenever any recurrence rule exists.
+  const hasRecurrence = parsed.some((e) => !!e.rrule);
   const lastEnd = ends.length ? Math.max(...ends) : now;
-  const max = new Date(hasOpenRecurrence ? Math.max(lastEnd, now + 365 * 24 * 3600 * 1000) : lastEnd);
+  const max = new Date(hasRecurrence ? Math.max(lastEnd, now + 365 * 24 * 3600 * 1000) : lastEnd);
   const occurrences = expandOccurrences(parsed, from, max);
 
   const seen = new Set<string>();
