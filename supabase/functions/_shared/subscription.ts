@@ -1,6 +1,9 @@
 // Shared helper: verify an email belongs to an active subscriber.
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
+/** TEMPORARY: set to false to re-enable the subscription paywall. */
+const PAYWALL_DISABLED = true;
+
 export function serviceClient(): SupabaseClient {
   return createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -52,6 +55,8 @@ export async function hasPaidAccess(
   email: string,
   reviewCode?: unknown,
 ): Promise<boolean> {
+  // TEMPORARY: paywall disabled — all visitors get calendar insights + coach.
+  if (PAYWALL_DISABLED) return true;
   if (isReviewAccess(reviewCode)) return true;
   return await isActiveSubscriber(supabase, email);
 }

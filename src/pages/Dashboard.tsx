@@ -60,7 +60,8 @@ const Dashboard = () => {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
   const [recoveringIdentity, setRecoveringIdentity] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(isReviewMode());
+  // Paywall temporarily removed — everyone gets calendar insights + Heady.
+  const [isSubscribed, setIsSubscribed] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const isIndia = (() => {
     try {

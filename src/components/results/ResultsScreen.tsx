@@ -337,13 +337,13 @@ const ResultsScreen = ({ result, role, email, name, onRetake }: ResultsScreenPro
               </ul>
 
               <button
-                onClick={() => setShowUpgradeModal(true)}
+                onClick={() => { window.location.href = "/dashboard"; }}
                 className="w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-primary via-accent to-warm-red text-primary-foreground font-semibold text-sm sm:text-base shadow-lg hover:opacity-90 transition"
               >
-                Track real-time schedule for $9/month
+                Click here for Calendar Insights &amp; Access personalized AI coach
               </button>
               <p className="text-[11px] text-center text-muted-foreground">
-                $9/month · Cancel anytime.
+                Free for a limited time.
               </p>
             </div>
           </motion.div>
